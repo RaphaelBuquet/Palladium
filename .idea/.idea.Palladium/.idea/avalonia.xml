@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AvaloniaProject">
+    <option name="projectPerEditor">
+      <map>
+        <entry key="Palladium/App.axaml" value="Palladium/Palladium.csproj" />
+        <entry key="Palladium/Views/ActionTile.axaml" value="Palladium/Palladium.csproj" />
+        <entry key="Palladium/Views/MainWindow.axaml" value="Palladium/Palladium.csproj" />
+      </map>
+    </option>
+  </component>
+</project>

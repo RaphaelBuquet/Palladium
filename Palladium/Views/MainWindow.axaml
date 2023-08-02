@@ -1,0 +1,52 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Palladium.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:views="clr-namespace:Palladium.Views"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="Palladium.Views.MainWindow"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="Palladium">
+    
+    <DockPanel>
+        <!-- 'Status Bar' at the top -->
+        <Border Background="LightGray" DockPanel.Dock="Top">
+            <StackPanel Orientation="Horizontal">
+                <TextBox Width="200" Watermark="Search..." /> <!-- Search bar -->
+                <Button Content="Settings"/> <!-- Settings button -->
+                <Button Content="Logs"/> <!-- Logs button -->
+            </StackPanel>
+        </Border>
+
+        <!-- Log view in the center -->
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+
+            <!-- Grid of buttons for commonly used actions at the top -->
+            <StackPanel Grid.Row="0" Orientation="Vertical">
+                <views:ActionTile>
+                    <views:ActionTile.DataContext>
+                        <vm:ActionViewModel Icon="A" Title="Hello world"></vm:ActionViewModel>
+                    </views:ActionTile.DataContext>
+                </views:ActionTile>
+                <Button Content="Action 1" />
+                <Button Content="Action 2" />
+                <Button Content="Action 3" />
+                <!-- More buttons can be added here -->
+            </StackPanel>
+
+            <!-- List of actions beneath the button grid -->
+            <ListBox Grid.Row="1">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
+    </DockPanel>
+</Window>

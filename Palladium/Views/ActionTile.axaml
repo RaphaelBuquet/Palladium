@@ -1,0 +1,36 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:Palladium.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Palladium.Views.ActionTile"
+             x:DataType="viewModels:ActionViewModel">
+    
+    <Design.DataContext>
+        <viewModels:ActionViewModel Icon="X" Title="Example Title" Description="Example description"/>
+    </Design.DataContext>
+    
+    <Border BorderThickness="2" BorderBrush="Black" Padding="20">
+        <Grid Background="LightGray" >
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+                    
+            <!-- #1 Icon -->
+            <Image Grid.Column="0" Width="50" Height="50" Source="{Binding Icon}" />
+                    
+            <!-- #2 Texts -->
+            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                <TextBlock FontWeight="Bold" Text="{Binding Title}" />
+                <TextBlock Opacity="0.6" Text="{Binding Description}" />
+            </StackPanel>
+                    
+            <!-- #3 Button -->
+            <Button Grid.Column="2"  Command="{Binding RunActionCommand}" />
+            <!-- Content="{StaticResource TODO_RUN_BUTTON}" -->
+        </Grid>
+    </Border>
+</UserControl>
