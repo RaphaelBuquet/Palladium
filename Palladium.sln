@@ -14,8 +14,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mvvm.Core", "LogViewerContr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Controls", "Palladium.Controls\Palladium.Controls.csproj", "{0A87A157-DFF6-4F44-BE34-A7CCFE74CE45}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Theme", "Palladium.Theme\Palladium.Theme.csproj", "{AD6B1143-3BAA-453C-BBF5-812442C70E54}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -50,9 +48,5 @@ Global
 		{0A87A157-DFF6-4F44-BE34-A7CCFE74CE45}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0A87A157-DFF6-4F44-BE34-A7CCFE74CE45}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0A87A157-DFF6-4F44-BE34-A7CCFE74CE45}.Release|Any CPU.Build.0 = Release|Any CPU
-		{AD6B1143-3BAA-453C-BBF5-812442C70E54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{AD6B1143-3BAA-453C-BBF5-812442C70E54}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{AD6B1143-3BAA-453C-BBF5-812442C70E54}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{AD6B1143-3BAA-453C-BBF5-812442C70E54}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

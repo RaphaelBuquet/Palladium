@@ -1,0 +1,11 @@
+﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Color x:Key="Tone1">#FF4D5272</Color>
+    <Color x:Key="Tone1-75">#BF4D5272</Color>
+    <Color x:Key="Tone1-50">#804D5272</Color>
+    <Color x:Key="Tone1-25">#404D5272</Color>
+    <Color x:Key="Tone2">#FFE6E6E9</Color>
+    <Color x:Key="Tone2-75">#BFE6E6E9</Color>
+    <Color x:Key="Tone2-50">#80E6E6E9</Color>
+    <Color x:Key="Tone2-25">#40E6E6E9</Color>
+</ResourceDictionary>

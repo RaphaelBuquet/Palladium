@@ -25,4 +25,8 @@
         <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.2" />
         <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.2" />
     </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Palladium.Controls\Palladium.Controls.csproj" />
+    </ItemGroup>
 </Project>

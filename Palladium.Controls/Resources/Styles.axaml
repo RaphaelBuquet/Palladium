@@ -1,0 +1,21 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:Palladium.Controls">
+    <StyleInclude Source="avares://Palladium.Controls/IconButton.axaml"/>
+    
+    <!-- This file loads all of the styles of Palladium.Controls, and applies additional styling (such as global font family). -->
+    
+    
+    <Styles.Resources>
+        <FontFamily x:Key="InterFont">avares://Palladium.Controls/Resources/Fonts#Inter</FontFamily>
+    </Styles.Resources>
+    <Design.PreviewWith>
+        <Border Padding="20">
+            <controls:IconButton IconData="{StaticResource SettingsIcon}" Text="Settings" />
+        </Border>
+    </Design.PreviewWith>
+    
+    <Style Selector="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource InterFont}" />
+    </Style>
+</Styles>
