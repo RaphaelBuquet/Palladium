@@ -3,10 +3,12 @@
   <component name="AvaloniaProject">
     <option name="projectPerEditor">
       <map>
+        <entry key="Palladium.Controls/HeadedSection.axaml" value="Palladium/Palladium.csproj" />
         <entry key="Palladium.Controls/Icon.axaml" value="Palladium/Palladium.csproj" />
         <entry key="Palladium.Controls/IconButton.axaml" value="Palladium/Palladium.csproj" />
         <entry key="Palladium.Controls/ImageButton.axaml" value="Palladium/Palladium.csproj" />
         <entry key="Palladium.Controls/Resources/Colours.axaml" value="Palladium/Palladium.csproj" />
+        <entry key="Palladium.Controls/Resources/Fonts.axaml" value="Palladium/Palladium.csproj" />
         <entry key="Palladium.Controls/Resources/Icons.axaml" value="Palladium/Palladium.csproj" />
         <entry key="Palladium.Controls/Resources/Styles.axaml" value="Palladium/Palladium.csproj" />
         <entry key="Palladium.Controls/SearchBar.axaml" value="Palladium/Palladium.csproj" />

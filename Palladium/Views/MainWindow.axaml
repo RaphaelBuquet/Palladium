@@ -9,8 +9,8 @@
         Title="Palladium">
 
     <StackPanel Orientation="Vertical">
-        <Border Classes="Header" 
-                BorderThickness="0 0 0 1" 
+        <Border Classes="Header"
+                BorderThickness="0 0 0 1"
                 BorderBrush="{StaticResource Tone2}"
                 Padding="12 6">
             <Grid>
@@ -20,20 +20,23 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <controls:SearchBar Grid.Column="1" Width="200" Watermark="Search..."/>
+                <controls:SearchBar Grid.Column="1" Width="200" Watermark="Search..." />
                 <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="4">
                     <controls:IconButton Text="Settings" IconData="{StaticResource SettingsIcon}" />
-                    <controls:IconButton Text="Logs" IconData="{StaticResource InfoIcon}"/>
+                    <controls:IconButton Text="Logs" IconData="{StaticResource InfoIcon}" />
                 </StackPanel>
             </Grid>
         </Border>
-        <!-- TODO: TabControl -->
+        <!-- TODO: TabControl for multiple tabs -->
         <ScrollViewer Classes="MainContent">
-            <StackPanel Orientation="Vertical">
-
-                <TextBlock>Hello world</TextBlock>
-                <controls:IconButton IconData="{StaticResource SettingsIcon}" Text="Settings" />
+            <StackPanel Orientation="Vertical" Margin="14 40" Spacing="28">
+                <controls:HeadedSection>
+                    <StackPanel Orientation="Vertical">
+                        <TextBlock>Example action</TextBlock>
+                    </StackPanel>
+                </controls:HeadedSection>
             </StackPanel>
+
         </ScrollViewer>
     </StackPanel>
 </Window>

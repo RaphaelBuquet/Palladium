@@ -1,0 +1,14 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Styles.Resources>
+        <FontFamily x:Key="InterFont">avares://Palladium.Controls/Resources/Fonts#Inter</FontFamily>
+    </Styles.Resources>
+    <Style Selector="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource InterFont}" />
+    </Style>
+    <Style Selector="TextBox">
+        <Setter Property="FontFamily" Value="{StaticResource InterFont}" />
+    </Style>
+    
+</Styles>

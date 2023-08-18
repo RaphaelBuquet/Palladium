@@ -12,7 +12,8 @@
                 <Border>
                     <Grid ColumnDefinitions="Auto,*">
                         <PathIcon Data="{StaticResource SearchIcon}" Grid.Column="0" />
-                        <TextBox Grid.Column="1" AcceptsReturn="False" Watermark="{TemplateBinding Watermark}" Text="{TemplateBinding Text}" />
+                        <TextBox Grid.Column="1" AcceptsReturn="False" Watermark="{TemplateBinding Watermark}"
+                                 Text="{TemplateBinding Text}" />
                     </Grid>
                 </Border>
             </ControlTemplate>
@@ -29,6 +30,7 @@
             <Setter Property="Padding" Value="3" /> <!--Using 3 because border thickness is 1, so it totals 4-->
             <Setter Property="Height" Value="24" />
         </Style>
+
         <Style Selector="^ /template/ PathIcon">
             <Setter Property="Foreground" Value="{StaticResource Tone1}" />
             <Setter Property="Height" Value="16" />
@@ -36,28 +38,36 @@
             <Setter Property="VerticalAlignment" Value="Top" /> <!-- Fix icon being positioned incorrectly low -->
         </Style>
         <Style Selector="^ /template/ TextBox">
-            <Setter Property="Margin" Value="4 0 0 0"/> <!--Grid columns have no gap between them, manually adding 4px here.-->
-            <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Padding" Value="0"/>
-            <Setter Property="Foreground" Value="{StaticResource Tone1}"/>
+            <!--Grid columns have no gap between them, manually adding 4px here.-->
+            <Setter Property="Margin" Value="4 0 0 0" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Foreground" Value="{StaticResource Tone1}" />
             <Setter Property="FontSize" Value="12" />
+            <Setter Property="SelectionBrush" Value="{StaticResource Tone2-75}" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
             <Style Selector="^ /template/ Border#PART_BorderElement">
                 <Setter Property="IsVisible" Value="False" />
             </Style>
         </Style>
-        <!-- <Style Selector="^ /template/ TextBox:focus"> -->
-        <!--     <Setter Property="BorderThickness" Value="0"/> -->
-        <!--     <Setter Property="Background" Value="Transparent"/> -->
-        <!-- </Style> -->
-        <!-- <Style Selector="^ /template/ TextBox:pointerover"> -->
-        <!--     <Setter Property="BorderThickness" Value="0"/> -->
-        <!--     <Setter Property="Background" Value="Transparent"/> -->
-        <!--     ~1~ <Style Selector="^ /template/ Border#PART_BorderElement"> @1@ -->
-        <!--     ~1~     <Setter Property="BorderThickness" Value="0"/> @1@ -->
-        <!--     ~1~     <Setter Property="Background" Value="Transparent" /> @1@ -->
-        <!--     ~1~ </Style> @1@ -->
-        <!-- </Style> -->
+        <Style Selector="^:pointerover">
+            <Style Selector="^ /template/ Border">
+                <Setter Property="Background" Value="{StaticResource Tone2-50}" />
+            </Style>
+            <!-- Prevent TextBox styles from overriding font brush by applying it again  -->
+            <Style Selector="^ /template/ TextBox">
+                <Setter Property="Foreground" Value="{StaticResource Tone1}" />
+            </Style>
+        </Style>
+        <Style Selector="^:focus-within">
+            <Style Selector="^ /template/ Border">
+                <Setter Property="Background" Value="Transparent" />
+            </Style>
+            <!-- Prevent TextBox styles from overriding font brush by applying it again  -->
+            <Style Selector="^ /template/ TextBox">
+                <Setter Property="Foreground" Value="{StaticResource Tone1}" />
+            </Style>
+        </Style>
     </Style>
 
 </Styles>

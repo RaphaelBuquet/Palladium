@@ -1,0 +1,31 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:Palladium.Controls">
+    <Design.PreviewWith>
+        <controls:HeadedSection Margin="20">
+            <StackPanel Orientation="Vertical">
+                <TextBlock>Hello World</TextBlock>
+            </StackPanel>
+        </controls:HeadedSection>
+    </Design.PreviewWith>
+
+    <Style Selector="controls|HeadedSection">
+        <!-- Set Defaults -->
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border 
+                     
+                    BorderThickness="1 0 0 0" 
+                    BorderBrush="{StaticResource Tone2}" >
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal" Margin="10 4 10 14" Spacing="4">
+                            <PathIcon Data="{StaticResource FastForwardIcon}" Foreground="{StaticResource Tone1}"/>
+                            <TextBlock Foreground="{StaticResource Tone1}" VerticalAlignment="Center">Actions</TextBlock>
+                        </StackPanel>
+                        <Border Margin="14 0  14 14" Child="{TemplateBinding Child}" />
+                    </StackPanel>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+</Styles>
