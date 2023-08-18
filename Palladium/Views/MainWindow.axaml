@@ -5,7 +5,7 @@
         xmlns:controls="clr-namespace:Palladium.Controls;assembly=Palladium.Controls"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Palladium.Views.MainWindow"
-        Icon="/Assets/avalonia-logo.ico"
+        Icon="/Assets/v3_256x256.png"
         Title="Palladium">
 
     <StackPanel Orientation="Vertical">
