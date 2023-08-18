@@ -22,8 +22,8 @@
 
                 <controls:SearchBar Grid.Column="1" Width="200" Watermark="Search..." />
                 <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="4">
-                    <controls:IconButton Text="Settings" IconData="{StaticResource SettingsIcon}" />
-                    <controls:IconButton Text="Logs" IconData="{StaticResource InfoIcon}" />
+                    <controls:IconButton Content="Settings" IconData="{StaticResource SettingsIcon}" />
+                    <controls:IconButton Content="Logs" IconData="{StaticResource InfoIcon}" />
                 </StackPanel>
             </Grid>
         </Border>
@@ -33,6 +33,10 @@
                 <controls:HeadedSection>
                     <StackPanel Orientation="Vertical">
                         <TextBlock>Example action</TextBlock>
+                        <StackPanel Orientation="Vertical">
+                            <controls:IconButton Content="Settings" IconData="{StaticResource SettingsIcon}" />
+                            <controls:IconButton Content="Logs" IconData="{StaticResource InfoIcon}" />
+                        </StackPanel>
                     </StackPanel>
                 </controls:HeadedSection>
             </StackPanel>

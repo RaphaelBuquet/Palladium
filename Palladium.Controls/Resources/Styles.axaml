@@ -13,7 +13,7 @@
     <!-- Preview -->
     <Design.PreviewWith>
         <Border Padding="20">
-            <controls:IconButton IconData="{StaticResource SettingsIcon}" Text="Settings" />
+            <controls:IconButton IconData="{StaticResource SettingsIcon}" Content="Settings" />
         </Border>
     </Design.PreviewWith>
 </Styles>
