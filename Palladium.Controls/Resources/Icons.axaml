@@ -12,12 +12,17 @@
         <PathGeometry>F1 M32,32z M0,0z M16,2C8.2799,2 2,8.2799 2,16 2,23.7201 8.2799,30 16,30 23.7201,30 30,23.7201 30,16 30,8.2799 23.7201,2 16,2z M16,4C22.6393,4 28,9.3607 28,16 28,22.6393 22.6393,28 16,28 9.3607,28 4,22.6393 4,16 4,9.3607 9.3607,4 16,4z</PathGeometry>
     </GeometryGroup>
     
+    <GeometryGroup x:Key="SearchIcon">
+        <PathGeometry>F1 M32,32z M0,0z M13,3C7.489,3 3,7.489 3,13 3,18.511 7.489,23 13,23 15.3965,23 17.5974,22.14899 19.3223,20.7363L27.293,28.707A1.0001,1.0001,0,1,0,28.7071,27.2929L20.7364,19.3222C22.1491,17.5973 23.0001,15.3964 23.0001,12.9999 23.0001,7.4889 18.5111,2.9999 13.0001,2.9999z M13,5C17.4301,5 21,8.5699 21,13 21,17.4301 17.4301,21 13,21 8.5699,21 5,17.4301 5,13 5,8.5699 8.5699,5 13,5z</PathGeometry>
+    </GeometryGroup>
+    
     <Design.PreviewWith>
         <Border Padding="2">
             <StackPanel Orientation="Vertical">
                 <TextBlock>Begin</TextBlock>
                 <PathIcon Width="24" Height="24" Foreground="SandyBrown" Data="{StaticResource SettingsIcon}" />
                 <PathIcon Width="24" Height="24" Foreground="SandyBrown" Data="{StaticResource InfoIcon}" />
+                <PathIcon Width="24" Height="24" Foreground="SandyBrown" Data="{StaticResource SearchIcon}" />
                 <TextBlock>End</TextBlock>
             </StackPanel>
         </Border>

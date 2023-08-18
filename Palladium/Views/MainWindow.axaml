@@ -20,7 +20,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <TextBox Grid.Column="1" Width="200" Watermark="Search..." /> <!-- Search bar -->
+                <controls:SearchBar Grid.Column="1" Width="200"/>
                 <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="4">
                     <controls:IconButton Text="Settings" IconData="{StaticResource SettingsIcon}" />
                     <controls:IconButton Text="Logs" IconData="{StaticResource InfoIcon}"/>

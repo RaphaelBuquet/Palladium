@@ -1,0 +1,63 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:Palladium.Controls">
+    <Design.PreviewWith>
+        <controls:SearchBar Width="200" Watermark="Placeholder"/>
+    </Design.PreviewWith>
+
+    <!-- Template -->
+    <Style Selector="controls|SearchBar">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border>
+                    <Grid ColumnDefinitions="Auto,*">
+                        <PathIcon Data="{StaticResource SearchIcon}" Grid.Column="0" />
+                        <TextBox Grid.Column="1" AcceptsReturn="False" Watermark="{TemplateBinding Watermark}" />
+                    </Grid>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+
+    <!-- Default Style -->
+    <Style Selector="controls|SearchBar">
+        <Style Selector="^ /template/ Border">
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="{StaticResource Tone1}" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="CornerRadius" Value="2" />
+            <Setter Property="Padding" Value="3" /> <!--Using 3 because border thickness is 1, so it totals 4-->
+            <Setter Property="Height" Value="24" />
+        </Style>
+        <Style Selector="^ /template/ PathIcon">
+            <Setter Property="Foreground" Value="{StaticResource Tone1}" />
+            <Setter Property="Height" Value="16" />
+            <Setter Property="Width" Value="16" />
+        </Style>
+        <Style Selector="^ /template/ TextBox">
+            <Setter Property="Margin" Value="0 0 0 20"/>
+            <Setter Property="Foreground" Value="{StaticResource Tone1}"/>
+            <!-- <Setter Property="BorderThickness" Value="0"/> -->
+            <!-- <Setter Property="Background" Value="Transparent"/> -->
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+            <Style Selector="^ /template/ Border#PART_BorderElement">
+                <Setter Property="IsVisible" Value="False" />
+            </Style>
+        </Style>
+        <!-- <Style Selector="^ /template/ TextBox:focus"> -->
+        <!--     <Setter Property="BorderThickness" Value="0"/> -->
+        <!--     <Setter Property="Background" Value="Transparent"/> -->
+        <!-- </Style> -->
+        <!-- <Style Selector="^ /template/ TextBox:pointerover"> -->
+        <!--     <Setter Property="BorderThickness" Value="0"/> -->
+        <!--     <Setter Property="Background" Value="Transparent"/> -->
+        <!--     ~1~ <Style Selector="^ /template/ Border#PART_BorderElement"> @1@ -->
+        <!--     ~1~     <Setter Property="BorderThickness" Value="0"/> @1@ -->
+        <!--     ~1~     <Setter Property="Background" Value="Transparent" /> @1@ -->
+        <!--     ~1~ </Style> @1@ -->
+        <!-- </Style> -->
+    </Style>
+
+</Styles>

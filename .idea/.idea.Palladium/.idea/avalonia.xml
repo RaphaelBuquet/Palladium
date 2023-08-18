@@ -9,6 +9,7 @@
         <entry key="Palladium.Controls/Resources/Colours.axaml" value="Palladium/Palladium.csproj" />
         <entry key="Palladium.Controls/Resources/Icons.axaml" value="Palladium/Palladium.csproj" />
         <entry key="Palladium.Controls/Resources/Styles.axaml" value="Palladium/Palladium.csproj" />
+        <entry key="Palladium.Controls/SearchBar.axaml" value="Palladium/Palladium.csproj" />
         <entry key="Palladium/App.axaml" value="Palladium/Palladium.csproj" />
         <entry key="Palladium/Views/ActionTile.axaml" value="Palladium/Palladium.csproj" />
         <entry key="Palladium/Views/MainWindow.axaml" value="Palladium/Palladium.csproj" />
