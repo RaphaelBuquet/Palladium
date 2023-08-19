@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AvaloniaProject">
+    <option name="projectPerEditor">
+      <map>
+        <entry key="CSharp/Applications/AvaloniaLoggingDI/Views/MainWindow.axaml" value="CSharp/Applications/AvaloniaLoggingDI/AvaloniaLoggingDI.csproj" />
+        <entry key="CSharp/Applications/AvaloniaLoggingNoDI/App.axaml" value="CSharp/Applications/AvaloniaLoggingNoDI/AvaloniaLoggingNoDI.csproj" />
+      </map>
+    </option>
+  </component>
+</project>

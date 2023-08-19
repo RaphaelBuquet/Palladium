@@ -3,10 +3,15 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:controls="clr-namespace:Palladium.Controls;assembly=Palladium.Controls"
+        xmlns:viewModels="clr-namespace:Palladium.ViewModels"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Palladium.Views.MainWindow"
-        Icon="/Assets/v3_256x256.png"
+        Icon="/Assets/v3.ico"
         Title="Palladium">
+
+    <Design.DataContext>
+        <viewModels:MainWindowViewModel />
+    </Design.DataContext>
 
     <StackPanel Orientation="Vertical">
         <Border Classes="Header"
@@ -22,8 +27,12 @@
 
                 <controls:SearchBar Grid.Column="1" Width="200" Watermark="Search..." />
                 <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="4">
-                    <controls:IconButton Content="Settings" IconData="{StaticResource SettingsIcon}" />
-                    <controls:IconButton Content="Logs" IconData="{StaticResource InfoIcon}" />
+                    <controls:IconButton Content="Settings"
+                                         IconData="{StaticResource SettingsIcon}"
+                                         Command="{Binding OpenSettingsCommand}" />
+                    <controls:IconButton Content="Logs"
+                                         IconData="{StaticResource InfoIcon}"
+                                         Command="{Binding OpenLogsCommand}" />
                 </StackPanel>
             </Grid>
         </Border>
