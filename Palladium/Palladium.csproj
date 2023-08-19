@@ -32,5 +32,6 @@
       <ProjectReference Include="..\LogViewerControl\CSharp\Controls\LogViewer.Avalonia\LogViewer.Avalonia.csproj" />
       <ProjectReference Include="..\LogViewerControl\CSharp\Core\MsLogger.Core\MsLogger.Core.csproj" />
       <ProjectReference Include="..\Palladium.Controls\Palladium.Controls.csproj" />
+      <ProjectReference Include="..\Palladium.Logging\Palladium.Logging.csproj" />
     </ItemGroup>
 </Project>
