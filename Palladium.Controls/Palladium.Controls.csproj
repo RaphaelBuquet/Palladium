@@ -8,35 +8,13 @@
 
     <ItemGroup>
         <PackageReference Include="Avalonia" Version="11.0.3" />
+        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.3" />
     </ItemGroup>
 
     <ItemGroup>
         <Compile Update="IconButton.axaml.cs">
             <DependentUpon>IconButton.axaml</DependentUpon>
         </Compile>
-    </ItemGroup>
-    <ItemGroup>
-        <Folder Include="Resources\Fonts\"/>
-    </ItemGroup>
-    <ItemGroup>
-      <None Remove="Resources\Fonts\Inter-Black.ttf" />
-      <AvaloniaResource Include="Resources\Fonts\Inter-Black.ttf" />
-      <None Remove="Resources\Fonts\Inter-Bold.ttf" />
-      <AvaloniaResource Include="Resources\Fonts\Inter-Bold.ttf" />
-      <None Remove="Resources\Fonts\Inter-ExtraBold.ttf" />
-      <AvaloniaResource Include="Resources\Fonts\Inter-ExtraBold.ttf" />
-      <None Remove="Resources\Fonts\Inter-ExtraLight.ttf" />
-      <AvaloniaResource Include="Resources\Fonts\Inter-ExtraLight.ttf" />
-      <None Remove="Resources\Fonts\Inter-Light.ttf" />
-      <AvaloniaResource Include="Resources\Fonts\Inter-Light.ttf" />
-      <None Remove="Resources\Fonts\Inter-Medium.ttf" />
-      <AvaloniaResource Include="Resources\Fonts\Inter-Medium.ttf" />
-      <None Remove="Resources\Fonts\Inter-Regular.ttf" />
-      <AvaloniaResource Include="Resources\Fonts\Inter-Regular.ttf" />
-      <None Remove="Resources\Fonts\Inter-SemiBold.ttf" />
-      <AvaloniaResource Include="Resources\Fonts\Inter-SemiBold.ttf" />
-      <None Remove="Resources\Fonts\Inter-Thin.ttf" />
-      <AvaloniaResource Include="Resources\Fonts\Inter-Thin.ttf" />
     </ItemGroup>
 
 </Project>
