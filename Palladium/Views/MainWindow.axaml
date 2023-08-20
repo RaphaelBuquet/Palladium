@@ -4,10 +4,21 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:controls="clr-namespace:Palladium.Controls;assembly=Palladium.Controls"
         xmlns:viewModels="clr-namespace:Palladium.ViewModels"
+        xmlns:views="clr-namespace:Palladium.Views"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Palladium.Views.MainWindow"
         Icon="/Assets/v3.ico"
-        Title="Palladium">
+        Title="Palladium"
+        x:Name="MainWindowName">
+    
+    <Window.Styles>
+        <Style Selector="Window#MainWindowName">
+            <Style Selector="^ TabControl TabItem">
+                <Setter Property="FontSize" Value="10"/>
+                <Setter Property="Background" Value="Pink"/>
+            </Style>
+        </Style>
+    </Window.Styles>
 
     <Design.DataContext>
         <viewModels:MainWindowViewModel />
@@ -36,20 +47,10 @@
                 </StackPanel>
             </Grid>
         </Border>
-        <!-- TODO: TabControl for multiple tabs -->
-        <ScrollViewer Classes="MainContent">
-            <StackPanel Orientation="Vertical" Margin="14 40" Spacing="28">
-                <controls:HeadedSection>
-                    <StackPanel Orientation="Vertical">
-                        <TextBlock>Example action</TextBlock>
-                        <StackPanel Orientation="Vertical">
-                            <controls:IconButton Content="Settings" IconData="{StaticResource SettingsIcon}" />
-                            <controls:IconButton Content="Logs" IconData="{StaticResource InfoIcon}" />
-                        </StackPanel>
-                    </StackPanel>
-                </controls:HeadedSection>
-            </StackPanel>
-
-        </ScrollViewer>
+        <TabControl x:Name="Tabs">
+            <TabItem Header="🏠 Home">
+                <views:Home x:Name="Home" /> <!-- DataContext is set in App.axaml.cs (as MainWindow should not have a dependency on that DataContext) -->
+            </TabItem>
+        </TabControl>
     </StackPanel>
 </Window>

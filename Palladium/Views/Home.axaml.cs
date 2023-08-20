@@ -4,9 +4,9 @@ using Avalonia.Markup.Xaml;
 
 namespace Palladium.Views;
 
-public partial class ActionTile : UserControl
+public partial class Home : UserControl
 {
-	public ActionTile()
+	public Home()
 	{
 		InitializeComponent();
 	}

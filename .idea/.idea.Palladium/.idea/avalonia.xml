@@ -4,6 +4,8 @@
     <option name="projectPerEditor">
       <map>
         <entry key="LogViewerControl/CSharp/Controls/LogViewer.Avalonia/LogViewerControl.axaml" value="Palladium/Palladium.csproj" />
+        <entry key="Palladium.Actions/BuiltinActions/ImmersiveGame/ImmersiveGameControl.axaml" value="Palladium/Palladium.csproj" />
+        <entry key="Palladium.Actions/Views/Action.axaml" value="Palladium/Palladium.csproj" />
         <entry key="Palladium.Controls/HeadedSection.axaml" value="Palladium/Palladium.csproj" />
         <entry key="Palladium.Controls/Icon.axaml" value="Palladium/Palladium.csproj" />
         <entry key="Palladium.Controls/IconButton.axaml" value="Palladium/Palladium.csproj" />
@@ -15,6 +17,7 @@
         <entry key="Palladium.Controls/SearchBar.axaml" value="Palladium/Palladium.csproj" />
         <entry key="Palladium/App.axaml" value="Palladium/Palladium.csproj" />
         <entry key="Palladium/Views/ActionTile.axaml" value="Palladium/Palladium.csproj" />
+        <entry key="Palladium/Views/Home.axaml" value="Palladium/Palladium.csproj" />
         <entry key="Palladium/Views/LogsWindow.axaml" value="Palladium/Palladium.csproj" />
         <entry key="Palladium/Views/MainWindow.axaml" value="Palladium/Palladium.csproj" />
       </map>

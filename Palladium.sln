@@ -18,6 +18,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MsLogger.Core", "LogViewerC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Logging", "Palladium.Logging\Palladium.Logging.csproj", "{ADCF8A91-256A-4CC0-B183-56AC98149E95}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Actions", "Palladium.Actions\Palladium.Actions.csproj", "{8D9F9D0C-A8D8-4ECD-896D-70AB15A32700}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Tabs", "Palladium.Tabs\Palladium.Tabs.csproj", "{C4A4DE1E-1912-45FB-94D2-66641C7F949E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -60,5 +64,13 @@ Global
 		{ADCF8A91-256A-4CC0-B183-56AC98149E95}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ADCF8A91-256A-4CC0-B183-56AC98149E95}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ADCF8A91-256A-4CC0-B183-56AC98149E95}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8D9F9D0C-A8D8-4ECD-896D-70AB15A32700}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8D9F9D0C-A8D8-4ECD-896D-70AB15A32700}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8D9F9D0C-A8D8-4ECD-896D-70AB15A32700}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8D9F9D0C-A8D8-4ECD-896D-70AB15A32700}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C4A4DE1E-1912-45FB-94D2-66641C7F949E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C4A4DE1E-1912-45FB-94D2-66641C7F949E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C4A4DE1E-1912-45FB-94D2-66641C7F949E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C4A4DE1E-1912-45FB-94D2-66641C7F949E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

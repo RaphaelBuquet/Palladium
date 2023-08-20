@@ -1,0 +1,71 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:Palladium.ActionsService.ViewModels"
+             xmlns:views="clr-namespace:Palladium.ActionsService.Views"
+             xmlns:controls="clr-namespace:Palladium.Controls;assembly=Palladium.Controls"
+             mc:Ignorable="d"
+             x:Class="Palladium.ActionsService.Views.Action">
+
+    <Design.DataContext>
+        <viewModels:ActionViewModel Emoji="🛠️"
+                                    Title="An example title for an action"
+                                    Description="A really fascinating description for this example action that is particularly useful on a day-to-day basis." />
+    </Design.DataContext>
+
+    <UserControl.Styles>
+        <Style Selector="views|Action">
+            <Style Selector="^ Border">
+                <Setter Property="CornerRadius" Value="4" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="BorderBrush" Value="{StaticResource Tone1}" />
+                <Setter Property="Padding" Value="14" />
+            </Style>
+
+            <Style Selector="^ TextBlock.Icon">
+                <Setter Property="FontSize" Value="14" />
+                <Setter Property="Margin" Value="0 0 14 0" />
+            </Style>
+            <Style Selector="^ StackPanel.Texts">
+                <Setter Property="Margin" Value="0 0 14 0" />
+            </Style>
+            <Style Selector="^ TextBlock.Title">
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="Foreground" Value="{StaticResource Tone1}" />
+                <Setter Property="Margin" Value="0 0 0 6" />
+            </Style>
+            <Style Selector="^ TextBlock.Description">
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="Foreground" Value="{StaticResource Tone1-75}" />
+            </Style>
+        </Style>
+
+    </UserControl.Styles>
+
+    <Border>
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Classes="Icon" Grid.Column="0" Text="{Binding Emoji}" />
+
+            <StackPanel Classes="Texts" Grid.Column="1" VerticalAlignment="Center">
+                <TextBlock Classes="Title"
+                           Text="{Binding Title}"
+                           TextTrimming="WordEllipsis" />
+                <TextBlock Classes="Description"
+                           Text="{Binding Description}"
+                           TextWrapping="Wrap" />
+            </StackPanel>
+
+            <controls:IconButton Grid.Column="2"
+                                 IconData="{StaticResource PlayIcon}"
+                                 Command="{Binding StartCommand}" />
+        </Grid>
+    </Border>
+
+</UserControl>

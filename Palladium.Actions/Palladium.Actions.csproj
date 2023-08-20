@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <RootNamespace>Palladium.ActionsService</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Avalonia" Version="11.0.3" />
+      <PackageReference Include="ReactiveUI" Version="19.4.1" />
+    </ItemGroup>
+
+
+
+    <ItemGroup>
+      <ProjectReference Include="..\Palladium.Controls\Palladium.Controls.csproj" />
+      <ProjectReference Include="..\Palladium.Tabs\Palladium.Tabs.csproj" />
+    </ItemGroup>
+
+</Project>

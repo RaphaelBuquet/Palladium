@@ -5,11 +5,15 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using DynamicData;
 using LogViewer.Core.ViewModels;
 using Microsoft.Extensions.Logging;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
+using Palladium.ActionsService;
+using Palladium.ActionsService.BuiltinActions;
 using Palladium.Logging;
+using Palladium.Tabs;
 using Palladium.ViewModels;
 using Palladium.Views;
 using ReactiveUI;
@@ -31,10 +35,19 @@ public  class App : Application
 			// logging
 			var logVm = InstallLogging();
 			
+			// services
+			var tabsService = new TabsService();
+			var actionsRepositoryService = InstallActions();
+            
 			// main window
 			var mainWindow = new MainWindow();
 			mainWindow.DataContext = new MainWindowViewModel(logVm, mainWindow);
 			desktop.MainWindow = mainWindow;
+			tabsService.Target = mainWindow.Tabs;
+			
+			// home
+			var homeViewModel = new HomeViewModel(actionsRepositoryService, tabsService);
+			mainWindow.Home.DataContext = homeViewModel;
 			
 			try
 			{
@@ -50,6 +63,15 @@ public  class App : Application
 		}
 
 		base.OnFrameworkInitializationCompleted();
+	}
+
+	private ActionsRepositoryService InstallActions()
+	{
+		var actionsRepositoryService = new ActionsRepositoryService();
+
+		actionsRepositoryService.Actions.Add(new ImmersiveGameAction().Description);
+		
+		return actionsRepositoryService;
 	}
 
 	private LogViewerControlViewModel InstallLogging()

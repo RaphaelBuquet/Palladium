@@ -1,0 +1,35 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:Palladium.Controls;assembly=Palladium.Controls"
+             xmlns:viewModels="clr-namespace:Palladium.ViewModels"
+             xmlns:actionsViewModels="clr-namespace:Palladium.ActionsService.ViewModels;assembly=Palladium.Actions"
+             xmlns:views="clr-namespace:Palladium.ActionsService.Views;assembly=Palladium.Actions"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Palladium.Views.Home">
+
+    <Design.DataContext>
+        <viewModels:HomeViewModel>
+            <viewModels:HomeViewModel.Actions>
+                <actionsViewModels:ActionViewModel Emoji="🛠️" Title="Example"
+                                                   Description="A really fascinating description for this example action that is particularly useful on a day-to-day basis." />
+            </viewModels:HomeViewModel.Actions>
+        </viewModels:HomeViewModel>
+    </Design.DataContext>
+
+    <ScrollViewer Classes="MainContent">
+        <StackPanel Orientation="Vertical" Margin="14 40" Spacing="28">
+            <controls:HeadedSection>
+                <ItemsControl ItemsSource="{Binding Actions}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <views:Action DataContext="{Binding}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </controls:HeadedSection>
+        </StackPanel>
+
+    </ScrollViewer>
+</UserControl>
