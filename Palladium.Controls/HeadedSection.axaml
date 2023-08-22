@@ -22,7 +22,13 @@
                             <PathIcon Data="{StaticResource FastForwardIcon}" Foreground="{StaticResource Tone1}"/>
                             <TextBlock Foreground="{StaticResource Tone1}" VerticalAlignment="Center">Actions</TextBlock>
                         </StackPanel>
-                        <Border Margin="14 0  14 14" Child="{TemplateBinding Child}" />
+                        <ContentPresenter x:Name="PART_ContentPresenter" 
+                                          Margin="14 0  14 14"
+                                          Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          RecognizesAccessKey="True"
+                                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"  />
                     </StackPanel>
                 </Border>
             </ControlTemplate>
