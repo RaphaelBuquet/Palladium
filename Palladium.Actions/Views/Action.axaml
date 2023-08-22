@@ -7,7 +7,8 @@
              xmlns:controls="clr-namespace:Palladium.Controls;assembly=Palladium.Controls"
              mc:Ignorable="d"
              x:Class="Palladium.ActionsService.Views.Action">
-
+    
+    <Design.Width>500</Design.Width>
     <Design.DataContext>
         <viewModels:ActionViewModel Emoji="🛠️"
                                     Title="An example title for an action"
@@ -16,7 +17,7 @@
 
     <UserControl.Styles>
         <Style Selector="views|Action">
-            <Style Selector="^ Border">
+            <Style Selector="^ > Border">
                 <Setter Property="CornerRadius" Value="4" />
                 <Setter Property="BorderThickness" Value="1" />
                 <Setter Property="BorderBrush" Value="{StaticResource Tone1}" />
@@ -64,7 +65,8 @@
 
             <controls:IconButton Grid.Column="2"
                                  IconData="{StaticResource PlayIcon}"
-                                 Command="{Binding StartCommand}" />
+                                 Command="{Binding StartCommand}" 
+                                 />
         </Grid>
     </Border>
 
