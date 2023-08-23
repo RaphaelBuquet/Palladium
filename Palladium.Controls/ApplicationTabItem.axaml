@@ -1,0 +1,78 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Design.PreviewWith>
+        <Border Padding="0">
+            <TabControl x:Name="Tabs" Classes="ApplicationTabs">
+                <TabItem Classes="ApplicationTabs" Header="🏠 Home">
+                    <TextBlock Background="Pink">Home content</TextBlock>
+                </TabItem>
+                <TabItem Classes="ApplicationTabs" Header="🚘 Supercars">
+                    <TextBlock>Supercars content</TextBlock>
+                </TabItem>
+            </TabControl>
+        </Border>
+    </Design.PreviewWith>
+
+    <Style Selector="TabControl.ApplicationTabs">
+        <Style Selector="^ /template/ ItemsPresenter#PART_ItemsPresenter">
+            <Setter Property="Margin" Value="0" /> <!--Remove margin-->
+        </Style>
+        <Style Selector="^ /template/ ItemsPresenter#PART_ItemsPresenter > WrapPanel">
+            <Setter Property="Background" Value="{StaticResource Tone2-75}" />
+        </Style>
+        <Setter Property="Padding" Value="0" />
+    </Style>
+
+    <Style Selector="TabControl.ApplicationTabs > TabItem">
+        <!-- Completely override default (fluent) styling by redefining the theme -->
+        <Setter Property="Theme">
+            <ControlTheme TargetType="TabItem">
+                <Setter Property="Template">
+                    <ControlTemplate>
+                        <Border
+                            Name="PART_LayoutRoot"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            Padding="{TemplateBinding Padding}">
+                            <ContentPresenter
+                                Name="PART_ContentPresenter"
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                Content="{TemplateBinding Header}"
+                                ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                FontFamily="{TemplateBinding FontFamily}"
+                                FontSize="{TemplateBinding FontSize}"
+                                FontWeight="{TemplateBinding FontWeight}" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter>
+                <Setter Property="FontSize" Value="10" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="Foreground" Value="{StaticResource Tone1}" />
+                <Setter Property="Padding" Value="6 0" />
+                <Setter Property="Height" Value="23" /> <!-- 24 - 1 for the border at the bottom -->
+                <Setter Property="Background" Value="White" />
+
+                <Setter Property="BorderThickness" Value="0 0 0 1" />
+
+                <!--Hide Border representing selection indicator when not selected-->
+                <Setter Property="BorderBrush" Value="Transparent" />
+
+                <Style Selector="^:selected">
+                    <Setter Property="BorderBrush" Value="{StaticResource Tone1}" />
+                </Style>
+                <Style Selector="^:pointerover">
+                    <Setter Property="Background" Value="{StaticResource Tone2-50}" />
+                </Style>
+                <Style Selector="^:pressed">
+                    <Setter Property="Background" Value="{StaticResource Tone2}" />
+                </Style>
+
+            </ControlTheme>
+        </Setter>
+
+    </Style>
+    <!-- Add Styles Here -->
+</Styles>

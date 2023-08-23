@@ -6,6 +6,7 @@
         <entry key="LogViewerControl/CSharp/Controls/LogViewer.Avalonia/LogViewerControl.axaml" value="Palladium/Palladium.csproj" />
         <entry key="Palladium.Actions/BuiltinActions/ImmersiveGame/ImmersiveGameControl.axaml" value="Palladium/Palladium.csproj" />
         <entry key="Palladium.Actions/Views/Action.axaml" value="Palladium/Palladium.csproj" />
+        <entry key="Palladium.Controls/ApplicationTabItem.axaml" value="Palladium/Palladium.csproj" />
         <entry key="Palladium.Controls/HeadedSection.axaml" value="Palladium/Palladium.csproj" />
         <entry key="Palladium.Controls/Icon.axaml" value="Palladium/Palladium.csproj" />
         <entry key="Palladium.Controls/IconButton.axaml" value="Palladium/Palladium.csproj" />

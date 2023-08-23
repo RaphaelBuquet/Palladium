@@ -6,6 +6,7 @@
     <StyleInclude Source="avares://Palladium.Controls/IconButton.axaml"/>
     <StyleInclude Source="avares://Palladium.Controls/SearchBar.axaml"/>
     <StyleInclude Source="avares://Palladium.Controls/HeadedSection.axaml"/>
+    <StyleInclude Source="avares://Palladium.Controls/ApplicationTabItem.axaml"/>
     
     <!-- Font -->
     <StyleInclude Source="Fonts.axaml"/>

@@ -18,13 +18,18 @@
         </viewModels:HomeViewModel>
     </Design.DataContext>
 
-    <ScrollViewer Classes="MainContent">
+    <ScrollViewer>
         <StackPanel Orientation="Vertical" Margin="14 40" Spacing="28">
             <controls:HeadedSection>
                 <ItemsControl ItemsSource="{Binding Actions}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Vertical" Spacing="14"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                            <views:Action DataContext="{Binding}" />
+                            <views:Action DataContext="{Binding}"/>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
