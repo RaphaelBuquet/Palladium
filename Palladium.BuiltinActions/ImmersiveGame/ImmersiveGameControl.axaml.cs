@@ -1,8 +1,6 @@
-﻿using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Markup.Xaml;
+﻿using Avalonia.Controls;
 
-namespace Palladium.ActionsService.BuiltinActions;
+namespace Palladium.BuiltinActions.ImmersiveGame;
 
 public partial class ImmersiveGameControl : UserControl
 {

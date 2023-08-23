@@ -1,6 +1,7 @@
 ﻿using Avalonia.Controls;
+using Palladium.ActionsService;
 
-namespace Palladium.ActionsService.BuiltinActions;
+namespace Palladium.BuiltinActions.ImmersiveGame;
 
 public class ImmersiveGameAction
 {

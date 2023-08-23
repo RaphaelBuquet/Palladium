@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using Palladium.ActionsService;
-using Palladium.ActionsService.BuiltinActions;
+using Palladium.BuiltinActions.ImmersiveGame;
 using Palladium.Logging;
 using Palladium.Tabs;
 using Palladium.ViewModels;

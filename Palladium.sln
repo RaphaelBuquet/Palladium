@@ -22,6 +22,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Actions", "Pallad
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Tabs", "Palladium.Tabs\Palladium.Tabs.csproj", "{C4A4DE1E-1912-45FB-94D2-66641C7F949E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.BuiltinActions", "Palladium.BuiltinActions\Palladium.BuiltinActions.csproj", "{144D4AF4-C1AA-4095-9E4F-EAC87FC9F38B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -72,5 +74,9 @@ Global
 		{C4A4DE1E-1912-45FB-94D2-66641C7F949E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C4A4DE1E-1912-45FB-94D2-66641C7F949E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C4A4DE1E-1912-45FB-94D2-66641C7F949E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{144D4AF4-C1AA-4095-9E4F-EAC87FC9F38B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{144D4AF4-C1AA-4095-9E4F-EAC87FC9F38B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{144D4AF4-C1AA-4095-9E4F-EAC87FC9F38B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{144D4AF4-C1AA-4095-9E4F-EAC87FC9F38B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
