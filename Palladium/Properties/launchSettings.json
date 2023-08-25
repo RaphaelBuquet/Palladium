@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Palladium": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

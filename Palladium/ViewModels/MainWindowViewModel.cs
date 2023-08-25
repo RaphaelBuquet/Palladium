@@ -7,7 +7,7 @@ using ReactiveUI;
 
 namespace Palladium.ViewModels;
 
-public class MainWindowViewModel : ViewModelBase, IActivatableViewModel
+public class MainWindowViewModel : ReactiveObject, IActivatableViewModel
 {
 	// dependencies
 	private readonly LogViewerControlViewModel? logVm;
@@ -48,7 +48,7 @@ public class MainWindowViewModel : ViewModelBase, IActivatableViewModel
 		logWindow ??= new LogsWindow { DataContext = logVm };
 		logWindow.Show(mainWindow);
 	}
-    
+
 	private void OpenSettings()
 	{
 		throw new System.NotImplementedException();

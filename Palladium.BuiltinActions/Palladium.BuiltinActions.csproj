@@ -4,16 +4,17 @@
         <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
+        <Configurations>Release;Debug</Configurations>
+        <Platforms>x64</Platforms>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Palladium.Actions\Palladium.Actions.csproj" />
-      <ProjectReference Include="..\Palladium.Logging\Palladium.Logging.csproj" />
+        <ProjectReference Include="..\Palladium.Actions\Palladium.Actions.csproj"/>
+        <ProjectReference Include="..\Palladium.Logging\Palladium.Logging.csproj"/>
+
+        <!-- Build dependency on Palladium.NativeWindows -->
+        <ProjectReference Include="..\Palladium.NativeWindows\Palladium.NativeWindows.vcxproj"/>
+        <ProjectReference Include="..\Palladium.ObservableExtensions\Palladium.ObservableExtensions.csproj"/>
     </ItemGroup>
-
-
-    <ItemGroup>
-      <PackageReference Include="Avalonia" Version="11.0.3" />
-    </ItemGroup>
-
+    
 </Project>

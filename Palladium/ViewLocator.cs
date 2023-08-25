@@ -1,7 +1,7 @@
 using System;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using Palladium.ViewModels;
+using ReactiveUI;
 
 namespace Palladium;
 
@@ -13,7 +13,7 @@ public class ViewLocator : IDataTemplate
 		{
 			return new TextBlock { Text = "Not Found: no name" };
 		}
-		
+
 		var name = data.GetType().FullName!.Replace("ViewModel", "View");
 		var type = Type.GetType(name);
 
@@ -27,6 +27,6 @@ public class ViewLocator : IDataTemplate
 
 	public bool Match(object? data)
 	{
-		return data is ViewModelBase;
+		return data is ReactiveObject;
 	}
 }

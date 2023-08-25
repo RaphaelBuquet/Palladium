@@ -8,10 +8,8 @@ using ReactiveUI;
 
 namespace Palladium.ViewModels;
 
-public class HomeViewModel : ViewModelBase, IActivatableViewModel
+public class HomeViewModel : ReactiveObject, IActivatableViewModel
 {
-	public ObservableCollectionExtended<ActionViewModel> Actions { get; }
-	
 	/// <summary>
 	/// Design preview constructor.
 	/// </summary>
@@ -36,6 +34,8 @@ public class HomeViewModel : ViewModelBase, IActivatableViewModel
 			if (connection is not null) disposables.Add(connection);
 		});
 	}
+
+	public ObservableCollectionExtended<ActionViewModel> Actions { get; }
 
 	/// <inheritdoc />
 	ViewModelActivator IActivatableViewModel.Activator { get; } = new ();

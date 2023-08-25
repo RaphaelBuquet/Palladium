@@ -8,9 +8,6 @@
     <StyleInclude Source="avares://Palladium.Controls/HeadedSection.axaml"/>
     <StyleInclude Source="avares://Palladium.Controls/ApplicationTabItem.axaml"/>
     
-    <!-- Font -->
-    <StyleInclude Source="Fonts.axaml"/>
-
     <!-- Preview -->
     <Design.PreviewWith>
         <Border Padding="20">

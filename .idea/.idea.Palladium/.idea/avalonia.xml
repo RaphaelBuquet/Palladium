@@ -12,8 +12,11 @@
         <entry key="Palladium.Controls/Icon.axaml" value="Palladium/Palladium.csproj" />
         <entry key="Palladium.Controls/IconButton.axaml" value="Palladium/Palladium.csproj" />
         <entry key="Palladium.Controls/ImageButton.axaml" value="Palladium/Palladium.csproj" />
+        <entry key="Palladium.Controls/MiniLog.axaml" value="Palladium/Palladium.csproj" />
+        <entry key="Palladium.Controls/MiniLogDump.axaml" value="Palladium/Palladium.csproj" />
         <entry key="Palladium.Controls/Resources/Colours.axaml" value="Palladium/Palladium.csproj" />
         <entry key="Palladium.Controls/Resources/Fonts.axaml" value="Palladium/Palladium.csproj" />
+        <entry key="Palladium.Controls/Resources/Fontss.axaml" value="Palladium/Palladium.csproj" />
         <entry key="Palladium.Controls/Resources/Icons.axaml" value="Palladium/Palladium.csproj" />
         <entry key="Palladium.Controls/Resources/Styles.axaml" value="Palladium/Palladium.csproj" />
         <entry key="Palladium.Controls/SearchBar.axaml" value="Palladium/Palladium.csproj" />

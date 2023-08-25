@@ -18,6 +18,7 @@
             <ResourceDictionary.MergedDictionaries>
                 <ResourceInclude Source="avares://Palladium.Controls/Resources/Icons.axaml" />
                 <ResourceInclude Source="avares://Palladium.Controls/Resources/Colours.axaml" />
+                <ResourceInclude Source="avares://Palladium.Controls/Resources/Fonts.axaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

@@ -5,7 +5,7 @@ namespace Palladium.Tabs;
 public class TabsService
 {
 	public TabControl? Target;
-	
+
 	public ContentControl AddNewTab(string header)
 	{
 		if (Target == null) throw new InvalidOperationException("Target has not been set.");
@@ -13,10 +13,11 @@ public class TabsService
 		var contentControl = new ContentControl();
 		var newTab = new TabItem()
 		{
-            Content = contentControl,
-            Header = header
+			Content = contentControl,
+			Header = header
 		};
 		Target.Items.Add(newTab);
+		Target.SelectedItem = newTab;
 		return contentControl;
 	}
 }

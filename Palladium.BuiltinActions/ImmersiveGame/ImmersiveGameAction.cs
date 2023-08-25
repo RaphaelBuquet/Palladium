@@ -12,9 +12,14 @@ public class ImmersiveGameAction
 		Emoji = "🎮",
 		OnStart = Start
 	};
-	
+
 	public void Start(ContentControl container)
 	{
-		container.Content = new ImmersiveGameControl();
+		var immersiveGameViewModel = new ImmersiveGameViewModel(new WindowsDisplays());
+		container.Content = new ImmersiveGameControl
+		{
+			DataContext = immersiveGameViewModel
+		};
+		immersiveGameViewModel.RefreshAvailableDisplays();
 	}
 }
