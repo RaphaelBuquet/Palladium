@@ -11,10 +11,16 @@
     <ItemGroup>
         <ProjectReference Include="..\Palladium.Actions\Palladium.Actions.csproj"/>
         <ProjectReference Include="..\Palladium.Logging\Palladium.Logging.csproj"/>
-
+        <ProjectReference Include="..\Palladium.ObservableExtensions\Palladium.ObservableExtensions.csproj"/>
         <!-- Build dependency on Palladium.NativeWindows -->
         <ProjectReference Include="..\Palladium.NativeWindows\Palladium.NativeWindows.vcxproj"/>
-        <ProjectReference Include="..\Palladium.ObservableExtensions\Palladium.ObservableExtensions.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="..\Palladium.NativeWindows\bin\$(Platform)\$(Configuration)\Palladium.NativeWindows.dll">
+        <Link>Palladium.NativeWindows.dll</Link>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
     </ItemGroup>
     
 </Project>
