@@ -45,6 +45,13 @@ public class MainWindowViewModel : ReactiveObject, IActivatableViewModel
 	private void OpenLogs()
 	{
 		if (logVm == null || mainWindow == null) return;
+		
+		// if window has been closed it needs to be re-created.
+		if (logWindow != null && logWindow.PlatformImpl == null)
+		{
+			logWindow = null;
+		} 
+		
 		logWindow ??= new LogsWindow { DataContext = logVm };
 		logWindow.Show(mainWindow);
 	}
