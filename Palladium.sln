@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.ObservableExtensi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Extensions", "AppSource\Palladium.Extensions\Palladium.Extensions.csproj", "{41A760C1-6419-4033-82E7-D0BA288E610D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PalladiumExtensionTemplate", "ExtensionTemplateSource\PalladiumExtensionTemplate\PalladiumExtensionTemplate.csproj", "{C7345587-C3A7-4F9F-86FC-A0AD6841144E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|x64 = Release|x64
@@ -104,5 +106,7 @@ Global
 		{41A760C1-6419-4033-82E7-D0BA288E610D}.Debug|x64.Build.0 = Debug|x64
 		{41A760C1-6419-4033-82E7-D0BA288E610D}.Release|x64.ActiveCfg = Release|x64
 		{41A760C1-6419-4033-82E7-D0BA288E610D}.Release|x64.Build.0 = Release|x64
+		{C7345587-C3A7-4F9F-86FC-A0AD6841144E}.Release|x64.ActiveCfg = Release|Any CPU
+		{C7345587-C3A7-4F9F-86FC-A0AD6841144E}.Debug|x64.ActiveCfg = Debug|Any CPU
 	EndGlobalSection
 EndGlobal

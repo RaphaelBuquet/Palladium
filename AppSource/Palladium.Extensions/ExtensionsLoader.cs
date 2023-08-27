@@ -59,6 +59,7 @@ public class ExtensionsLoader
 				{
 					loadedExtension.ActionsRepositoryService = actionsRepositoryService;
 					loadedExtension.Init();
+					Log.Emit(new EventId(), LogLevel.Information, $"Loaded extension \"{extensionType.Assembly.FullName}\".");
 				}
 			}
 			catch (Exception e)

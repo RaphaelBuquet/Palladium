@@ -6,30 +6,63 @@
         <Nullable>enable</Nullable>
         <EnableDynamicLoading>true</EnableDynamicLoading>
     </PropertyGroup>
+
+    <!-- Palladium DLLs -->
     <ItemGroup>
-        <Reference Include="Palladium.Extensions">
-            <Private>false</Private>
-            <ExcludeAssets>runtime</ExcludeAssets>
-            <HintPath>..\..\Palladium\Palladium.Extensions.dll</HintPath>
-        </Reference>
         <Reference Include="Palladium.Actions">
             <Private>false</Private>
             <ExcludeAssets>runtime</ExcludeAssets>
-            <HintPath>..\..\Palladium\Palladium.Actions.dll</HintPath>
+            <HintPath>..\..\AppBinaries\Palladium.Actions.dll</HintPath>
+        </Reference>
+        <Reference Include="Palladium.BuiltinActions">
+            <Private>false</Private>
+            <ExcludeAssets>runtime</ExcludeAssets>
+            <HintPath>..\..\AppBinaries\Palladium.BuiltinActions.dll</HintPath>
+        </Reference>
+        <Reference Include="Palladium.Controls">
+            <Private>false</Private>
+            <ExcludeAssets>runtime</ExcludeAssets>
+            <HintPath>..\..\AppBinaries\Palladium.Controls.dll</HintPath>
+        </Reference>
+        <Reference Include="Palladium.Extensions">
+            <Private>false</Private>
+            <ExcludeAssets>runtime</ExcludeAssets>
+            <HintPath>..\..\AppBinaries\Palladium.Extensions.dll</HintPath>
+        </Reference>
+        <Reference Include="Palladium.Logging">
+            <Private>false</Private>
+            <ExcludeAssets>runtime</ExcludeAssets>
+            <HintPath>..\..\AppBinaries\Palladium.Logging.dll</HintPath>
+        </Reference>
+
+        <Reference Include="Palladium.ObservableExtensions">
+            <Private>false</Private>
+            <ExcludeAssets>runtime</ExcludeAssets>
+            <HintPath>..\..\AppBinaries\Palladium.ObservableExtensions.dll</HintPath>
+        </Reference>
+        <Reference Include="Palladium.Tabs">
+            <Private>false</Private>
+            <ExcludeAssets>runtime</ExcludeAssets>
+            <HintPath>..\..\AppBinaries\Palladium.Tabs.dll</HintPath>
         </Reference>
     </ItemGroup>
+
+    <!--
+     Nuget packages used by Palladium that are likely to be needed by extensions. 
+     Packages already used by Palladium should be referenced using <ExcludeAssets>runtime</ExcludeAssets>. 
+     -->
     <ItemGroup>
-      <PackageReference Include="Avalonia" Version="11.0.3">
-          <ExcludeAssets>runtime</ExcludeAssets>
-      </PackageReference>
-      <PackageReference Include="DynamicData" Version="7.14.2">
-          <ExcludeAssets>runtime</ExcludeAssets>
-      </PackageReference>
-      <PackageReference Include="ReactiveUI" Version="19.4.1">
-          <ExcludeAssets>runtime</ExcludeAssets>
-      </PackageReference>
-      <PackageReference Include="System.Reactive" Version="6.0.0">
-          <ExcludeAssets>runtime</ExcludeAssets>
-      </PackageReference>
+        <PackageReference Include="Avalonia" Version="11.0.3">
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </PackageReference>
+        <PackageReference Include="DynamicData" Version="7.14.2">
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </PackageReference>
+        <PackageReference Include="ReactiveUI" Version="19.4.1">
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </PackageReference>
+        <PackageReference Include="System.Reactive" Version="6.0.0">
+            <ExcludeAssets>runtime</ExcludeAssets>
+        </PackageReference>
     </ItemGroup>
 </Project>
