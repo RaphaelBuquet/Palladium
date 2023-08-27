@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Reactive;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using Palladium.ActionsService;
 using Palladium.BuiltinActions.ImmersiveGame;
+using Palladium.Extensions;
 using Palladium.Logging;
 using Palladium.Tabs;
 using Palladium.ViewModels;
@@ -49,17 +51,14 @@ public  class App : Application
 			var homeViewModel = new HomeViewModel(actionsRepositoryService, tabsService);
 			mainWindow.Home.DataContext = homeViewModel;
 			
-			try
+			// background load
+			Task.Run(() =>
 			{
 				LogStartingMode();
-
-				desktop.MainWindow = mainWindow;
-			}
-			catch (Exception ex)
-			{
-				ShowMessageBox("Unhandled Error", ex.Message);
-				return;
-			}
+				
+				new ExtensionsLoader(Path.Combine(Environment.CurrentDirectory, "Extensions"))
+					.LoadExtensions(actionsRepositoryService);
+			});
 		}
 
 		base.OnFrameworkInitializationCompleted();

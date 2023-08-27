@@ -36,13 +36,14 @@
         <DataGrid x:Name="MyDataGrid"
                   ItemsSource="{Binding DataStore.Entries}" AutoGenerateColumns="False"
                   CanUserSortColumns="False"
+                  CanUserResizeColumns="True"
                   LayoutUpdated="OnLayoutUpdated">
             <DataGrid.Columns>
-                <DataGridTextColumn CellStyleClasses="size" Header="Time" Width="150"  Binding="{Binding Timestamp}"/>
-                <DataGridTextColumn CellStyleClasses="size" Header="Level" Width="90" Binding="{Binding LogLevel}" />
-                <DataGridTextColumn CellStyleClasses="size" Header="Event Id" Width="120" Binding="{Binding EventId, Converter={StaticResource EventIdConverter}}" />
-                <DataGridTextColumn CellStyleClasses="size" Header="State" Width="300" Binding="{Binding State}" />
-                <DataGridTextColumn CellStyleClasses="size" Header="Exception" Width="300" Binding="{Binding Exception}" />
+                <DataGridTextColumn CellStyleClasses="size" Header="Time" Width="150" CanUserResize="True" Binding="{Binding Timestamp}"/>
+                <DataGridTextColumn CellStyleClasses="size" Header="Level" Width="90" CanUserResize="True" Binding="{Binding LogLevel}" />
+                <DataGridTextColumn CellStyleClasses="size" Header="Event Id" Width="120" CanUserResize="True" Binding="{Binding EventId, Converter={StaticResource EventIdConverter}}" />
+                <DataGridTextColumn CellStyleClasses="size" Header="State" Width="300" CanUserResize="True" Binding="{Binding State}" />
+                <DataGridTextColumn CellStyleClasses="size" Header="Exception" Width="300" CanUserResize="True" Binding="{Binding Exception}" />
             </DataGrid.Columns>
         </DataGrid>
 

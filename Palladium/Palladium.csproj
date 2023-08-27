@@ -35,6 +35,7 @@
       <ProjectReference Include="..\Palladium.Actions\Palladium.Actions.csproj" />
       <ProjectReference Include="..\Palladium.BuiltinActions\Palladium.BuiltinActions.csproj" />
       <ProjectReference Include="..\Palladium.Controls\Palladium.Controls.csproj" />
+      <ProjectReference Include="..\Palladium.Extensions\Palladium.Extensions.csproj" />
       <ProjectReference Include="..\Palladium.Logging\Palladium.Logging.csproj" />
     </ItemGroup>
 </Project>
