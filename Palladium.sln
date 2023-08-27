@@ -1,39 +1,39 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium", "Palladium\Palladium.csproj", "{56C3B27E-A983-4609-A2FE-E4409D99DEC9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium", "AppSource\Palladium\Palladium.csproj", "{56C3B27E-A983-4609-A2FE-E4409D99DEC9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogViewer.Core", "LogViewerControl\CSharp\Core\LogViewer.Core\LogViewer.Core.csproj", "{12B69E00-D068-4FB6-B55B-7C72BF44A990}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogViewer.Core", "AppSource\LogViewerControl\CSharp\Core\LogViewer.Core\LogViewer.Core.csproj", "{12B69E00-D068-4FB6-B55B-7C72BF44A990}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RandomLogging.Service", "LogViewerControl\CSharp\Background Services\RandomLogging.Service\RandomLogging.Service.csproj", "{83DE9134-E17E-4FB4-B2C3-C4B4BF43E5F4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RandomLogging.Service", "AppSource\LogViewerControl\CSharp\Background Services\RandomLogging.Service\RandomLogging.Service.csproj", "{83DE9134-E17E-4FB4-B2C3-C4B4BF43E5F4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogViewer.Avalonia", "LogViewerControl\CSharp\Controls\LogViewer.Avalonia\LogViewer.Avalonia.csproj", "{578ECB89-3BA6-4669-ACCF-02C6D27B2E5B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LogViewer.Avalonia", "AppSource\LogViewerControl\CSharp\Controls\LogViewer.Avalonia\LogViewer.Avalonia.csproj", "{578ECB89-3BA6-4669-ACCF-02C6D27B2E5B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Core", "LogViewerControl\CSharp\Core\Common.Core\Common.Core.csproj", "{238C6FC4-89B4-496E-89E3-2AACC87C9739}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common.Core", "AppSource\LogViewerControl\CSharp\Core\Common.Core\Common.Core.csproj", "{238C6FC4-89B4-496E-89E3-2AACC87C9739}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mvvm.Core", "LogViewerControl\CSharp\Core\Mvvm.Core\Mvvm.Core.csproj", "{F3F69B77-2BB9-49E7-8932-9AA993FF5DBC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mvvm.Core", "AppSource\LogViewerControl\CSharp\Core\Mvvm.Core\Mvvm.Core.csproj", "{F3F69B77-2BB9-49E7-8932-9AA993FF5DBC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Controls", "Palladium.Controls\Palladium.Controls.csproj", "{0A87A157-DFF6-4F44-BE34-A7CCFE74CE45}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Controls", "AppSource\Palladium.Controls\Palladium.Controls.csproj", "{0A87A157-DFF6-4F44-BE34-A7CCFE74CE45}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MsLogger.Core", "LogViewerControl\CSharp\Core\MsLogger.Core\MsLogger.Core.csproj", "{626B8C51-FC86-474A-89E4-74119842DEB8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MsLogger.Core", "AppSource\LogViewerControl\CSharp\Core\MsLogger.Core\MsLogger.Core.csproj", "{626B8C51-FC86-474A-89E4-74119842DEB8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Logging", "Palladium.Logging\Palladium.Logging.csproj", "{ADCF8A91-256A-4CC0-B183-56AC98149E95}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Logging", "AppSource\Palladium.Logging\Palladium.Logging.csproj", "{ADCF8A91-256A-4CC0-B183-56AC98149E95}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Actions", "Palladium.Actions\Palladium.Actions.csproj", "{8D9F9D0C-A8D8-4ECD-896D-70AB15A32700}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Actions", "AppSource\Palladium.Actions\Palladium.Actions.csproj", "{8D9F9D0C-A8D8-4ECD-896D-70AB15A32700}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Tabs", "Palladium.Tabs\Palladium.Tabs.csproj", "{C4A4DE1E-1912-45FB-94D2-66641C7F949E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Tabs", "AppSource\Palladium.Tabs\Palladium.Tabs.csproj", "{C4A4DE1E-1912-45FB-94D2-66641C7F949E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.BuiltinActions", "Palladium.BuiltinActions\Palladium.BuiltinActions.csproj", "{144D4AF4-C1AA-4095-9E4F-EAC87FC9F38B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.BuiltinActions", "AppSource\Palladium.BuiltinActions\Palladium.BuiltinActions.csproj", "{144D4AF4-C1AA-4095-9E4F-EAC87FC9F38B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{34AC5BB5-4043-4E0A-8575-61E65399A0D4} = {34AC5BB5-4043-4E0A-8575-61E65399A0D4}
 	EndProjectSection
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Palladium.NativeWindows", "Palladium.NativeWindows\Palladium.NativeWindows.vcxproj", "{34AC5BB5-4043-4E0A-8575-61E65399A0D4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Palladium.NativeWindows", "AppSource\Palladium.NativeWindows\Palladium.NativeWindows.vcxproj", "{34AC5BB5-4043-4E0A-8575-61E65399A0D4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.BuiltinActions.Tests", "Palladium.BuiltinActions.Tests\Palladium.BuiltinActions.Tests.csproj", "{0BFD82E9-E034-4F5A-BCF2-56DC4B883B2D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.BuiltinActions.Tests", "AppSource\Palladium.BuiltinActions.Tests\Palladium.BuiltinActions.Tests.csproj", "{0BFD82E9-E034-4F5A-BCF2-56DC4B883B2D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.ObservableExtensions", "Palladium.ObservableExtensions\Palladium.ObservableExtensions.csproj", "{D60311BB-5698-4665-8456-7A171C8A0794}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.ObservableExtensions", "AppSource\Palladium.ObservableExtensions\Palladium.ObservableExtensions.csproj", "{D60311BB-5698-4665-8456-7A171C8A0794}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Extensions", "Palladium.Extensions\Palladium.Extensions.csproj", "{41A760C1-6419-4033-82E7-D0BA288E610D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Extensions", "AppSource\Palladium.Extensions\Palladium.Extensions.csproj", "{41A760C1-6419-4033-82E7-D0BA288E610D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

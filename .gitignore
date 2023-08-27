@@ -7,3 +7,5 @@ riderModule.iml
 .vs/
 
 *.vcxproj.user
+
+/Publish/
