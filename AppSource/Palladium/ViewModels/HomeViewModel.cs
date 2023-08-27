@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reactive.Linq;
 using DynamicData;
 using DynamicData.Binding;
 using Palladium.ActionsService;
@@ -25,6 +26,7 @@ public class HomeViewModel : ReactiveObject, IActivatableViewModel
 			connection = actionsRepositoryService.Actions
 				.Connect()
 				.Transform(description => new ActionViewModel(description, tabsService))
+				.ObserveOn(RxApp.MainThreadScheduler) // this seems to solve actions being created multiple times by the ItemsControl
 				.Bind(Actions)
 				.Subscribe();
 		}

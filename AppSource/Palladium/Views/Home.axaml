@@ -28,7 +28,7 @@
                         </ItemsPanelTemplate>
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
-                        <DataTemplate>
+                        <DataTemplate DataType="{x:Type actionsViewModels:ActionViewModel}">
                             <views:Action DataContext="{Binding}"/>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>

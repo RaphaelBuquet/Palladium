@@ -1,4 +1,6 @@
-﻿using System.Reactive;
+﻿using System;
+using System.Diagnostics;
+using System.Reactive;
 using System.Reactive.Disposables;
 using Avalonia.Controls;
 using LogViewer.Core.ViewModels;
@@ -28,16 +30,25 @@ public class MainWindowViewModel : ReactiveObject, IActivatableViewModel
 		this.mainWindow = mainWindow;
 		OpenLogsCommand = ReactiveCommand.Create(OpenLogs);
 		OpenSettingsCommand = ReactiveCommand.Create(OpenSettings);
+		DebugCommand = ReactiveCommand.Create(Debug);
 
 		this.WhenActivated(disposables =>
 		{
 			OpenLogsCommand.DisposeWith(disposables);
 			OpenSettingsCommand.DisposeWith(disposables);
+			DebugCommand.DisposeWith(disposables);
 		});
 	}
 
 	public ReactiveCommand<Unit, Unit> OpenLogsCommand { get ; }
 	public ReactiveCommand<Unit, Unit> OpenSettingsCommand { get ; }
+	public ReactiveCommand<Unit, Unit> DebugCommand { get ; }
+
+#if DEBUG
+	public bool ShowDebug => true;
+#else
+	public bool ShowDebug => false;
+#endif
 
 	/// <inheritdoc />
 	ViewModelActivator IActivatableViewModel.Activator { get; } = new ();
@@ -45,19 +56,24 @@ public class MainWindowViewModel : ReactiveObject, IActivatableViewModel
 	private void OpenLogs()
 	{
 		if (logVm == null || mainWindow == null) return;
-		
+
 		// if window has been closed it needs to be re-created.
 		if (logWindow != null && logWindow.PlatformImpl == null)
 		{
 			logWindow = null;
-		} 
-		
+		}
+
 		logWindow ??= new LogsWindow { DataContext = logVm };
 		logWindow.Show(mainWindow);
 	}
 
 	private void OpenSettings()
 	{
-		throw new System.NotImplementedException();
+		throw new NotImplementedException();
+	}
+	
+	private void Debug()
+	{
+		Debugger.Break();
 	}
 }

@@ -1,0 +1,26 @@
+﻿<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:palladium="clr-namespace:Palladium;assembly=Palladium"
+             x:Class="Palladium.Tests.HeadlessApp">
+    <Application.DataTemplates>
+        <palladium:ViewLocator />
+    </Application.DataTemplates>
+
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="avares://Palladium.Controls/Resources/Styles.axaml" />
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
+    </Application.Styles>
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Headless mode does not support geometry groups, so we need to manually mock the icon resources to something else. -->
+                <!-- RectangleGeometry is supported so that's what is being used here. -->
+                <ResourceInclude Source="avares://Palladium.Tests/IconMocks.axaml" />
+                <ResourceInclude Source="avares://Palladium.Controls/Resources/Colours.axaml" />
+                <ResourceInclude Source="avares://Palladium.Controls/Resources/Fonts.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AvaloniaProject">
+    <option name="projectPerEditor">
+      <map>
+        <entry key="AppSource/Palladium.Actions/Views/Action.axaml" value="AppSource/Palladium/Palladium.csproj" />
+        <entry key="AppSource/Palladium.Controls/ApplicationTabItem.axaml" value="AppSource/Palladium/Palladium.csproj" />
+        <entry key="AppSource/Palladium.Controls/HeadedSection.axaml" value="AppSource/Palladium/Palladium.csproj" />
+        <entry key="AppSource/Palladium.Controls/Resources/Icons.axaml" value="AppSource/Palladium/Palladium.csproj" />
+        <entry key="AppSource/Palladium/App.axaml" value="AppSource/Palladium/Palladium.csproj" />
+        <entry key="AppSource/Palladium/Views/Home.axaml" value="AppSource/Palladium/Palladium.csproj" />
+        <entry key="AppSource/Palladium/Views/LogsWindow.axaml" value="AppSource/Palladium/Palladium.csproj" />
+        <entry key="AppSource/Palladium/Views/MainWindow.axaml" value="AppSource/Palladium/Palladium.csproj" />
+      </map>
+    </option>
+  </component>
+</project>

@@ -28,6 +28,12 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
+                <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" Spacing="4">
+                    <controls:IconButton Content="Debug"
+                                         IconData="{StaticResource SettingsIcon}"
+                                         Command="{Binding DebugCommand}"
+                                         IsVisible="{Binding ShowDebug}"/>
+                </StackPanel>
                 <controls:SearchBar Grid.Column="1" Width="200" Watermark="Search..." />
                 <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="4">
                     <controls:IconButton Content="Settings"

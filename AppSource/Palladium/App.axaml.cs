@@ -1,6 +1,8 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Reactive;
+using System.Reactive.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Avalonia;
@@ -15,6 +17,7 @@ using Palladium.ActionsService;
 using Palladium.BuiltinActions.ImmersiveGame;
 using Palladium.Extensions;
 using Palladium.Logging;
+using Palladium.ObservableExtensions;
 using Palladium.Tabs;
 using Palladium.ViewModels;
 using Palladium.Views;
@@ -50,6 +53,18 @@ public  class App : Application
 			// home
 			var homeViewModel = new HomeViewModel(actionsRepositoryService, tabsService);
 			mainWindow.Home.DataContext = homeViewModel;
+
+			actionsRepositoryService.Actions.Connect()
+				.Select(set =>
+				{
+					var change = set.ToList().First();
+
+					var item = change.Range.Any() ? change.Range.First() : change.Item.Current;
+					
+					return $"{change.Reason}: {item.Title}";
+				})
+				.DebugToLogs("ACTIONS CHANGE")
+				.Subscribe();
 			
 			// background load
 			Task.Run(() =>
