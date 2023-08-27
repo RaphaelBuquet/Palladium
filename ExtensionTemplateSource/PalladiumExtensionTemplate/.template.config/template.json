@@ -1,0 +1,12 @@
+﻿{
+  "author": "Raphaël Buquet",
+  "name": "Palladium extension",
+  "description": "Create an extension to add functionality to Palladium.",
+  "identity": "RaphaelBuquet.PalladiumExtension.1.0",
+  "shortName": "palladiumextension",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "sourceName": "PalladiumExtensionTemplate"
+}
