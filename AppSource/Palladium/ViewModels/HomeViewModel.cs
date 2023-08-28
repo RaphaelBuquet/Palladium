@@ -4,7 +4,6 @@ using DynamicData;
 using DynamicData.Binding;
 using Palladium.ActionsService;
 using Palladium.ActionsService.ViewModels;
-using Palladium.Tabs;
 using ReactiveUI;
 
 namespace Palladium.ViewModels;

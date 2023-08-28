@@ -20,8 +20,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Logging", "AppSou
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Actions", "AppSource\Palladium.Actions\Palladium.Actions.csproj", "{8D9F9D0C-A8D8-4ECD-896D-70AB15A32700}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Tabs", "AppSource\Palladium.Tabs\Palladium.Tabs.csproj", "{C4A4DE1E-1912-45FB-94D2-66641C7F949E}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.BuiltinActions", "AppSource\Palladium.BuiltinActions\Palladium.BuiltinActions.csproj", "{144D4AF4-C1AA-4095-9E4F-EAC87FC9F38B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{34AC5BB5-4043-4E0A-8575-61E65399A0D4} = {34AC5BB5-4043-4E0A-8575-61E65399A0D4}
@@ -89,10 +87,6 @@ Global
 		{34AC5BB5-4043-4E0A-8575-61E65399A0D4}.Release|x64.Build.0 = Release|x64
 		{34AC5BB5-4043-4E0A-8575-61E65399A0D4}.Debug|x64.ActiveCfg = Debug|x64
 		{34AC5BB5-4043-4E0A-8575-61E65399A0D4}.Debug|x64.Build.0 = Debug|x64
-		{C4A4DE1E-1912-45FB-94D2-66641C7F949E}.Release|x64.ActiveCfg = Release|x64
-		{C4A4DE1E-1912-45FB-94D2-66641C7F949E}.Release|x64.Build.0 = Release|x64
-		{C4A4DE1E-1912-45FB-94D2-66641C7F949E}.Debug|x64.ActiveCfg = Debug|x64
-		{C4A4DE1E-1912-45FB-94D2-66641C7F949E}.Debug|x64.Build.0 = Debug|x64
 		{83DE9134-E17E-4FB4-B2C3-C4B4BF43E5F4}.Release|x64.ActiveCfg = Release|x64
 		{83DE9134-E17E-4FB4-B2C3-C4B4BF43E5F4}.Release|x64.Build.0 = Release|x64
 		{83DE9134-E17E-4FB4-B2C3-C4B4BF43E5F4}.Debug|x64.ActiveCfg = Debug|x64

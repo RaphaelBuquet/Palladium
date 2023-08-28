@@ -1,6 +1,5 @@
 using DynamicData;
 using Palladium.ActionsService;
-using Palladium.Tabs;
 using Palladium.ViewModels;
 
 namespace Palladium.Tests;

@@ -1,6 +1,5 @@
 ﻿using System.Reactive;
 using Avalonia.Controls;
-using Palladium.Tabs;
 using ReactiveUI;
 
 namespace Palladium.ActionsService.ViewModels;
@@ -36,9 +35,6 @@ public class ActionViewModel
 		Emoji = description.Emoji;
 		Title = description.Title;
 		Description = description.Description;
-		StartCommand = ReactiveCommand.Create(() =>
-		{
-			description.OnStart.Invoke(tabsService.AddNewTab($"{description.Emoji} {description.Title}"));
-		});
+		StartCommand = ReactiveCommand.Create(() => tabsService.HandleStartAction(description));
 	}
 }

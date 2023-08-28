@@ -18,7 +18,6 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Palladium.Controls\Palladium.Controls.csproj" />
-      <ProjectReference Include="..\Palladium.Tabs\Palladium.Tabs.csproj" />
     </ItemGroup>
 
 </Project>

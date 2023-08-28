@@ -21,6 +21,7 @@ public class MyExtension : ExtensionBase
 				Title = "Example Extension Action",
 				Description = "Example extension description",
 				Emoji = "⚠️",
+				CanOpenMultiple = false,
 				OnStart = StartExampleAction
 			}
 		);

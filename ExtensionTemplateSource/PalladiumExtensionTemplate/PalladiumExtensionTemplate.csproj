@@ -40,11 +40,6 @@
             <ExcludeAssets>runtime</ExcludeAssets>
             <HintPath>..\..\AppBinaries\Palladium.ObservableExtensions.dll</HintPath>
         </Reference>
-        <Reference Include="Palladium.Tabs">
-            <Private>false</Private>
-            <ExcludeAssets>runtime</ExcludeAssets>
-            <HintPath>..\..\AppBinaries\Palladium.Tabs.dll</HintPath>
-        </Reference>
     </ItemGroup>
 
     <!--

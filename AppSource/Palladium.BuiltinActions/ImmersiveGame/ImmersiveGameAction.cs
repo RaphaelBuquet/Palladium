@@ -10,6 +10,7 @@ public class ImmersiveGameAction
 		Title = "Immersive Game",
 		Description = "Turn off all monitors except the main monitor for an immersive gaming experience.",
 		Emoji = "🎮",
+		CanOpenMultiple = false,
 		OnStart = Start
 	};
 

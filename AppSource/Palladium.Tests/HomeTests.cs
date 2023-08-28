@@ -7,7 +7,6 @@ using Avalonia.VisualTree;
 using DynamicData;
 using Palladium.ActionsService;
 using Palladium.ActionsService.ViewModels;
-using Palladium.Tabs;
 using Palladium.ViewModels;
 using Palladium.Views;
 using Action = Palladium.ActionsService.Views.Action;

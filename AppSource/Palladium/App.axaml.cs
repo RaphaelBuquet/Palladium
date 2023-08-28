@@ -18,7 +18,6 @@ using Palladium.BuiltinActions.ImmersiveGame;
 using Palladium.Extensions;
 using Palladium.Logging;
 using Palladium.ObservableExtensions;
-using Palladium.Tabs;
 using Palladium.ViewModels;
 using Palladium.Views;
 using ReactiveUI;

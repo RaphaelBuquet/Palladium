@@ -20,6 +20,11 @@ public struct ActionDescription
 	public string? Description;
 
 	/// <summary>
+	///     When true, multiple tabs can be opened for this action.
+	/// </summary>
+	public bool CanOpenMultiple;
+
+	/// <summary>
 	///     Called when the user starts the action. The given <see cref="ContentControl" /> is the newly created tab. The UI
 	///     can be added inside using <see cref="ContentControl.Content" />.
 	/// </summary>
