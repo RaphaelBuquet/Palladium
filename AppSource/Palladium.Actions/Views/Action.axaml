@@ -4,10 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:viewModels="clr-namespace:Palladium.ActionsService.ViewModels"
              xmlns:views="clr-namespace:Palladium.ActionsService.Views"
-             xmlns:controls="clr-namespace:Palladium.Controls;assembly=Palladium.Controls"
              mc:Ignorable="d"
              x:Class="Palladium.ActionsService.Views.Action">
-    
+
     <Design.Width>500</Design.Width>
     <Design.DataContext>
         <viewModels:ActionViewModel Emoji="🛠️"
@@ -17,11 +16,37 @@
 
     <UserControl.Styles>
         <Style Selector="views|Action">
-            <Style Selector="^ > Border">
+            <Style Selector="^ > Button">
+                <!-- Completely override default (fluent) styling by redefining the theme -->
+                <Setter Property="Theme">
+                    <ControlTheme TargetType="Button">
+                        <Setter Property="Template">
+                            <ControlTemplate>
+                                <ContentPresenter x:Name="PART_ContentPresenter"
+                                                  Background="{TemplateBinding Background}"
+                                                  BorderBrush="{TemplateBinding BorderBrush}"
+                                                  BorderThickness="{TemplateBinding BorderThickness}"
+                                                  CornerRadius="{TemplateBinding CornerRadius}"
+                                                  Content="{TemplateBinding Content}"
+                                                  ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                  Padding="{TemplateBinding Padding}"
+                                                  RecognizesAccessKey="True"
+                                                  HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                  VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+                            </ControlTemplate>
+                        </Setter>
+                    </ControlTheme>
+                </Setter>
                 <Setter Property="CornerRadius" Value="4" />
                 <Setter Property="BorderThickness" Value="1" />
                 <Setter Property="BorderBrush" Value="{StaticResource Tone1}" />
                 <Setter Property="Padding" Value="14" />
+                <Style Selector="^:pointerover">
+                    <Setter Property="Background" Value="{StaticResource Tone2-25}" />
+                </Style>
+                <Style Selector="^:pressed">
+                    <Setter Property="Background" Value="{StaticResource Tone2-50}" />
+                </Style>
             </Style>
 
             <Style Selector="^ TextBlock.Icon">
@@ -44,12 +69,11 @@
 
     </UserControl.Styles>
 
-    <Border>
+    <Button Command="{Binding StartCommand}">
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
             <TextBlock Classes="Icon" Grid.Column="0" Text="{Binding Emoji}" />
@@ -62,12 +86,7 @@
                            Text="{Binding Description}"
                            TextWrapping="Wrap" />
             </StackPanel>
-
-            <controls:IconButton Grid.Column="2"
-                                 IconData="{StaticResource PlayIcon}"
-                                 Command="{Binding StartCommand}" 
-                                 />
         </Grid>
-    </Border>
+    </Button>
 
 </UserControl>
