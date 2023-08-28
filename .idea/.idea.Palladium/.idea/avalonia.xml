@@ -6,6 +6,7 @@
         <entry key="AppSource/Palladium.Actions/Views/Action.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.Controls/ApplicationTabItem.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.Controls/HeadedSection.axaml" value="AppSource/Palladium/Palladium.csproj" />
+        <entry key="AppSource/Palladium.Controls/Resources/Colours.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.Controls/Resources/Icons.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium/App.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium/Views/Home.axaml" value="AppSource/Palladium/Palladium.csproj" />

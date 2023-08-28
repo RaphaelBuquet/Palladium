@@ -64,7 +64,7 @@
                     <Setter Property="BorderBrush" Value="{StaticResource Tone1}" />
                 </Style>
                 <Style Selector="^:pointerover">
-                    <Setter Property="Background" Value="{StaticResource Tone2-50}" />
+                    <Setter Property="Background" Value="{StaticResource Tone2-50-Fill}" />
                 </Style>
                 <Style Selector="^:pressed">
                     <Setter Property="Background" Value="{StaticResource Tone2}" />
