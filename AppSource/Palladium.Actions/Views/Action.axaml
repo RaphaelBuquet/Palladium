@@ -35,18 +35,19 @@
                                                   VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
                             </ControlTemplate>
                         </Setter>
+                        
+                        <Setter Property="CornerRadius" Value="4" />
+                        <Setter Property="BorderThickness" Value="1" />
+                        <Setter Property="BorderBrush" Value="{StaticResource Tone1}" />
+                        <Setter Property="Padding" Value="14" />
+                        <Style Selector="^:pointerover">
+                            <Setter Property="Background" Value="{StaticResource Tone2-25}" />
+                        </Style>
+                        <Style Selector="^:pressed">
+                            <Setter Property="Background" Value="{StaticResource Tone2-50}" />
+                        </Style>
                     </ControlTheme>
                 </Setter>
-                <Setter Property="CornerRadius" Value="4" />
-                <Setter Property="BorderThickness" Value="1" />
-                <Setter Property="BorderBrush" Value="{StaticResource Tone1}" />
-                <Setter Property="Padding" Value="14" />
-                <Style Selector="^:pointerover">
-                    <Setter Property="Background" Value="{StaticResource Tone2-25}" />
-                </Style>
-                <Style Selector="^:pressed">
-                    <Setter Property="Background" Value="{StaticResource Tone2-50}" />
-                </Style>
             </Style>
 
             <Style Selector="^ TextBlock.Icon">

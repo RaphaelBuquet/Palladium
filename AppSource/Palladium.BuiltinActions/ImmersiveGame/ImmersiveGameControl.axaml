@@ -9,8 +9,8 @@
     <Design.DataContext>
         <immersiveGame:ImmersiveGameViewModel />
     </Design.DataContext>
-    <StackPanel Orientation="Vertical">
-        <StackPanel Orientation="Horizontal">
+    <StackPanel Orientation="Vertical" Margin="14 40" Spacing="14">
+        <StackPanel Orientation="Horizontal" Spacing="4">
             <Button Command="{Binding ActivateCommand}">Enable</Button>
             <Button Command="{Binding DeactivateCommand}">Disable</Button>
         </StackPanel>

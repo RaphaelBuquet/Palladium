@@ -1,0 +1,58 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:Palladium.Controls">
+    <Design.PreviewWith>
+        <Border Padding="20">
+            <StackPanel Orientation="Horizontal">
+                <Button>Hello</Button>
+                <controls:IconButton IconData="{StaticResource SettingsIcon}" Content="Hello" />
+            </StackPanel>
+        </Border>
+    </Design.PreviewWith>
+
+    <Style Selector="Button">
+        <Setter Property="Theme">
+            <ControlTheme TargetType="Button">
+                <Setter Property="Template">
+                    <ControlTemplate>
+                        <ContentPresenter x:Name="PART_ContentPresenter"
+                                          Foreground="{TemplateBinding Foreground}"
+                                          Background="{TemplateBinding Background}"
+                                          BorderBrush="{TemplateBinding BorderBrush}"
+                                          BorderThickness="{TemplateBinding BorderThickness}"
+                                          CornerRadius="{TemplateBinding CornerRadius}"
+                                          Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          Padding="{TemplateBinding Padding}"
+                                          RecognizesAccessKey="True"
+                                          HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          Height="{TemplateBinding Height}" />
+                    </ControlTemplate>
+                </Setter>
+                
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="BorderBrush" Value="{StaticResource Tone1}" />
+                <Setter Property="CornerRadius" Value="2" />
+                <Setter Property="Padding" Value="3" /> <!--Using 3 because border thickness is 1, so it totals 4-->
+                <Setter Property="Height" Value="24" />
+                <Setter Property="FontSize" Value="12" />
+                <Setter Property="Foreground" Value="{StaticResource Tone1}" />
+
+                <Style Selector="^:pointerover">
+                    <Setter Property="Background" Value="{StaticResource Tone2-50}" />
+                </Style>
+                <Style Selector="^:pressed">
+                    <Setter Property="Background" Value="{StaticResource Tone2}" />
+                </Style>
+                <Style Selector="^:disabled">
+                    <Setter Property="Background" Value="{StaticResource Tone2-25}" />
+                    <Setter Property="Foreground" Value="{StaticResource Tone1-50}" />
+                </Style>
+            </ControlTheme>
+        </Setter>
+        
+    </Style>
+
+</Styles>

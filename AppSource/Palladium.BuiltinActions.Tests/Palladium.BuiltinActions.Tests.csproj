@@ -10,6 +10,10 @@
         <Configurations>Release;Debug</Configurations>
         <Platforms>x64</Platforms>
     </PropertyGroup>
+    
+    <PropertyGroup>
+        <NoWarn>NUnit2005$(NoWarn)</NoWarn>
+    </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.0"/>
