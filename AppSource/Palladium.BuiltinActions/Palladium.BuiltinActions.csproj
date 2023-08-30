@@ -11,7 +11,7 @@
     <ItemGroup>
         <ProjectReference Include="..\Palladium.Actions\Palladium.Actions.csproj"/>
         <ProjectReference Include="..\Palladium.Logging\Palladium.Logging.csproj"/>
-        <ProjectReference Include="..\Palladium.ObservableExtensions\Palladium.ObservableExtensions.csproj"/>
+        <ProjectReference Include="..\Palladium.ExtensionFunctions\Palladium.ExtensionFunctions.csproj" />
         <!-- Build dependency on Palladium.NativeWindows -->
         <ProjectReference Include="..\Palladium.NativeWindows\Palladium.NativeWindows.vcxproj"/>
     </ItemGroup>

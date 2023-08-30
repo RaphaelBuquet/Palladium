@@ -49,7 +49,7 @@ public class HomeTests
 		// assert
 		Assert.AreEqual(2, actionsItemsControl.ItemCount);
 		
-		var actions = actionsItemsControl.GetLogicalChildren().OfType<Action>();
+		var actions = actionsItemsControl.GetLogicalDescendants().OfType<Action>();
 		var match = actions.FirstOrDefault(a => a.DataContext is ActionViewModel { Title: "Action2" } );
 		Assert.IsNotNull(match);
 	}

@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:immersiveGame="clr-namespace:Palladium.BuiltinActions.ImmersiveGame"
+             xmlns:controls="clr-namespace:Palladium.Controls;assembly=Palladium.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Palladium.BuiltinActions.ImmersiveGame.ImmersiveGameControl">
 
@@ -15,5 +16,6 @@
             <Button Command="{Binding DeactivateCommand}">Disable</Button>
         </StackPanel>
         <TextBlock Text="{Binding AvailableDisplays}" />
+        <controls:MiniLog TextStream="{Binding OutputStream}"/>
     </StackPanel>
 </UserControl>

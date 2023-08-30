@@ -2,8 +2,12 @@
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using Avalonia.Controls.Documents;
+using Palladium.ActionsService;
+using Palladium.Controls;
 using Palladium.ObservableExtensions;
 using ReactiveUI;
+using MiniLog = Palladium.Logging.MiniLog;
 
 namespace Palladium.BuiltinActions.ImmersiveGame;
 
@@ -15,6 +19,7 @@ public class ImmersiveGameViewModel : ReactiveObject, IActivatableViewModel
 	private readonly ObservableAsPropertyHelper<string> availableDisplays;
 
 	private readonly ObservableAsPropertyHelper<bool> isWorking;
+	private readonly ReplaySubject<Inline> outputStream = new (2);
 
 	/// <inheritdoc />
 	public ImmersiveGameViewModel() : this(null)
@@ -54,8 +59,10 @@ public class ImmersiveGameViewModel : ReactiveObject, IActivatableViewModel
 				return $"Displays: {string.Join(", ", task.Result)}";
 			})
 			.ToProperty(this, x => x.AvailableDisplays);
-
-
+		
+		outputStream.OnNext(new Run("Debug output"));
+		outputStream.OnNext(SmartLineBreak.Instance);
+		
 		this.WhenActivated(disposables =>
 		{
 			ActivateCommand.DisposeWith(disposables);
@@ -64,6 +71,7 @@ public class ImmersiveGameViewModel : ReactiveObject, IActivatableViewModel
 		});
 	}
 
+	public IObservable<Inline> OutputStream => outputStream;
 	public ReactiveCommand<Unit, Unit> ActivateCommand { get; }
 	public ReactiveCommand<Unit, Unit> DeactivateCommand { get; }
 	public string AvailableDisplays => availableDisplays.Value;
@@ -71,7 +79,7 @@ public class ImmersiveGameViewModel : ReactiveObject, IActivatableViewModel
 
 	/// <inheritdoc />
 	ViewModelActivator IActivatableViewModel.Activator { get; } = new ();
-
+	
 	/// <remarks>
 	///     This has to be manually called (as opposed to just calling it from the constructor) because the view model can be
 	///     used from the design preview.
@@ -85,12 +93,14 @@ public class ImmersiveGameViewModel : ReactiveObject, IActivatableViewModel
 	private void Activate()
 	{
 		if (source == null) return;
-		source.DisableNonPrimaryDisplays();
+		MiniLog result = source.DisableNonPrimaryDisplays();
+		result.AdaptForControl().Subscribe(outputStream).Dispose();
 	}
 
 	private void Deactivate()
 	{
 		if (source == null) return;
-		source.RestoreSettings();
+		MiniLog result = source.RestoreSettings();
+		result.AdaptForControl().Subscribe(outputStream).Dispose();
 	}
 }

@@ -1,7 +1,7 @@
 ﻿using Avalonia;
 using Avalonia.Markup.Xaml;
 
-namespace Palladium.Tests;
+namespace Palladium.Headless;
 
 public class HeadlessApp : Application
 {

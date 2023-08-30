@@ -18,6 +18,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Palladium.Controls\Palladium.Controls.csproj" />
+      <ProjectReference Include="..\Palladium.Logging\Palladium.Logging.csproj" />
     </ItemGroup>
 
 </Project>

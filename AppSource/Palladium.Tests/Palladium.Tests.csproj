@@ -9,6 +9,10 @@
         <IsTestProject>true</IsTestProject>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <NoWarn>NUnit2005</NoWarn>
+    </PropertyGroup>
+
     <ItemGroup>
         <PackageReference Include="Avalonia.Headless.NUnit" Version="11.0.3" />
         <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.3" />
@@ -20,6 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\Palladium.Headless\Palladium.Headless.csproj" />
       <ProjectReference Include="..\Palladium\Palladium.csproj" />
     </ItemGroup>
 

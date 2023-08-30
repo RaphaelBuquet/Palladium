@@ -4,12 +4,15 @@
     <option name="projectPerEditor">
       <map>
         <entry key="AppSource/Palladium.Actions/Views/Action.axaml" value="AppSource/Palladium/Palladium.csproj" />
+        <entry key="AppSource/Palladium.Actions/Views/MiniLog.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.BuiltinActions/ImmersiveGame/ImmersiveGameControl.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.Controls/ApplicationTabItem.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.Controls/Button.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.Controls/HeadedSection.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.Controls/IconButton.axaml" value="AppSource/Palladium/Palladium.csproj" />
+        <entry key="AppSource/Palladium.Controls/MiniLog.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.Controls/Resources/Colours.axaml" value="AppSource/Palladium/Palladium.csproj" />
+        <entry key="AppSource/Palladium.Controls/Resources/Fonts.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.Controls/Resources/Icons.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.Controls/Resources/Styles.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium/App.axaml" value="AppSource/Palladium/Palladium.csproj" />

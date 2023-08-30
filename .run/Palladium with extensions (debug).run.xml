@@ -1,5 +1,5 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Palladium with extensions" type="RunExe" factoryName=".NET Executable">
+﻿<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Palladium with extensions (debug)" type="RunExe" factoryName=".NET Executable">
     <option name="EXE_PATH" value="$PROJECT_DIR$/AppBinaries/Palladium.exe" />
     <option name="PROGRAM_PARAMETERS" value="" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/AppBinaries" />

@@ -10,8 +10,13 @@
     <Color x:Key="Tone2">#FFE6E6E9</Color>
     <Color x:Key="Tone2-75">#BFE6E6E9</Color>
     <Color x:Key="Tone2-50">#80E6E6E9</Color>
-    <Color x:Key="Tone2-25">#40E6E6E9</Color>   
+    <Color x:Key="Tone2-25">#40E6E6E9</Color>
     <Color x:Key="Tone2-75-Fill">#FFECECEF</Color>
     <Color x:Key="Tone2-50-Fill">#FFF3F3F4</Color>
     <Color x:Key="Tone2-25-Fill">#FFF8F8F9</Color>
+    
+    <Color x:Key="Validation-Success">#FF1E722B</Color>
+    <Color x:Key="Validation-Success-Background">#FFE1F1E4</Color>
+    <Color x:Key="Validation-Error">#FFEC3636</Color>
+    <Color x:Key="Validation-Error-Background">#FFFDEDED</Color>
 </ResourceDictionary>

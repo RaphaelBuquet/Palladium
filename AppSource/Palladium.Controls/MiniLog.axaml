@@ -1,0 +1,33 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="using:Palladium.Controls">
+    <Design.PreviewWith>
+        <controls:MiniLog Width="500" Height="300">Hello <Bold>world</Bold>!</controls:MiniLog>
+    </Design.PreviewWith>
+
+    <Styles.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="Resources/Fonts.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Styles.Resources>
+
+    <Style Selector="controls|MiniLog">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border
+                    x:Name="Border"
+                    Background="{StaticResource Tone2}"
+                    CornerRadius="2"
+                    Padding="6">
+                    <ScrollViewer>
+                        <SelectableTextBlock x:Name="PART_TextBlock" />
+                    </ScrollViewer>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+
+        <Setter Property="FontFamily" Value="{StaticResource JetBrainsMonoFont}" />
+    </Style>
+</Styles>

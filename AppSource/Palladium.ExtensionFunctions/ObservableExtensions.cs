@@ -1,12 +1,126 @@
-﻿using System.Reactive.Disposables;
+﻿using System.Collections.Concurrent;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Microsoft.Extensions.Logging;
 using Palladium.Logging;
 
 namespace Palladium.ObservableExtensions;
 
-public static class Extensions
+public static class ObservableExtensions
 {
+	public static IObservable<T> BufferWithToggle<T>(this IObservable<T> observable, IObservable<bool> unlockedToggle)
+	{
+		return Observable.Create<T>(observer =>
+		{
+			var disposables = new CompositeDisposable();
+
+			var unlocked = false;
+			var queue = new ConcurrentQueue<BufferedItem<T>>();
+			var slim = new ReaderWriterLockSlim();
+
+			IDisposable bufferSubscription = observable.Subscribe(
+				value =>
+				{
+					slim.EnterReadLock();
+					try
+					{
+						if (!unlocked)
+						{
+							queue.Enqueue(new BufferedItem<T> { Value = value });
+						}
+						else
+						{
+							observer.OnNext(value);
+						}
+					}
+					finally
+					{
+						slim.ExitReadLock();
+					}
+				},
+				exception =>
+				{
+					slim.EnterReadLock();
+					try
+					{
+						if (!unlocked)
+						{
+							queue.Enqueue(new BufferedItem<T> { Exception = exception });
+						}
+						else
+						{
+							observer.OnError(exception);
+						}
+					}
+					finally
+					{
+						slim.ExitReadLock();
+					}
+				},
+				() =>
+				{
+					slim.EnterReadLock();
+					try
+					{
+						if (!unlocked)
+						{
+							queue.Enqueue(new BufferedItem<T> { IsCompleted = true });
+						}
+						else
+						{
+							observer.OnCompleted();
+						}
+					}
+					finally
+					{
+						slim.ExitReadLock();
+					}
+				});
+
+
+			IDisposable unlockSubscription = unlockedToggle.Subscribe(newUnlockedState =>
+			{
+				slim.EnterWriteLock();
+				try
+				{
+					if (newUnlockedState == unlocked) return;
+					// unlock
+					if (newUnlockedState)
+					{
+						foreach (var bufferedItem in queue)
+						{
+							if (bufferedItem.IsCompleted)
+							{
+								observer.OnCompleted();
+							}
+							else if (bufferedItem.Exception != null)
+							{
+								observer.OnError(bufferedItem.Exception);
+							}
+							observer.OnNext(bufferedItem.Value);
+						}
+						queue.Clear();
+						unlocked = true;
+					}
+					// lock
+					else
+					{
+						unlocked = false;
+					}
+				}
+				finally
+				{
+					slim.ExitWriteLock();
+				}
+			});
+
+			unlockSubscription.DisposeWith(disposables);
+			bufferSubscription.DisposeWith(disposables);
+
+			return disposables;
+		});
+	}
+
 	/// <summary>
 	///     When a task is emitted, this observable will also emit it. The difference is that once the task completes, it will
 	///     be emitted again.

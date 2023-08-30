@@ -1,8 +1,10 @@
-﻿namespace Palladium.BuiltinActions.ImmersiveGame;
+﻿using Palladium.Logging;
+
+namespace Palladium.BuiltinActions.ImmersiveGame;
 
 public interface IDisplaySource
 {
-	bool DisableNonPrimaryDisplays();
-	bool RestoreSettings();
+	MiniLog DisableNonPrimaryDisplays();
+	MiniLog RestoreSettings();
 	Task<string[]> GetDisplayDevices();
 }

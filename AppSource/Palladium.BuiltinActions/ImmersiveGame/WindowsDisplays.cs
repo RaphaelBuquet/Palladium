@@ -5,6 +5,7 @@ using Palladium.Logging;
 
 namespace Palladium.BuiltinActions.ImmersiveGame;
 
+// NOTE: this code was partially generated with JetBrains AI assistant
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public class WindowsDisplays : IDisplaySource
 {
@@ -56,19 +57,21 @@ public class WindowsDisplays : IDisplaySource
 	}
 
 	/// <inheritdoc />
-	bool IDisplaySource.DisableNonPrimaryDisplays()
+	MiniLog IDisplaySource.DisableNonPrimaryDisplays()
 	{
 		int result = DisableNonPrimaryDisplays();
 		Log.Emit(new EventId(), LogLevel.Debug, $"{nameof(DisableNonPrimaryDisplays)} returned {result}");
-		return result == 0;
+		
+		return InterpretResult(result);
 	}
-
+	
 	/// <inheritdoc />
-	bool IDisplaySource.RestoreSettings()
+	MiniLog IDisplaySource.RestoreSettings()
 	{
 		int result = RestoreSettings();
 		Log.Emit(new EventId(), LogLevel.Debug, $"{nameof(RestoreSettings)} returned {result}");
-		return result == 0;
+		
+		return InterpretResult(result);
 	}
 
 	/// <inheritdoc />
@@ -95,5 +98,21 @@ public class WindowsDisplays : IDisplaySource
 
 		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
 		public string DeviceKey;
+	}
+	
+	private static MiniLog InterpretResult(int result)
+	{
+		var miniLogProvider = new MiniLogProvider();
+		bool success = result == 0;
+		if (!success)
+		{
+			miniLogProvider.Entries.OnNext(new MiniLog.Entry
+			{
+				LogLevel = LogLevel.Error,
+				Message = $"Operation failed with code {result}"
+			});
+		}
+		miniLogProvider.Result.OnNext(success);
+		return miniLogProvider.Value;
 	}
 }

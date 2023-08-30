@@ -8,6 +8,7 @@
     <StyleInclude Source="avares://Palladium.Controls/HeadedSection.axaml"/>
     <StyleInclude Source="avares://Palladium.Controls/ApplicationTabItem.axaml"/>
     <StyleInclude Source="avares://Palladium.Controls/Button.axaml"/>
+    <StyleInclude Source="avares://Palladium.Controls/MiniLog.axaml"/>
     
     <!-- Preview -->
     <Design.PreviewWith>
