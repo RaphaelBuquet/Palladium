@@ -4,8 +4,6 @@
         <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <Configurations>Release;Debug</Configurations>
-        <Platforms>x64</Platforms>
         <RootNamespace>Palladium.ObservableExtensions</RootNamespace>
     </PropertyGroup>
 
@@ -16,12 +14,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Palladium.Logging\Palladium.Logging.csproj"/>
-    </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="Avalonia.Controls">
-        <HintPath>..\..\AppBinaries\Avalonia.Controls.dll</HintPath>
-      </Reference>
     </ItemGroup>
 
 </Project>

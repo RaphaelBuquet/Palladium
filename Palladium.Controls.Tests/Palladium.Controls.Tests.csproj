@@ -19,13 +19,7 @@
         <PackageReference Include="coverlet.collector" Version="3.2.0"/>
         <PackageReference Include="System.Reactive" Version="6.0.0" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Reference Include="Avalonia.Controls">
-        <HintPath>..\AppBinaries\Avalonia.Controls.dll</HintPath>
-      </Reference>
-    </ItemGroup>
-
+    
     <ItemGroup>
       <ProjectReference Include="..\AppSource\Palladium.Controls\Palladium.Controls.csproj" />
       <ProjectReference Include="..\Palladium.Headless\Palladium.Headless.csproj" />

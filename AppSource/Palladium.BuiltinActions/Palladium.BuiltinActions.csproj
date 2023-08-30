@@ -4,8 +4,6 @@
         <TargetFramework>net7.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <Configurations>Release;Debug</Configurations>
-        <Platforms>x64</Platforms>
     </PropertyGroup>
 
     <ItemGroup>
@@ -17,7 +15,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="..\Palladium.NativeWindows\bin\$(Platform)\$(Configuration)\Palladium.NativeWindows.dll">
+      <Content Include="..\Palladium.NativeWindows\bin\x64\$(Configuration)\Palladium.NativeWindows.dll">
         <Link>Palladium.NativeWindows.dll</Link>
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </Content>

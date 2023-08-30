@@ -35,10 +35,10 @@
             <HintPath>..\..\AppBinaries\Palladium.Logging.dll</HintPath>
         </Reference>
 
-        <Reference Include="Palladium.ObservableExtensions">
+        <Reference Include="Palladium.ExtensionFunctions">
             <Private>false</Private>
             <ExcludeAssets>runtime</ExcludeAssets>
-            <HintPath>..\..\AppBinaries\Palladium.ObservableExtensions.dll</HintPath>
+            <HintPath>..\..\AppBinaries\Palladium.ExtensionFunctions.dll</HintPath>
         </Reference>
     </ItemGroup>
 

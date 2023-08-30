@@ -3,7 +3,6 @@
         <OutputType>WinExe</OutputType>
         <TargetFramework>net7.0</TargetFramework>
         <Nullable>enable</Nullable>
-        <Platforms>x64</Platforms>
         <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <ApplicationIcon>Assets/v3.ico</ApplicationIcon>
