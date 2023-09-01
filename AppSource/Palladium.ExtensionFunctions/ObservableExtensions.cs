@@ -8,6 +8,13 @@ namespace Palladium.ObservableExtensions;
 
 public static class ObservableExtensions
 {
+	public static IObservable<(T? Previous, T Current)> PairWithPrevious<T>(this IObservable<T> observable)
+	{
+		return observable.Scan(
+			(Previous: default(T), Current: default(T)!),
+			(acc, current) => (acc.Current, current));
+	}
+
 	public static IObservable<T> BufferWithToggle<T>(this IObservable<T> observable, IObservable<bool> unlockedToggle)
 	{
 		return Observable.Create<T>(observer =>

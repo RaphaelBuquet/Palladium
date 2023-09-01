@@ -4,21 +4,22 @@ using DynamicData;
 using DynamicData.Binding;
 using Palladium.ActionsService;
 using Palladium.ActionsService.ViewModels;
+using Palladium.ObservableExtensions.Lifecycle;
 using ReactiveUI;
 
 namespace Palladium.ViewModels;
 
-public class HomeViewModel : ReactiveObject, IActivatableViewModel
+public class HomeViewModel : ReactiveObject, IActivatableViewModel, ILifecycleAwareViewModel
 {
 	/// <summary>
-	/// Design preview constructor.
+	///     Design preview constructor.
 	/// </summary>
 	public HomeViewModel() : this(null, null)
 	{ }
 
 	public HomeViewModel(ActionsRepositoryService? actionsRepositoryService, TabsService? tabsService)
 	{
-		Actions = new();
+		Actions = new ObservableCollectionExtended<ActionViewModel>();
 		IDisposable? connection = null;
 		if (actionsRepositoryService != null && tabsService != null)
 		{
@@ -30,7 +31,7 @@ public class HomeViewModel : ReactiveObject, IActivatableViewModel
 				.Subscribe();
 		}
 
-		this.WhenActivated(disposables =>
+		this.WhenAttached(disposables =>
 		{
 			if (connection is not null) disposables.Add(connection);
 		});
@@ -40,4 +41,7 @@ public class HomeViewModel : ReactiveObject, IActivatableViewModel
 
 	/// <inheritdoc />
 	ViewModelActivator IActivatableViewModel.Activator { get; } = new ();
+
+	/// <inheritdoc />
+	public LifecycleActivator Activator { get; } = new();
 }

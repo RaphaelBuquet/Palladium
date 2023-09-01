@@ -7,6 +7,33 @@ namespace Palladium.ExtensionFunctions.Tests;
 public class ObservableExtensionsTests
 {
 	[Test]
+	public void Test()
+	{
+		var s = new Subject<int>();
+		s.OnCompleted();
+		bool itDoes = false;
+		s.Subscribe(i => { },
+			() => { itDoes = true;});
+
+		Assert.IsTrue(itDoes);
+	}
+
+	[Test]
+	public void PairWithPrevious_EmitsWithPrevious()
+	{
+		// arrange
+		var observable = Observable.Range(1, 3);
+		var result = new List<(int, int)>();
+
+		// act
+		var bufferedObservable = observable.PairWithPrevious();
+		bufferedObservable.Subscribe(result.Add);
+
+		// assert
+		CollectionAssert.AreEqual(new [] { (0, 1), (1, 2), (2, 3) }, result);
+	}
+
+	[Test]
 	public void BufferedUntil_Emits_WhenSubscribingAfterRelease_OnColdObservable()
 	{
 		// arrange

@@ -1,0 +1,19 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:searchOverride="clr-namespace:Palladium.BuiltinActions.SearchOverride"
+             xmlns:controls="clr-namespace:Palladium.Controls;assembly=Palladium.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Palladium.BuiltinActions.SearchOverride.SearchOverrideView">
+    <Design.DataContext>
+        <searchOverride:SearchOverrideViewModel />
+    </Design.DataContext>
+    <StackPanel Orientation="Vertical" Margin="14 40" Spacing="14">
+        <StackPanel Orientation="Horizontal" Spacing="4">
+            <Button Command="{Binding ActivateCommand}">Enable</Button>
+            <Button Command="{Binding DeactivateCommand}">Disable</Button>
+        </StackPanel>
+        <controls:MiniLog TextStream="{Binding OutputStream}"/>
+    </StackPanel>
+</UserControl>

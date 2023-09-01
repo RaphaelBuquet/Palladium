@@ -6,6 +6,7 @@
         <entry key="AppSource/Palladium.Actions/Views/Action.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.Actions/Views/MiniLog.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.BuiltinActions/ImmersiveGame/ImmersiveGameControl.axaml" value="AppSource/Palladium/Palladium.csproj" />
+        <entry key="AppSource/Palladium.BuiltinActions/SearchOverride/SearchOverrideView.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.Controls/ApplicationTabItem.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.Controls/Button.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.Controls/HeadedSection.axaml" value="AppSource/Palladium/Palladium.csproj" />

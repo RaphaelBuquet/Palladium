@@ -1,11 +1,11 @@
 ﻿using Avalonia.ReactiveUI;
 using Palladium.ObservableExtensions.Lifecycle;
 
-namespace Palladium.BuiltinActions.ImmersiveGame;
+namespace Palladium.BuiltinActions.SearchOverride;
 
-public partial class ImmersiveGameControl : ReactiveUserControl<ImmersiveGameViewModel>, IDisposable
+public partial class SearchOverrideView : ReactiveUserControl<SearchOverrideViewModel>, IDisposable
 {
-	public ImmersiveGameControl()
+	public SearchOverrideView()
 	{
 		InitializeComponent();
 		this.InstallLifecycleHandler();

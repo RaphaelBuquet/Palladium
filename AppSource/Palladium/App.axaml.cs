@@ -15,6 +15,7 @@ using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using Palladium.ActionsService;
 using Palladium.BuiltinActions.ImmersiveGame;
+using Palladium.BuiltinActions.SearchOverride;
 using Palladium.Extensions;
 using Palladium.Logging;
 using Palladium.ObservableExtensions;
@@ -52,18 +53,6 @@ public  class App : Application
 			// home
 			var homeViewModel = new HomeViewModel(actionsRepositoryService, tabsService);
 			mainWindow.Home.DataContext = homeViewModel;
-
-			actionsRepositoryService.Actions.Connect()
-				.Select(set =>
-				{
-					var change = set.ToList().First();
-
-					var item = change.Range.Any() ? change.Range.First() : change.Item.Current;
-					
-					return $"{change.Reason}: {item.Title}";
-				})
-				.DebugToLogs("ACTIONS CHANGE")
-				.Subscribe();
 			
 			// background load
 			Task.Run(() =>
@@ -83,6 +72,7 @@ public  class App : Application
 		var actionsRepositoryService = new ActionsRepositoryService();
 
 		actionsRepositoryService.Actions.Add(new ImmersiveGameAction().Description);
+		actionsRepositoryService.Actions.Add(new SearchOverrideAction().Description);
 		
 		return actionsRepositoryService;
 	}
