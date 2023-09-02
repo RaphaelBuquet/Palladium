@@ -1,6 +1,6 @@
-﻿using System.Reactive;
+﻿using System.Diagnostics;
+using System.Reactive;
 using System.Reactive.Disposables;
-using System.Reactive.Subjects;
 using Avalonia.Controls.Documents;
 using Palladium.Controls;
 using Palladium.ObservableExtensions;
@@ -12,6 +12,7 @@ namespace Palladium.BuiltinActions.SearchOverride;
 public class SearchOverrideViewModel : ReactiveObject, IActivatableViewModel, ILifecycleAwareViewModel
 {
 	private readonly ReplayFirstValuesSubject<Inline> outputStream = new (2);
+	private readonly WindowsKeyboard windowsKeyboard = new ();
 
 	/// <inheritdoc />
 	public SearchOverrideViewModel()
@@ -24,7 +25,7 @@ public class SearchOverrideViewModel : ReactiveObject, IActivatableViewModel, IL
 
 		this.WhenAttached(disposables =>
 		{
-			Disposable.Create(WindowsKeyboard.UnsetHook).DisposeWith(disposables);
+			Disposable.Create(windowsKeyboard.UnsetHook).DisposeWith(disposables);
 			ActivateCommand.DisposeWith(disposables);
 			DeactivateCommand.DisposeWith(disposables);
 		});
@@ -36,24 +37,29 @@ public class SearchOverrideViewModel : ReactiveObject, IActivatableViewModel, IL
 	public ReactiveCommand<Unit, Unit> DeactivateCommand { get; }
 
 	/// <inheritdoc />
-	public ViewModelActivator Activator { get; } = new ();
+	ViewModelActivator IActivatableViewModel.Activator { get; } = new ();
 
 	/// <inheritdoc />
 	LifecycleActivator ILifecycleAwareViewModel.Activator { get; } = new();
 
 	private void Deactivate()
 	{
-		WindowsKeyboard.UnsetHook();
+		windowsKeyboard.UnsetHook();
 		outputStream.OnNext(new Run("Deactivated"));
 		outputStream.OnNext(SmartLineBreak.Instance);
 	}
 
 	private void Activate()
 	{
-		WindowsKeyboard.InstallKeyboardShortcut(() =>
+		windowsKeyboard.InstallKeyboardShortcut(() =>
 		{
-			outputStream.OnNext(new Run("Callback!!"));
+			outputStream.OnNext(new Run("Shortcut pressed"));
 			outputStream.OnNext(SmartLineBreak.Instance);
+
+			// firefox
+			Process.Start(@"C:\Program Files\Mozilla Firefox\firefox.exe", "--new-tab --url about:newtab");
+			// edge
+			// Process.Start(@"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe", "chrome-search://local-ntp/local-ntp.html");
 		}, RxApp.MainThreadScheduler, WindowsKeyboard.VK_S, null, null);
 
 		outputStream.OnNext(new Run("Activated"));
@@ -62,6 +68,6 @@ public class SearchOverrideViewModel : ReactiveObject, IActivatableViewModel, IL
 
 	~SearchOverrideViewModel()
 	{
-		WindowsKeyboard.UnsetHook();
+		windowsKeyboard.UnsetHook();
 	}
 }

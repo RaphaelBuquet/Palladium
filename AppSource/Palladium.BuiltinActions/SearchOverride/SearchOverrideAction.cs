@@ -18,7 +18,6 @@ public class SearchOverrideAction
 
 	private void Start(ContentControl container)
 	{
-		var vm = new SearchOverrideViewModel();
 		if (!(Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop))
 		{
 			container.Content = new TextBlock
@@ -28,12 +27,13 @@ public class SearchOverrideAction
 			return;
 		}
 
-		container.Content = new SearchOverrideView
+		var view = new SearchOverrideView
 		{
-			DataContext = vm
+			DataContext = new SearchOverrideViewModel()
 		};
+		container.Content = view;
 
-		// ensure windows API clean up 
-		desktop.Exit += (sender, args) => WindowsKeyboard.UnsetHook();
+		// ensure windows API clean up
+		desktop.Exit += (sender, args) => view.DataContext = null;
 	}
 }

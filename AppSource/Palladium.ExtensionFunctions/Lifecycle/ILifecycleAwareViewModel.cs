@@ -48,11 +48,13 @@ public class LifecycleActivator
 		{
 			block.Invoke(WhenDetached);
 		}
+		WhenAttachedBlocks.Clear();
 	}
 
 	public void RunWhenDetached()
 	{
 		WhenDetached.Dispose();
+		WhenDetached.Clear();
 	}
 }
 
