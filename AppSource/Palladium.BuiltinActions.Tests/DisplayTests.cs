@@ -5,6 +5,7 @@ namespace Palladium.BuiltinActions.Tests;
 public class DisplayTests
 {
 	[Test]
+	[Ignore("The test works but is annoying to run continuously")]
 	public void EnableThenDisableTest()
 	{
 		if (WindowsDisplays.GetDisplayDevices().adapters

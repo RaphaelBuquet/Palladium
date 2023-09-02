@@ -1,5 +1,6 @@
 ﻿using Avalonia;
 using Avalonia.Headless;
+using Avalonia.ReactiveUI;
 using Palladium.Headless;
 using Palladium.Tests;
 
@@ -12,6 +13,8 @@ public class TestAppBuilder
 	public static AppBuilder BuildAvaloniaApp()
 	{
 		return AppBuilder.Configure<HeadlessApp>()
+			.UseReactiveUI()
+			.WithInterFont()
 			.UseHeadless(new AvaloniaHeadlessPlatformOptions());
 	}
 }

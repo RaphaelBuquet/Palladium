@@ -1,9 +1,12 @@
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
 using Avalonia.Controls.Templates;
 using Avalonia.Headless.NUnit;
+using Avalonia.Media;
+using Avalonia.Threading;
 using Microsoft.Reactive.Testing;
 using ReactiveUI;
 
@@ -43,11 +46,10 @@ public class MiniLogTests
 		var inline2 = new Bold { Inlines = new InlineCollection { new Run("world") } };
 		source.OnNext(inline1);
 		source.OnNext(inline2);
-		var window = new Window
-		{
-			Content = control
-		};
-		window.Show();
+		var window = new Window();
+		window.Show(); // for some reason the window has to be loaded before the MiniLog is added, otherwise the custom fonts used in MiniLog won't be loaded yet.
+		window.Content = control;
+		Dispatcher.UIThread.RunJobs(); // ensure visual children of MiniLog are populated
 
 		// assert
 		TextBlock? textBlock = control.GetTemplateChildren().OfType<TextBlock>().FirstOrDefault();
@@ -70,12 +72,11 @@ public class MiniLogTests
 		// act 
 		var inline = new Run("Hello");
 		control.Inlines.Add(inline);
-		var window = new Window
-		{
-			Content = control
-		};
-		window.Show();
-
+		var window = new Window();
+		window.Show(); // for some reason the window has to be loaded before the MiniLog is added, otherwise the custom fonts used in MiniLog won't be loaded yet.
+		window.Content = control; 
+		Dispatcher.UIThread.RunJobs(); // ensure visual children of MiniLog are populated
+		
 		// assert
 		TextBlock? textBlock = control.GetTemplateChildren().OfType<TextBlock>().FirstOrDefault();
 		Assert.IsNotNull(textBlock);
