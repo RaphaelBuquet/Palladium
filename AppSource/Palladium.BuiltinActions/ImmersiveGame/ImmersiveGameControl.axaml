@@ -10,12 +10,15 @@
     <Design.DataContext>
         <immersiveGame:ImmersiveGameViewModel />
     </Design.DataContext>
-    <StackPanel Orientation="Vertical" Margin="14 40" Spacing="14">
-        <StackPanel Orientation="Horizontal" Spacing="4">
-            <Button Command="{Binding ActivateCommand}">Enable</Button>
-            <Button Command="{Binding DeactivateCommand}">Disable</Button>
+
+    <ScrollViewer>
+        <StackPanel Orientation="Vertical" Margin="14 40" Spacing="14">
+            <StackPanel Orientation="Horizontal" Spacing="4">
+                <Button Command="{Binding ActivateCommand}">Enable</Button>
+                <Button Command="{Binding DeactivateCommand}">Disable</Button>
+            </StackPanel>
+            <TextBlock Text="{Binding AvailableDisplays}" />
+            <controls:MiniLog TextStream="{Binding OutputStream}" />
         </StackPanel>
-        <TextBlock Text="{Binding AvailableDisplays}" />
-        <controls:MiniLog TextStream="{Binding OutputStream}"/>
-    </StackPanel>
+    </ScrollViewer>
 </UserControl>

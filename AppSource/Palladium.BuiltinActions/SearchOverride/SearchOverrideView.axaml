@@ -9,11 +9,14 @@
     <Design.DataContext>
         <searchOverride:SearchOverrideViewModel />
     </Design.DataContext>
-    <StackPanel Orientation="Vertical" Margin="14 40" Spacing="14">
-        <StackPanel Orientation="Horizontal" Spacing="4">
-            <Button Command="{Binding ActivateCommand}">Enable</Button>
-            <Button Command="{Binding DeactivateCommand}">Disable</Button>
+    
+    <ScrollViewer>
+        <StackPanel Orientation="Vertical" Margin="14 40" Spacing="14">
+            <StackPanel Orientation="Horizontal" Spacing="4">
+                <Button Command="{Binding ActivateCommand}">Enable</Button>
+                <Button Command="{Binding DeactivateCommand}">Disable</Button>
+            </StackPanel>
+            <controls:MiniLog TextStream="{Binding OutputStream}" />
         </StackPanel>
-        <controls:MiniLog TextStream="{Binding OutputStream}"/>
-    </StackPanel>
+    </ScrollViewer>
 </UserControl>
