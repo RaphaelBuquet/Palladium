@@ -53,14 +53,20 @@ public class SearchOverrideViewModel : ReactiveObject, IActivatableViewModel, IL
 	{
 		windowsKeyboard.InstallKeyboardShortcut(() =>
 		{
-			outputStream.OnNext(new Run("Shortcut pressed"));
+			outputStream.OnNext(new Run($"{DateTime.Now:HH:mm:ss.ffff} Shortcut pressed"));
 			outputStream.OnNext(SmartLineBreak.Instance);
 
-			// firefox
-			Process.Start(@"C:\Program Files\Mozilla Firefox\firefox.exe", "--new-tab --url about:newtab");
-			// edge
-			// Process.Start(@"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe", "chrome-search://local-ntp/local-ntp.html");
-		}, RxApp.MainThreadScheduler, WindowsKeyboard.VK_S, null, null);
+			// // firefox
+			// var psi = new ProcessStartInfo()
+			// {
+			// 	FileName = @"C:\Program Files\Mozilla Firefox\firefox.exe",
+			// 	// Arguments = "--url about:newtab",
+			// };
+			// Process.Start(psi);
+			
+            // edge
+			Process.Start(@"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe", "chrome-search://local-ntp/local-ntp.html");
+		}, RxApp.MainThreadScheduler, WindowsKeyboard.VK_S, WindowsKeyboard.VK_LWIN);
 
 		outputStream.OnNext(new Run("Activated"));
 		outputStream.OnNext(SmartLineBreak.Instance);

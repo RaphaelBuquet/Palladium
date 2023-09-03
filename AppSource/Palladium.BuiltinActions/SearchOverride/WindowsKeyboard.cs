@@ -1,8 +1,6 @@
 ﻿using System.Reactive.Concurrency;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using Microsoft.Extensions.Logging;
-using Palladium.Logging;
 
 // ReSharper disable IdentifierTypo
 
@@ -21,11 +19,13 @@ public class WindowsKeyboard
 	private const int HC_ACTION = 0;
 	internal const int WM_KEYDOWN = 0x0100;
 	internal const int WM_KEYUP = 0x0101;
-	private readonly Dictionary<uint, int> keyStates = new ();
+
+
+	private ShortcutKeyboardState shortcutKeyboardState = new ();
 
 	private IntPtr hookHandle = IntPtr.Zero;
 
-	private KeyboardProc? callback;
+	private KeyboardProc? keyboardCallback;
 
 	[DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
 	private static extern IntPtr SetWindowsHookEx(int idHook, KeyboardProc? lpfn, IntPtr hMod, uint dwThreadId);
@@ -42,17 +42,16 @@ public class WindowsKeyboard
 	/// </summary>
 	/// <param name="callback">Code to run when the keys are pressed down.</param>
 	/// <param name="scheduler">Scheduler to send the callback to.</param>
-	/// <param name="keyOne"></param>
-	/// <param name="keyTwo"></param>
-	/// <param name="keyThree"></param>
-	public void InstallKeyboardShortcut(Action callback, IScheduler scheduler, uint keyOne, uint? keyTwo, uint? keyThree)
+	/// <param name="key"></param>
+	/// <param name="modifier"></param>
+	public void InstallKeyboardShortcut(Action callback, IScheduler scheduler, uint key, uint modifier)
 	{
 		IntPtr InternalCallback(int nCode, int wParam, IntPtr lParam)
 		{
 			var callNext = true;
 			if (nCode == HC_ACTION)
 			{
-				callNext = ProcessKey(wParam, lParam, keyOne, in keyTwo, in keyThree, scheduler, callback);
+				callNext = ProcessKey(wParam, lParam, key, modifier, scheduler, callback);
 			}
 			if (callNext) return CallNextHookEx(IntPtr.Zero, nCode, wParam, lParam);
 			return -1; // prevent the system from passing the message to the rest of the hook chain 
@@ -61,62 +60,85 @@ public class WindowsKeyboard
 		SetHook(InternalCallback);
 	}
 
-	private bool ProcessKey(int keyState, IntPtr lParam, uint keyOne, in uint? keyTwo, in uint? keyThree, IScheduler scheduler, Action callback)
+	private bool ProcessKey(int keyState, IntPtr lParam, uint key, uint modifier, IScheduler scheduler, Action callback)
 	{
 		var data = Marshal.PtrToStructure<KBDLLHOOKSTRUCT>(lParam);
 
-		return ProcessKey(keyState, keyOne, keyTwo, keyThree, scheduler, callback, data.vkCode);
+		return ProcessKeyBlocking(keyState, data.vkCode, key, modifier, scheduler, callback);
 	}
 
-	internal bool ProcessKey(int keyState, uint keyOne, uint? keyTwo, uint? keyThree, IScheduler scheduler, Action callback, uint vkCode)
+	/// <summary>
+	///     Process a keyboard event. The event may be consumed if it forms part of a recognized
+	///     key/modifier combination, in which case it will not be propagated to other handlers.
+	/// </summary>
+	/// <param name="keyState">New state (up/down)</param>
+	/// <param name="eventKeyCode">The code of the key whose state has changed.</param>
+	/// <param name="key">The code of the key to press to trigger the shortcut.</param>
+	/// <param name="modifier">The code of the modifier key to press to trigger the shortcut.</param>
+	/// <param name="scheduler">The scheduler to invoke the callback with.</param>
+	/// <param name="callback">Callback when shortcut is pressed.</param>
+	/// <returns>True to propagate the event to the rest of the chain, false to block.</returns>
+	internal bool ProcessKeyBlocking(int keyState, uint eventKeyCode, uint key, uint modifier, IScheduler scheduler, Action callback)
 	{
-		// update key states
-		if (vkCode == keyOne || vkCode == keyTwo || vkCode == keyThree)
-		{
-			keyStates.TryGetValue(vkCode, out int previousValue);
-			keyStates[vkCode] = keyState;
+		// Log.Emit(new EventId(), LogLevel.Debug, $"KEY: WM={keyState:X} vk={eventKeyCode:X}");
 
-			// only proceed if the value has changed, we don't want to constantly raise the callback when the keys are held.
-			if (previousValue == keyState)
+		if (keyState == WM_KEYDOWN)
+		{
+			if (eventKeyCode == modifier)
 			{
-				return true;
+				// block events when the key is being held down
+				if (shortcutKeyboardState.ModifierIsPressed)
+				{
+					return false;
+				}
+
+				shortcutKeyboardState.ModifierIsPressed = true;
+			}
+			else if (eventKeyCode == key)
+			{
+				// block events when the key is held down
+				if (shortcutKeyboardState.KeyIsPressed)
+				{
+					return false;
+				}
+
+				if (shortcutKeyboardState.ModifierIsPressed)
+				{
+					shortcutKeyboardState.KeyIsPressed = true;
+					scheduler.Schedule(callback);
+					return false;
+				}
+			}
+		}
+		else if (keyState == WM_KEYUP)
+		{
+			if (eventKeyCode == key)
+			{
+				shortcutKeyboardState.KeyIsPressed = false;
+			}
+			else if (eventKeyCode == modifier)
+			{
+				shortcutKeyboardState.ModifierIsPressed = false;
 			}
 		}
 
-		Log.Emit(new EventId(), LogLevel.Debug, $"KEY: WM={keyState:X} vk={vkCode:X}");
+		// if (eventKeyCode == VK_LWIN)
+		// {
+		// 	string type  = keyState == WM_KEYUP ? "up" : "down";
+		// 	Log.Emit(new EventId(), LogLevel.Debug, $"SENDING WIN KEY {type}");
+		// }
 
-		// check all required keys are down
-		if (keyState == WM_KEYDOWN && keyStates.TryGetValue(keyOne, out int keyOneState))
-		{
-			bool keyOneValid = keyOneState == WM_KEYDOWN;
-			var keyTwoValid = true;
-			var keyThreeValid = true;
-			if (keyTwo.HasValue)
-			{
-				keyTwoValid = keyStates.TryGetValue(keyTwo.Value, out int keyTwoState) && keyTwoState == WM_KEYDOWN;
-			}
-			if (keyThree.HasValue)
-			{
-				keyThreeValid = keyStates.TryGetValue(keyThree.Value, out int keyThreeState) && keyThreeState == WM_KEYDOWN;
-			}
-
-			if (keyOneValid && keyTwoValid && keyThreeValid)
-			{
-				scheduler.Schedule(callback);
-				return false;
-			}
-		}
-
+		// For all other cases/key events, propagate to other handlers
 		return true;
 	}
 
 	public void SetHook(KeyboardProc? proc)
 	{
 		// Store the callback delegate instance in a field to prevent it from being garbage collected
-		callback = proc;
+		keyboardCallback = proc;
 
 		// Set the hook
-		hookHandle = SetWindowsHookEx(WH_KEYBOARD_LL, callback, IntPtr.Zero, 0);
+		hookHandle = SetWindowsHookEx(WH_KEYBOARD_LL, keyboardCallback, IntPtr.Zero, 0);
 	}
 
 	public void UnsetHook()
@@ -124,7 +146,18 @@ public class WindowsKeyboard
 		// Unset the hook
 		UnhookWindowsHookEx(hookHandle);
 		hookHandle = IntPtr.Zero;
-		callback = null;
+		keyboardCallback = null;
+
+		shortcutKeyboardState = new ShortcutKeyboardState ();
+	}
+
+	private struct ShortcutKeyboardState
+	{
+		public ShortcutKeyboardState()
+		{ }
+
+		public bool KeyIsPressed = false;
+		public bool ModifierIsPressed = false;
 	}
 
 	[StructLayout(LayoutKind.Sequential)]

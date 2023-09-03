@@ -6,50 +6,220 @@ namespace Palladium.BuiltinActions.Tests;
 public class WindowsKeyboardTests
 {
 	[Test]
-	public void ForTwoKeysShortcut_PressKeyOne_ThenRelease_ThenPressKeyTwo_DoesNotInvokeCallback()
+	public void PressKeysAndModifierSeparately_DoesNotInvokeCallback()
 	{
 		// arrange
 		var scheduler = new TestScheduler();
 		var called = false;
 		Action callback = void () => called = true;
 		var windowsKeyboard = new WindowsKeyboard();
-		uint keyOne = 1;
-		uint? keyTwo = 2;
-		uint? keyThree = null;
+		uint key = 1;
+		uint modifier = 2;
 
 		// act
-		bool call1 = windowsKeyboard.ProcessKey(WindowsKeyboard.WM_KEYDOWN, keyOne, keyTwo, keyThree, scheduler, callback, keyOne);
-		bool call2 = windowsKeyboard.ProcessKey(WindowsKeyboard.WM_KEYUP, keyOne, keyTwo, keyThree, scheduler, callback, keyOne);
-		bool call3 = windowsKeyboard.ProcessKey(WindowsKeyboard.WM_KEYDOWN, keyOne, keyTwo, keyThree, scheduler, callback, keyTwo.Value);
+		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, key, key, modifier, scheduler, callback));
+		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYUP, key, key, modifier, scheduler, callback));
+		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, modifier, key, modifier, scheduler, callback));
+		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYUP, modifier, key, modifier, scheduler, callback));
 		scheduler.AdvanceBy(1);
-		
+
 		// assert
-		Assert.IsTrue(call1);
-		Assert.IsTrue(call2);
-		Assert.IsTrue(call3);
 		Assert.IsFalse(called);
 	}
-	
+
 	[Test]
-	public void ForTwoKeysShortcut_PressKeyOne_ThenPressTwo_InvokesCallback()
+	public void PressKeyThenPressModifier_DoesNotInvokeCallback()
 	{
 		// arrange
 		var scheduler = new TestScheduler();
 		var called = false;
 		Action callback = void () => called = true;
 		var windowsKeyboard = new WindowsKeyboard();
-		uint keyOne = 1;
-		uint? keyTwo = 2;
-		uint? keyThree = null;
+		uint key = 1;
+		uint modifier = 2;
 
 		// act
-		bool call1 = windowsKeyboard.ProcessKey(WindowsKeyboard.WM_KEYDOWN, keyOne, keyTwo, keyThree, scheduler, callback, keyOne);
-		bool call2 = windowsKeyboard.ProcessKey(WindowsKeyboard.WM_KEYDOWN, keyOne, keyTwo, keyThree, scheduler, callback, keyTwo.Value);
+		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, key, key, modifier, scheduler, callback));
+		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, modifier, key, modifier, scheduler, callback));
 		scheduler.AdvanceBy(1);
 
 		// assert
-		Assert.IsTrue(call1);
-		Assert.IsFalse(call2);
+		Assert.IsFalse(called);
+	}
+
+	[Test]
+	public void PressModifierThenPressKey_InvokesCallback()
+	{
+		// arrange
+		var scheduler = new TestScheduler();
+		var called = false;
+		Action callback = void () => called = true;
+		var windowsKeyboard = new WindowsKeyboard();
+		uint key = 1;
+		uint modifier = 2;
+
+		// act
+		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, modifier, key, modifier, scheduler, callback));
+		Assert.IsFalse(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, key, key, modifier, scheduler, callback));
+		scheduler.AdvanceBy(1);
+
+		// assert
 		Assert.IsTrue(called);
+	}
+
+	[Test]
+	public void WhenHolding_DontInvokeCallbackAgain_AndReturnFalseForModifierAndForKey()
+	{
+		// arrange
+		var scheduler = new TestScheduler();
+		var calledCount = 0;
+		Action callback = void () => calledCount++;
+		var windowsKeyboard = new WindowsKeyboard();
+		uint key = 1;
+		uint modifier = 2;
+
+		// act
+		// shortcut
+		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, modifier, key, modifier, scheduler, callback));
+		Assert.IsFalse(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, key, key, modifier, scheduler, callback));
+
+		// hold
+		Assert.IsFalse(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, modifier, key, modifier, scheduler, callback));
+		Assert.IsFalse(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, key, key, modifier, scheduler, callback));
+		Assert.IsFalse(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, modifier, key, modifier, scheduler, callback));
+		Assert.IsFalse(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, key, key, modifier, scheduler, callback));
+		Assert.IsFalse(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, modifier, key, modifier, scheduler, callback));
+		Assert.IsFalse(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, key, key, modifier, scheduler, callback));
+		scheduler.AdvanceBy(1);
+
+		// assert
+		Assert.AreEqual(1, calledCount);
+	}
+
+	[Test]
+	public void WhenReleasing_KeyUpReturnsTrue_ModifierUpReturnsTrue()
+	{
+		// arrange
+		var scheduler = new TestScheduler();
+		var calledCount = 0;
+		Action callback = void () => calledCount++;
+		var windowsKeyboard = new WindowsKeyboard();
+		uint key = 1;
+		uint modifier = 2;
+
+		// act
+		// shortcut
+		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, modifier, key, modifier, scheduler, callback));
+		Assert.IsFalse(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, key, key, modifier, scheduler, callback));
+
+		// release key
+		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYUP, key, key, modifier, scheduler, callback));
+
+		// hold modifier 
+		Assert.IsFalse(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, modifier, key, modifier, scheduler, callback));
+
+		// release modifier
+		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYUP, modifier, key, modifier, scheduler, callback));
+
+		// press modifier
+		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, modifier, key, modifier, scheduler, callback));
+
+		// assert
+		scheduler.AdvanceBy(1);
+		Assert.AreEqual(1, calledCount);
+	}
+
+	[Test]
+	public void AfterShortcutPressed_AndHold_ThenKeyReleased_ThenPressedAgain_InvokesCallbackAgain()
+	{
+		// arrange
+		var scheduler = new TestScheduler();
+		var calledCount = 0;
+		Action callback = void () => calledCount++;
+		var windowsKeyboard = new WindowsKeyboard();
+		uint key = 1;
+		uint modifier = 2;
+
+		// act
+		// shortcut
+		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, modifier, key, modifier, scheduler, callback));
+		Assert.IsFalse(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, key, key, modifier, scheduler, callback));
+
+		// hold
+		Assert.IsFalse(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, modifier, key, modifier, scheduler, callback));
+		Assert.IsFalse(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, key, key, modifier, scheduler, callback));
+
+		// release key
+		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYUP, key, key, modifier, scheduler, callback));
+
+		// press key
+		Assert.IsFalse(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, key, key, modifier, scheduler, callback));
+		
+		// release key
+		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYUP, key, key, modifier, scheduler, callback));
+		
+		// assert
+		scheduler.AdvanceBy(1);
+		Assert.AreEqual(2, calledCount);
+	}
+
+	[Test]
+	public void UnrelatedKeyPresses_ReturnTrue()
+	{
+		// arrange
+		var scheduler = new TestScheduler();
+		var calledCount = 0;
+		Action callback = void () => calledCount++;
+		var windowsKeyboard = new WindowsKeyboard();
+		uint key = 1;
+		uint modifier = 2;
+
+		// act
+		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, 435345, key, modifier, scheduler, callback));
+		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, 734598, key, modifier, scheduler, callback));
+		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, 359345, key, modifier, scheduler, callback));
+		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, 378434, key, modifier, scheduler, callback));
+		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, 421434, key, modifier, scheduler, callback));
+
+		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYUP, 435345, key, modifier, scheduler, callback));
+		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYUP, 734598, key, modifier, scheduler, callback));
+		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYUP, 359345, key, modifier, scheduler, callback));
+		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYUP, 378434, key, modifier, scheduler, callback));
+		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYUP, 421434, key, modifier, scheduler, callback));
+
+		// assert
+		scheduler.AdvanceBy(1);
+		Assert.AreEqual(0, calledCount);
+	}
+
+	[Test]
+	public void AfterShortcutPressed_AndReleased_ThenUnrelatedKeyPress_ReturnsTrue()
+	{
+		// arrange
+		var scheduler = new TestScheduler();
+		var calledCount = 0;
+		Action callback = void () => calledCount++;
+		var windowsKeyboard = new WindowsKeyboard();
+		uint key = 1;
+		uint modifier = 2;
+
+		// act
+		// shortcut
+		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, modifier, key, modifier, scheduler, callback));
+		Assert.IsFalse(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, key, key, modifier, scheduler, callback));
+		
+		// release
+		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYUP, key, key, modifier, scheduler, callback));
+		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYUP, modifier, key, modifier, scheduler, callback));
+		
+		// unrelated keys
+		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, 435345, key, modifier, scheduler, callback));
+		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, 734598, key, modifier, scheduler, callback));
+		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYUP, 435345, key, modifier, scheduler, callback));
+		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYUP, 734598, key, modifier, scheduler, callback));
+
+		// assert
+		scheduler.AdvanceBy(1);
+		Assert.AreEqual(1, calledCount);
 	}
 }
