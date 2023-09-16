@@ -4,9 +4,9 @@
     <Color x:Key="Tone1-75">#BF4D5272</Color>
     <Color x:Key="Tone1-50">#804D5272</Color>
     <Color x:Key="Tone1-25">#404D5272</Color>
-    <Color x:Key="Tone1-75-Fill">#BF4D5272</Color>
-    <Color x:Key="Tone1-50-Fill">#804D5272</Color>
-    <Color x:Key="Tone1-25-Fill">#404D5272</Color>
+    <Color x:Key="Tone1-75-Fill">#FF7A7D95</Color>
+    <Color x:Key="Tone1-50-Fill">#FFA6A9B9</Color>
+    <Color x:Key="Tone1-25-Fill">#FFD2D3DB</Color>
     <Color x:Key="Tone2">#FFE6E6E9</Color>
     <Color x:Key="Tone2-75">#BFE6E6E9</Color>
     <Color x:Key="Tone2-50">#80E6E6E9</Color>

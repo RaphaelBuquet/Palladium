@@ -1,0 +1,75 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Design.PreviewWith>
+        <Border Padding="20">
+            <StackPanel Orientation="Vertical" Spacing="2">
+                <ToggleButton IsChecked="True" />
+                <ToggleButton IsChecked="False" />
+                <ToggleButton IsChecked="False" IsEnabled="False" />
+                <ToggleButton IsChecked="True" IsEnabled="False" />
+            </StackPanel>
+        </Border>
+    </Design.PreviewWith>
+
+    <Style Selector="ToggleButton">
+        <Setter Property="Theme">
+            <ControlTheme TargetType="ToggleButton">
+                <Setter Property="Template">
+                    <ControlTemplate>
+                        <Border
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            Height="{TemplateBinding Height}"
+                            Width="{TemplateBinding Width}">
+                            <Panel>
+                                <PathIcon Data="{StaticResource CheckmarkIcon}"
+                                          Foreground="{TemplateBinding Foreground}"
+                                          Width="{TemplateBinding Width}" Height="{TemplateBinding Height}"
+                                          IsVisible="{TemplateBinding IsChecked}" />
+                            </Panel>
+                        </Border>
+                    </ControlTemplate>
+                </Setter>
+
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="CornerRadius" Value="2" />
+                <Setter Property="Height" Value="14" />
+                <Setter Property="Width" Value="14" />
+                <Setter Property="Background" Value="{StaticResource Tone2-25-Fill }" />
+                <Setter Property="BorderBrush" Value="{StaticResource Tone1}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="Foreground" Value="White" />
+
+                <Style Selector="^:pointerover">
+                    <Setter Property="Background" Value="{StaticResource Tone2-50}" />
+                </Style>
+                <Style Selector="^:pressed">
+                    <Setter Property="Background" Value="{StaticResource Tone2-75}" />
+                </Style>
+
+                <Style Selector="^:checked">
+                    <Setter Property="Background" Value="{StaticResource Tone1}" />
+                    <Style Selector="^:pointerover">
+                        <Setter Property="Background" Value="{StaticResource Tone1-75-Fill}" />
+                        <Setter Property="BorderBrush" Value="{StaticResource Tone1-75-Fill}" />
+                    </Style>
+                    <Style Selector="^:pressed">
+                        <Setter Property="Background" Value="{StaticResource Tone1-50-Fill}" />
+                        <Setter Property="BorderBrush" Value="{StaticResource Tone1-50-Fill}" />
+                    </Style>
+                </Style>
+                <Style Selector="^:disabled">
+                    <Setter Property="BorderBrush" Value="{StaticResource Tone2}" />
+
+                    <Style Selector="^:checked">
+                        <Setter Property="Background" Value="{StaticResource Tone1-25-Fill}" />
+                        <Setter Property="BorderBrush" Value="{StaticResource Tone1-25-Fill}" />
+                    </Style>
+                </Style>
+            </ControlTheme>
+        </Setter>
+
+    </Style>
+</Styles>

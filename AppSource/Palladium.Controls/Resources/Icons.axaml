@@ -23,6 +23,10 @@
     <GeometryGroup x:Key="PlayIcon">
         <PathGeometry>F1 M32,32z M0,0z M8.7891,3.0039C8.47917,2.990394,8.16448,3.061696,7.88676,3.21679A1.0001,1.0001,0,0,0,7.88481,3.21679C7.32916,3.52949,7.00004,4.11753,7.00004,4.74219L7.00004,27.25819C7.00004,27.88284,7.32916,28.47089,7.88481,28.78359A1.0001,1.0001,0,0,0,7.88676,28.78359C8.44221,29.09378,9.14076,29.06421,9.66796,28.70546L9.66796,28.70746C13.03876,26.41756 23.13596,19.55616 26.23596,17.44946 26.72094,17.12054 26.99963,16.57528 26.99963,16.00026 26.99963,15.42524 26.72094,14.87996 26.23596,14.55106 23.13506,12.44446 13.03796,5.58306 9.66796,3.29306L9.66796,3.29501C9.40432,3.11564,9.09898,3.0175,8.78905,3.004z M9.00004,5.2559C12.55954,7.674 21.61304,13.8276 24.81104,15.9999 21.61324,18.1724 12.56004,24.326 9.00004,26.7439z</PathGeometry>
     </GeometryGroup>
+
+    <GeometryGroup x:Key="CheckmarkIcon">
+        <PathGeometry>F1 M32,32z M0,0z M27.98,6.9902A1.0001,1.0001,0,0,0,27.2925,7.29293L11.9995,22.58593 4.7065,15.29293A1.0001,1.0001,0,1,0,3.2924,16.70703L11.2924,24.70703A1.0001,1.0001,0,0,0,12.7065,24.70703L28.7065,8.70703A1.0001,1.0001,0,0,0,27.97994,6.99023z</PathGeometry>
+    </GeometryGroup>
     
     <Design.PreviewWith>
         <Border Padding="2">
@@ -33,6 +37,7 @@
                 <PathIcon Width="24" Height="24" Foreground="SandyBrown" Data="{StaticResource SearchIcon}" />
                 <PathIcon Width="24" Height="24" Foreground="SandyBrown" Data="{StaticResource FastForwardIcon}" />
                 <PathIcon Width="24" Height="24" Foreground="SandyBrown" Data="{StaticResource PlayIcon}" />
+                <PathIcon Width="24" Height="24" Foreground="SandyBrown" Data="{StaticResource CheckmarkIcon}" />
                 <TextBlock>End</TextBlock>
             </StackPanel>
         </Border>

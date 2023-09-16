@@ -66,6 +66,8 @@ public class ImmersiveGameViewModel : ReactiveObject, IActivatableViewModel, ILi
 		
 		this.WhenAttached(disposables =>
 		{
+			isWorking.DisposeWith(disposables);
+			availableDisplays.DisposeWith(disposables);
 			ActivateCommand.DisposeWith(disposables);
 			DeactivateCommand.DisposeWith(disposables);
 			availableDisplays.DisposeWith(disposables);

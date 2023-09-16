@@ -64,6 +64,25 @@ public class LifecycleActivator
 /// <seealso cref="ILifecycleAwareViewModel" />
 public static class LifecycleCallbacks
 {
+	/// <summary>
+	///     <para>
+	///         WhenAttached allows you to register a callback that is invoked when a ViewModel is set on a View.
+	///         With the CompositeDisposable you can also handle cleaning up your ViewModel when it is removed from the View
+	///         or when the View is disposed.
+	///     </para>
+	///     <para>
+	///         The View to call <see cref="InstallLifecycleHandler{TObject}" /> in its constructor for this to function.
+	///     </para>
+	/// </summary>
+	/// <param name="viewModel"></param>
+	/// <param name="block">
+	///     Callback invoked when the View Model is set on the view. The Action parameter (usually called 'disposables') allows
+	///     you to collate all the disposables to be cleaned up when the View is disposed.
+	/// </param>
+	/// <typeparam name="T"></typeparam>
+	/// <remarks>
+	///     Views using <see cref="InstallLifecycleHandler{TObject}" /> have to be manually disposed.
+	/// </remarks>
 	public static void WhenAttached<T>(this T viewModel, Action<CompositeDisposable> block) where T : ILifecycleAwareViewModel
 	{
 		viewModel.Activator.WhenAttachedBlocks.Add(block);

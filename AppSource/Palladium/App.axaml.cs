@@ -1,8 +1,6 @@
 using System;
 using System.IO;
-using System.Linq;
 using System.Reactive;
-using System.Reactive.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Avalonia;
@@ -22,13 +20,13 @@ using Palladium.Settings;
 using Palladium.ViewModels;
 using Palladium.Views;
 using ReactiveUI;
-using Icon = MsBox.Avalonia.Enums.Icon;
 
 namespace Palladium;
 
 public  class App : Application
 {
 	private Log? log;
+
 	public override void Initialize()
 	{
 		AvaloniaXamlLoader.Load(this);
@@ -40,26 +38,31 @@ public  class App : Application
 		{
 			// logging
 			InstallLogging(out LogViewerControlViewModel logVm, out log);
-			
+
 			// services
+			string settingsFilePath = Path.Combine(
+				Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+				"Palladium",
+				"Settings.xml");
 			var tabsService = new TabsService();
-			var actionsRepositoryService = InstallActions(log);
-            
+			var settingsService = new SettingsService(log, settingsFilePath);
+			ActionsRepositoryService actionsRepositoryService = InstallActions(log, settingsService);
+
 			// main window
 			var mainWindow = new MainWindow();
-			mainWindow.DataContext = new MainWindowViewModel(logVm, mainWindow);
+			mainWindow.DataContext = new MainWindowViewModel(logVm, mainWindow, tabsService, settingsService);
 			desktop.MainWindow = mainWindow;
 			tabsService.Target = mainWindow.Tabs;
-			
+
 			// home
 			var homeViewModel = new HomeViewModel(actionsRepositoryService, tabsService);
 			mainWindow.Home.DataContext = homeViewModel;
-			
+
 			// background load
 			Task.Run(() =>
 			{
 				LogStartingMode();
-				
+
 				new ExtensionsLoader(Path.Combine(Environment.CurrentDirectory, "Extensions"))
 					.LoadExtensions(actionsRepositoryService, log);
 			});
@@ -68,18 +71,13 @@ public  class App : Application
 		base.OnFrameworkInitializationCompleted();
 	}
 
-	private ActionsRepositoryService InstallActions(Log log)
+	private ActionsRepositoryService InstallActions(Log log, SettingsService settingsService)
 	{
-		var settingsFilePath = Path.Combine(
-			Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-			"Palladium",
-			"Settings.xml");
-		var settingsService = new SettingsService(log, settingsFilePath);
 		var actionsRepositoryService = new ActionsRepositoryService();
-		
+
 		new SearchOverrideAction().Init(actionsRepositoryService, settingsService);
 		actionsRepositoryService.Actions.AddOrUpdate(new ImmersiveGameAction(log).Description);
-		
+
 		return actionsRepositoryService;
 	}
 
@@ -89,7 +87,7 @@ public  class App : Application
 		AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
 		TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
 		RxApp.DefaultExceptionHandler = Observer.Create<Exception>(OnUnhandledRxException);
-		
+
 
 		// For debugging purposes only. Register the Random Logging Service
 		// builder.AddRandomBackgroundService();
@@ -101,7 +99,7 @@ public  class App : Application
 		// Microsoft Logger
 		// builder.Logging.AddDefaultDataStoreLogger();
 	}
-    
+
 	private void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
 	{
 		var eventId = new EventId(0, Assembly.GetEntryAssembly()!.GetName().Name);
@@ -110,16 +108,16 @@ public  class App : Application
 		// show user
 		ShowMessageBox("Unhandled Error", ((Exception)e.ExceptionObject).Message);
 	}
-	
+
 	private void OnUnhandledRxException(Exception e)
 	{
 		var eventId = new EventId(0, Assembly.GetEntryAssembly()!.GetName().Name);
 		log?.Emit(eventId, LogLevel.Error, "Unobserved Task Exception", e);
-		
+
 		// show user
 		ShowMessageBox("Unhandled Error", e.Message);
 	}
-	
+
 	private void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
 	{
 		var eventId = new EventId(0, Assembly.GetEntryAssembly()!.GetName().Name);

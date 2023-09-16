@@ -14,7 +14,6 @@
         <Setter Property="Template">
             <ControlTemplate>
                 <Border 
-                     
                     BorderThickness="1 0 0 0" 
                     BorderBrush="{StaticResource Tone2}" >
                     <StackPanel Orientation="Vertical">

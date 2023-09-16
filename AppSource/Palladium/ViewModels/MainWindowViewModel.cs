@@ -1,9 +1,11 @@
-﻿using System;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Reactive;
 using System.Reactive.Disposables;
 using Avalonia.Controls;
 using LogViewer.Core.ViewModels;
+using Palladium.ActionsService;
+using Palladium.BuiltinActions.Settings;
+using Palladium.Settings;
 using Palladium.Views;
 using ReactiveUI;
 
@@ -14,20 +16,25 @@ public class MainWindowViewModel : ReactiveObject, IActivatableViewModel
 	// dependencies
 	private readonly LogViewerControlViewModel? logVm;
 	private readonly MainWindow? mainWindow;
-
+	private readonly TabsService? tabsService;
+	private readonly SettingsService? settingsService;
+	private SettingsAction? settingsAction;
+	
 	private Window? logWindow;
 
 	/// <summary>
 	///     XAML preview constructor.
 	/// </summary>
-	public MainWindowViewModel() : this(null, null)
+	public MainWindowViewModel() : this(null, null, null, null)
 	{ }
 
 	/// <inheritdoc />
-	public MainWindowViewModel(LogViewerControlViewModel? logVm, MainWindow? mainWindow)
+	public MainWindowViewModel(LogViewerControlViewModel? logVm, MainWindow? mainWindow, TabsService? tabsService, SettingsService? settingsService)
 	{
 		this.logVm = logVm;
 		this.mainWindow = mainWindow;
+		this.tabsService = tabsService;
+		this.settingsService = settingsService;
 		OpenLogsCommand = ReactiveCommand.Create(OpenLogs);
 		OpenSettingsCommand = ReactiveCommand.Create(OpenSettings);
 		DebugCommand = ReactiveCommand.Create(Debug);
@@ -69,9 +76,16 @@ public class MainWindowViewModel : ReactiveObject, IActivatableViewModel
 
 	private void OpenSettings()
 	{
-		throw new NotImplementedException();
+		if (tabsService == null || settingsService == null) return;
+
+		if (settingsAction == null)
+		{
+			settingsAction = new SettingsAction();
+			settingsAction.Init(settingsService);
+		}
+		tabsService?.HandleStartAction(settingsAction.Description);
 	}
-	
+
 	private void Debug()
 	{
 		Debugger.Break();
