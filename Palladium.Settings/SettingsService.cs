@@ -3,6 +3,7 @@ using System.Reactive.Subjects;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using DynamicData;
 using Microsoft.Extensions.Logging;
 using Palladium.Logging;
 using ReactiveUI;
@@ -19,10 +20,52 @@ public class SettingsService
 	{
 		this.log = log;
 		this.path = path;
-		WriteCommand = ReactiveCommand.CreateFromTask(Write);
+		var canExecute = new BehaviorSubject<bool>(true);
+		WriteCommand = ReactiveCommand.CreateFromTask(Write, canExecute);
+		WriteCommand.ThrownExceptions.Subscribe(e =>
+		{
+			canExecute.OnNext(false);
+			this.log.Emit(new EventId(), LogLevel.Error, "Failed to write settings.", e);
+		});
 	}
 
 	public ReactiveCommand<Unit, Unit> WriteCommand { get ; }
+
+	public SourceCache<(Guid ActionGuid, object View), Guid> SettingsViews { get; } = new (pair => pair.ActionGuid);
+
+	/// <summary>
+	///     Install a view and a view model for an action's settings.
+	/// </summary>
+	/// <param name="viewModel">The view model for the settings page.</param>
+	/// <param name="view">The view for the settings page.</param>
+	/// <param name="tryReadExistingSettings">
+	///     If true, will try to read any existing settings saved in user preferences. The
+	///     existing settings will be emitted through the observable in
+	///     <see cref="IActionSettingsViewModel{T}.ProcessDataObservable" />.
+	/// </param>
+	/// <returns>
+	///     A task for the deserialization of existing settings. This is useful to know if the settings are being deserialized.
+	///     You should implement <see cref="IActionSettingsViewModel{T}.ProcessDataObservable" /> to get the deserialized
+	///     value.
+	/// </returns>
+	public Task Install<T> (IActionSettingsViewModel<T> viewModel, object view, bool tryReadExistingSettings)
+	{
+		var writeFunction = delegate (XElement node) { WriteSerialize(node, viewModel.GetDataToSerialize()); };
+		serializers.Add(viewModel.ActionGuid, new SettingsSerializer { Type = typeof(T), SerializeFunction = writeFunction });
+
+		var subject = new ReplaySubject<T>(1);
+
+		var readTask = Task.CompletedTask;
+		if (tryReadExistingSettings)
+		{
+			readTask = DeserializeAsync(viewModel.ActionGuid, subject);
+			readTask.ContinueWith(task => { log.Emit(new EventId(), LogLevel.Warning, $"Failed to deserialize for {viewModel.ActionGuid} {typeof(T).Name}", task.Exception); }, TaskContinuationOptions.OnlyOnFaulted);
+		}
+		viewModel.ProcessDataObservable(subject);
+		SettingsViews.AddOrUpdate((viewModel.ActionGuid, view));
+
+		return readTask;
+	}
 
 	private async Task Write(CancellationToken cancellationToken)
 	{
@@ -76,6 +119,8 @@ public class SettingsService
 		cancellationToken.ThrowIfCancellationRequested();
 
 		// write back
+		string? directory = Path.GetDirectoryName(path);
+		if (directory is not null) Directory.CreateDirectory(directory);
 		await using (FileStream stream = File.Open(path, FileMode.Create, FileAccess.Write))
 		{
 			await using var xmlWriter = XmlWriter.Create(stream, new XmlWriterSettings { Async = true, Indent = true });
@@ -125,29 +170,6 @@ public class SettingsService
 		}
 
 		return doc;
-	}
-
-	/// <returns>
-	///     A task for the deserialization of existing settings. This is useful to know if the settings are being deserialized.
-	///     You should implement <see cref="IActionSettingsViewModel{T}.ProcessDataObservable" /> to get the deserialized
-	///     value.
-	/// </returns>
-	public Task Install<T> (IActionSettingsViewModel<T> viewModel, bool tryReadExistingSettings)
-	{
-		var writeFunction = delegate (XElement node) { WriteSerialize(node, viewModel.GetDataToSerialize()); };
-		serializers.Add(viewModel.ActionGuid, new SettingsSerializer { Type = typeof(T), SerializeFunction = writeFunction });
-
-		var subject = new ReplaySubject<T>(1);
-
-		var readTask = Task.CompletedTask;
-		if (tryReadExistingSettings)
-		{
-			readTask = DeserializeAsync(viewModel.ActionGuid, subject);
-			readTask.ContinueWith(task => { log.Emit(new EventId(), LogLevel.Warning, $"Failed to deserialize for {viewModel.ActionGuid} {typeof(T).Name}", task.Exception); }, TaskContinuationOptions.OnlyOnFaulted);
-		}
-		viewModel.ProcessDataObservable(subject);
-
-		return readTask;
 	}
 
 	private async Task DeserializeAsync<T>(Guid guid, IObserver<T> observer)
@@ -218,7 +240,9 @@ public class SettingsService
 		using var stream = new MemoryStream();
 		// using var xmlWriter = XmlWriter.Create(new XmlTextWriter(stream, Encoding.UTF8));
 		var serializer = new XmlSerializer(typeof(T));
-		serializer.Serialize(stream, data);
+		var xns = new XmlSerializerNamespaces();
+		xns.Add(string.Empty, string.Empty);
+		serializer.Serialize(stream, data, xns);
 		stream.Position = 0;
 		xmlNode.Add(XElement.Load(stream));
 	}

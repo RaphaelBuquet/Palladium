@@ -50,7 +50,7 @@ public  class App : Application
 
 			// main window
 			var mainWindow = new MainWindow();
-			mainWindow.DataContext = new MainWindowViewModel(logVm, mainWindow, tabsService, settingsService);
+			mainWindow.DataContext = new MainWindowViewModel(logVm, mainWindow, actionsRepositoryService, tabsService, settingsService);
 			desktop.MainWindow = mainWindow;
 			tabsService.Target = mainWindow.Tabs;
 

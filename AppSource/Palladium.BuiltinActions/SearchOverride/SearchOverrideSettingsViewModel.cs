@@ -1,5 +1,5 @@
 ﻿using System.Reactive.Disposables;
-using System.Reactive.Subjects;
+using System.Reactive.Linq;
 using Palladium.Settings;
 using ReactiveUI;
 
@@ -7,34 +7,43 @@ namespace Palladium.BuiltinActions.SearchOverride;
 
 public class SearchOverrideSettingsViewModel : ReactiveObject, IActivatableViewModel, IActionSettingsViewModel<SearchOverrideSettings>
 {
-	private ObservableAsPropertyHelper<string>? browserPathHelper;
-	private ObservableAsPropertyHelper<string>? browserArgumentsHelper;
-
-	public readonly ReplaySubject<string> BrowserPathSubject = new (1);
-	public readonly ReplaySubject<string> BrowserArgumentsSubject = new (1);
+	private readonly SettingsService? settingsService;
 
 	private IDisposable? dataSubscription;
+	private string browserPath = "";
+	private string browserArguments = "";
 
-	public SearchOverrideSettingsViewModel()
+	public SearchOverrideSettingsViewModel() : this(null)
+	{ }
+
+	public SearchOverrideSettingsViewModel(SettingsService? settingsService)
 	{
+		this.settingsService = settingsService;
 		this.WhenActivated(disposables =>
 		{
 			Disposable.Create(() => dataSubscription?.Dispose()).DisposeWith(disposables);
 
-			browserPathHelper = BrowserPathSubject
-				.ToProperty(this, x => x.BrowserPath)
-				.DisposeWith(disposables);
-			browserArgumentsHelper = BrowserArgumentsSubject
-				.ToProperty(this, x => x.BrowserPath)
+			this.WhenAnyValue(x => x.BrowserPath, x => x.BrowserArguments)
+				.Skip(1) // skip initial value
+				.Subscribe(_ => settingsService?.WriteCommand.Execute().Subscribe())
 				.DisposeWith(disposables);
 		});
 	}
 
-	public string BrowserPath => browserPathHelper?.Value ?? "";
-	public string BrowserArguments => browserArgumentsHelper?.Value ?? "";
+	public string BrowserPath
+	{
+		get => browserPath;
+		set => this.RaiseAndSetIfChanged(ref browserPath, value);
+	}
+
+	public string BrowserArguments
+	{
+		get => browserArguments;
+		set => this.RaiseAndSetIfChanged(ref browserArguments, value);
+	}
 
 	/// <inheritdoc />
-	ViewModelActivator IActivatableViewModel.Activator { get; } = new ();
+	ViewModelActivator IActivatableViewModel.Activator { get ; } = new ();
 
 	/// <inheritdoc />
 	Guid IActionSettingsViewModel<SearchOverrideSettings>.ActionGuid => SearchOverrideAction.Guid;
@@ -45,8 +54,8 @@ public class SearchOverrideSettingsViewModel : ReactiveObject, IActivatableViewM
 		dataSubscription?.Dispose();
 		dataSubscription = observable.Subscribe(settings =>
 		{
-			BrowserPathSubject.OnNext(settings.BrowserPath);
-			BrowserArgumentsSubject.OnNext(settings.BrowserArguments);
+			BrowserPath = settings.BrowserPath;
+			BrowserArguments = settings.BrowserArguments;
 		});
 	}
 

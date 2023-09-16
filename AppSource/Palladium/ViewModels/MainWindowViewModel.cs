@@ -16,6 +16,7 @@ public class MainWindowViewModel : ReactiveObject, IActivatableViewModel
 	// dependencies
 	private readonly LogViewerControlViewModel? logVm;
 	private readonly MainWindow? mainWindow;
+	private readonly ActionsRepositoryService? actionsRepositoryService;
 	private readonly TabsService? tabsService;
 	private readonly SettingsService? settingsService;
 	private SettingsAction? settingsAction;
@@ -25,14 +26,15 @@ public class MainWindowViewModel : ReactiveObject, IActivatableViewModel
 	/// <summary>
 	///     XAML preview constructor.
 	/// </summary>
-	public MainWindowViewModel() : this(null, null, null, null)
+	public MainWindowViewModel() : this(null, null, null, null, null)
 	{ }
 
 	/// <inheritdoc />
-	public MainWindowViewModel(LogViewerControlViewModel? logVm, MainWindow? mainWindow, TabsService? tabsService, SettingsService? settingsService)
+	public MainWindowViewModel(LogViewerControlViewModel? logVm, MainWindow? mainWindow, ActionsRepositoryService? actionsRepositoryService, TabsService? tabsService, SettingsService? settingsService)
 	{
 		this.logVm = logVm;
 		this.mainWindow = mainWindow;
+		this.actionsRepositoryService = actionsRepositoryService;
 		this.tabsService = tabsService;
 		this.settingsService = settingsService;
 		OpenLogsCommand = ReactiveCommand.Create(OpenLogs);
@@ -76,12 +78,12 @@ public class MainWindowViewModel : ReactiveObject, IActivatableViewModel
 
 	private void OpenSettings()
 	{
-		if (tabsService == null || settingsService == null) return;
+		if (tabsService == null || settingsService == null || actionsRepositoryService == null) return;
 
 		if (settingsAction == null)
 		{
 			settingsAction = new SettingsAction();
-			settingsAction.Init(settingsService);
+			settingsAction.Init(actionsRepositoryService, settingsService);
 		}
 		tabsService?.HandleStartAction(settingsAction.Description);
 	}

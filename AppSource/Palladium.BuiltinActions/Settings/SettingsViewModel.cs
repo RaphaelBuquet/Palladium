@@ -1,20 +1,50 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Layout;
 using Avalonia.Media;
+using DynamicData;
+using DynamicData.Binding;
+using Palladium.ActionsService;
 using Palladium.Settings;
+using ReactiveUI;
 
 namespace Palladium.BuiltinActions.Settings;
 
-public class SettingsViewModel
+public class SettingsViewModel : IActivatableViewModel
 {
-	public SettingsViewModel(SettingsService settingsService)
+	public SettingsViewModel(ActionsRepositoryService actionsRepositoryService, SettingsService settingsService)
 	{
-		throw new NotImplementedException();
+		this.WhenActivated( disposables =>
+		{
+			settingsService.SettingsViews
+				.Connect()
+				.InnerJoin(
+					actionsRepositoryService.Actions.Connect(),
+					actionDescription => actionDescription.Guid,
+					(pair, description) =>
+						new SettingsEntryViewModel(
+							description.Title ?? "",
+							$"{description.Emoji} {description.Title}", pair.View))
+				.ObserveOn(RxApp.MainThreadScheduler)
+				.Bind(Settings)
+				.Subscribe()
+				.DisposeWith(disposables);
+		});
 	}
 
 	public SettingsViewModel()
+	{
+		HandleDesignMode();
+	}
+
+	public ObservableCollectionExtended<SettingsEntryViewModel> Settings { get; } = new ();
+
+	/// <inheritdoc />
+	ViewModelActivator IActivatableViewModel.Activator { get; } = new ();
+
+	private void HandleDesignMode()
 	{
 		if (Design.IsDesignMode)
 		{
@@ -34,7 +64,4 @@ public class SettingsViewModel
 			Settings.Add(new SettingsEntryViewModel("Search Override", "🔎 Search Override", "Not implemented."));
 		}
 	}
-
-
-	public ObservableCollection<SettingsEntryViewModel> Settings { get; } = new ();
 }

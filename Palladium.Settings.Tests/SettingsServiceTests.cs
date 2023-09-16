@@ -26,7 +26,7 @@ public class SettingsServiceTests
 		// act
 		Assert.ThrowsAsync<XmlException>(async () =>
 		{
-			await service.Install(vm, true);
+			await service.Install(vm, "View", true);
 		});
 	}
 	
@@ -41,7 +41,7 @@ public class SettingsServiceTests
 		var vm = new MockActionSettingsViewModel { Value = 567 };
 
 		// act
-		_ = service.Install(vm, false);
+		_ = service.Install(vm, "View", false);
 		await service.WriteCommand.Execute();
 
 		// assert
@@ -72,13 +72,32 @@ public class SettingsServiceTests
 		var vm = new MockActionSettingsViewModel();
 		
 		// act
-		await service.Install(vm, true);
+		await service.Install(vm, "View", true);
 
 		// assert
 		Assert.IsNotNull(vm.Observable);
 		var task = vm.Observable!.FirstAsync().ToTask();
 		Assert.IsTrue(task.IsCompleted);
 		Assert.AreEqual(567, task.Result);
+		Assert.AreEqual(0, log.DataStore.Entries.Count);
+	}
+
+	[Test]
+	public void Install_MakesViewAvailable()
+	{
+		using IDisposable? l = LogToConsole(out Log? log);
+
+		// arrange
+		string tempFile = Path.GetTempFileName();
+		var service = new SettingsService(log, tempFile);
+		var vm = new MockActionSettingsViewModel();
+
+		// act
+		_ = service.Install(vm, "View", false);
+
+		// assert
+		Assert.AreEqual(1, service.SettingsViews.Count);
+		Assert.AreEqual("View", service.SettingsViews.Items.First().View);
 		Assert.AreEqual(0, log.DataStore.Entries.Count);
 	}
 
