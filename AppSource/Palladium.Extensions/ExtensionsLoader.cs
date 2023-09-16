@@ -14,13 +14,13 @@ public class ExtensionsLoader
 		this.extensionsDirectory = extensionsDirectory;
 	}
 
-	public void LoadExtensions(ActionsRepositoryService actionsRepositoryService)
+	public void LoadExtensions(ActionsRepositoryService actionsRepositoryService, Log log)
 	{
 		var extensionsToInvoke = new List<Type>();
 
 		if (!Path.Exists(extensionsDirectory))
 		{
-			Log.Emit(new EventId(), LogLevel.Warning, $"Could not load extensions as \"{extensionsDirectory}\" does not exist.");
+			log.Emit(new EventId(), LogLevel.Information, $"Could not load extensions as \"{extensionsDirectory}\" does not exist.");
 			return;
 		}
 
@@ -31,7 +31,7 @@ public class ExtensionsLoader
 			string assemblyFilePath = Path.Combine(extensionDirectory, $"{assemblyName}.dll");
 			if (!File.Exists(assemblyFilePath))
 			{
-				Log.Emit(new EventId(), LogLevel.Error, $"The extension \"{assemblyName}\" at \"{extensionDirectory}\" does not have a corresponding assembly at \"{assemblyFilePath}\".");
+				log?.Emit(new EventId(), LogLevel.Error, $"The extension \"{assemblyName}\" at \"{extensionDirectory}\" does not have a corresponding assembly at \"{assemblyFilePath}\".");
 				continue;
 			}
 
@@ -43,7 +43,7 @@ public class ExtensionsLoader
 			}
 			catch (Exception e)
 			{
-				Log.Emit(new EventId(), LogLevel.Error, $"Failed to load extension at \"{extensionDirectory}\"", e);
+				log?.Emit(new EventId(), LogLevel.Error, $"Failed to load extension at \"{extensionDirectory}\"", e);
 			}
 			if (assembly != null)
 			{
@@ -59,12 +59,12 @@ public class ExtensionsLoader
 				{
 					loadedExtension.ActionsRepositoryService = actionsRepositoryService;
 					loadedExtension.Init();
-					Log.Emit(new EventId(), LogLevel.Information, $"Loaded extension \"{extensionType.Assembly.FullName}\".");
+					log?.Emit(new EventId(), LogLevel.Information, $"Loaded extension \"{extensionType.Assembly.FullName}\".");
 				}
 			}
 			catch (Exception e)
 			{
-				Log.Emit(new EventId(), LogLevel.Error, $"Failed to initialize \"{extensionType.AssemblyQualifiedName}\".", e);
+				log?.Emit(new EventId(), LogLevel.Error, $"Failed to initialize \"{extensionType.AssemblyQualifiedName}\".", e);
 			}
 		}
 	}

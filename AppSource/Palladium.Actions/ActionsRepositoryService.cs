@@ -4,5 +4,5 @@ namespace Palladium.ActionsService;
 
 public class ActionsRepositoryService
 {
-	public readonly SourceList<ActionDescription> Actions = new ();
+	public readonly SourceCache<ActionDescription, Guid> Actions = new (description => description.Guid);
 }

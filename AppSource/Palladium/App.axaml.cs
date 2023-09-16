@@ -18,7 +18,7 @@ using Palladium.BuiltinActions.ImmersiveGame;
 using Palladium.BuiltinActions.SearchOverride;
 using Palladium.Extensions;
 using Palladium.Logging;
-using Palladium.ObservableExtensions;
+using Palladium.Settings;
 using Palladium.ViewModels;
 using Palladium.Views;
 using ReactiveUI;
@@ -28,6 +28,7 @@ namespace Palladium;
 
 public  class App : Application
 {
+	private Log? log;
 	public override void Initialize()
 	{
 		AvaloniaXamlLoader.Load(this);
@@ -38,11 +39,11 @@ public  class App : Application
 		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
 		{
 			// logging
-			var logVm = InstallLogging();
+			InstallLogging(out LogViewerControlViewModel logVm, out log);
 			
 			// services
 			var tabsService = new TabsService();
-			var actionsRepositoryService = InstallActions();
+			var actionsRepositoryService = InstallActions(log);
             
 			// main window
 			var mainWindow = new MainWindow();
@@ -60,24 +61,29 @@ public  class App : Application
 				LogStartingMode();
 				
 				new ExtensionsLoader(Path.Combine(Environment.CurrentDirectory, "Extensions"))
-					.LoadExtensions(actionsRepositoryService);
+					.LoadExtensions(actionsRepositoryService, log);
 			});
 		}
 
 		base.OnFrameworkInitializationCompleted();
 	}
 
-	private ActionsRepositoryService InstallActions()
+	private ActionsRepositoryService InstallActions(Log log)
 	{
+		var settingsFilePath = Path.Combine(
+			Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+			"Palladium",
+			"Settings.xml");
+		var settingsService = new SettingsService(log, settingsFilePath);
 		var actionsRepositoryService = new ActionsRepositoryService();
-
-		actionsRepositoryService.Actions.Add(new ImmersiveGameAction().Description);
-		actionsRepositoryService.Actions.Add(new SearchOverrideAction().Description);
+		
+		new SearchOverrideAction().Init(actionsRepositoryService, settingsService);
+		actionsRepositoryService.Actions.AddOrUpdate(new ImmersiveGameAction(log).Description);
 		
 		return actionsRepositoryService;
 	}
 
-	private LogViewerControlViewModel InstallLogging()
+	private void InstallLogging(out LogViewerControlViewModel vm, out Log log)
 	{
 		// catch all unhandled errors
 		AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
@@ -89,18 +95,17 @@ public  class App : Application
 		// builder.AddRandomBackgroundService();
 
 		// visual debugging tools
-		var vm = new LogViewerControlViewModel(Log.DataStore);
+		log = new Log();
+		vm = new LogViewerControlViewModel(log.DataStore);
 
 		// Microsoft Logger
 		// builder.Logging.AddDefaultDataStoreLogger();
-
-		return vm;
 	}
     
 	private void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
 	{
 		var eventId = new EventId(0, Assembly.GetEntryAssembly()!.GetName().Name);
-		Log.Emit(eventId, LogLevel.Error, "Unobserved Task Exception", (Exception)e.ExceptionObject);
+		log?.Emit(eventId, LogLevel.Error, "Unobserved Task Exception", (Exception)e.ExceptionObject);
 
 		// show user
 		ShowMessageBox("Unhandled Error", ((Exception)e.ExceptionObject).Message);
@@ -109,7 +114,7 @@ public  class App : Application
 	private void OnUnhandledRxException(Exception e)
 	{
 		var eventId = new EventId(0, Assembly.GetEntryAssembly()!.GetName().Name);
-		Log.Emit(eventId, LogLevel.Error, "Unobserved Task Exception", e);
+		log?.Emit(eventId, LogLevel.Error, "Unobserved Task Exception", e);
 		
 		// show user
 		ShowMessageBox("Unhandled Error", e.Message);
@@ -118,7 +123,7 @@ public  class App : Application
 	private void OnUnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
 	{
 		var eventId = new EventId(0, Assembly.GetEntryAssembly()!.GetName().Name);
-		Log.Emit(eventId, LogLevel.Error, "Unobserved Task Exception", e.Exception);
+		log?.Emit(eventId, LogLevel.Error, "Unobserved Task Exception", e.Exception);
 	}
 
 	private void ShowMessageBox(string title, string message)
@@ -142,6 +147,6 @@ public  class App : Application
 		// logger.TestPattern(eventId);
 
 		// log that we have started...
-		Log.Emit(eventId, LogLevel.Information, $"Running in {(isDevelopment ? "Debug" : "Release")} mode");
+		log?.Emit(eventId, LogLevel.Information, $"Running in {(isDevelopment ? "Debug" : "Release")} mode");
 	}
 }

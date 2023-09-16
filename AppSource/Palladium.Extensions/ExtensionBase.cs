@@ -1,4 +1,5 @@
 ﻿using Palladium.ActionsService;
+using Palladium.Logging;
 
 namespace Palladium.Extensions;
 
@@ -11,6 +12,7 @@ namespace Palladium.Extensions;
 public abstract class ExtensionBase
 {
 	public ActionsRepositoryService? ActionsRepositoryService;
+	public Log? ApplicationLog;
 
 	/// <summary>
 	///     Called by Palladium after the extension's DLL has been loaded. This is called from a background thread.

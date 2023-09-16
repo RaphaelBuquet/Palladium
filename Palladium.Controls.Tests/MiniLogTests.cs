@@ -21,7 +21,7 @@ public class MiniLogTests
 		var scheduler = new TestScheduler();
 		var observer = scheduler.CreateObserver<Inline>();
 		var control = new MiniLog();
-		control.WhenAnyValue(x => x.TextStream)
+		control.WhenAnyValue(x => x.TextStream)!
 			.Switch()
 			.Subscribe(observer);
 		scheduler.Start();
@@ -64,7 +64,7 @@ public class MiniLogTests
 		var scheduler = new TestScheduler();
 		var observer = scheduler.CreateObserver<Inline>();
 		var control = new MiniLog();
-		control.WhenAnyValue(x => x.TextStream)
+		control.WhenAnyValue(x => x.TextStream)!
 			.Switch()
 			.Subscribe(observer);
 		scheduler.Start();

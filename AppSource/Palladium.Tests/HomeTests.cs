@@ -30,7 +30,7 @@ public class HomeTests
 		var actionsItemsControl = home.FindDescendantOfType<ItemsControl>();
 		
 		// act
-		actionsRepository.Actions.Add(new ActionDescription(){Title = "Action1"});
+		actionsRepository.Actions.AddOrUpdate(new ActionDescription(new Guid("A1E1268F-167D-4AF2-AA40-5F221D0F9CE1")){Title = "Action1"});
 		Dispatcher.UIThread.RunJobs(); // needed for the ItemsControl to populate its children entirely
 		
 		// assert
@@ -42,7 +42,7 @@ public class HomeTests
 		// act
 		Task.Run(() =>
 		{
-			actionsRepository.Actions.Add(new ActionDescription { Title = "Action2" });
+			actionsRepository.Actions.AddOrUpdate(new ActionDescription(new Guid("C015DE92-A086-4576-B11C-9494D5174772")) { Title = "Action2" });
 		}).Wait();
 		Dispatcher.UIThread.RunJobs();
 		

@@ -2,8 +2,18 @@
 
 namespace Palladium.ActionsService;
 
-public struct ActionDescription
+public class ActionDescription
 {
+	public ActionDescription(Guid guid)
+	{
+		Guid = guid;
+	}
+
+	/// <summary>
+	///     Unique identifier.
+	/// </summary>
+	public Guid Guid;
+
 	/// <summary>
 	///     User-facing icon.
 	/// </summary>
@@ -28,5 +38,5 @@ public struct ActionDescription
 	///     Called when the user starts the action. The given <see cref="ContentControl" /> is the newly created tab. The UI
 	///     can be added inside using <see cref="ContentControl.Content" />.
 	/// </summary>
-	public Action<ContentControl> OnStart;
+	public Action<ContentControl>? OnStart;
 }

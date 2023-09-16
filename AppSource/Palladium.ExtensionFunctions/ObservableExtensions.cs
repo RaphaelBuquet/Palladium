@@ -182,13 +182,13 @@ public static class ObservableExtensions
 		});
 	}
 
-	public static IObservable<T> DebugToLogs<T>(this IObservable<T> observable, string? message = null)
+	public static IObservable<T> DebugToLogs<T>(this IObservable<T> observable, Log? log, string? message = null)
 	{
 #if DEBUG
 		return observable.Do(
-			obj => Log.Emit(new EventId(), LogLevel.Information, $"OnAction {message}: \"{obj}\""),
-			ex => Log.Emit(new EventId(), LogLevel.Error, $"OnException {message}: {ex}"),
-			() => Log.Emit(new EventId(), LogLevel.Information, $"OnCompleted {message}") );
+			obj => log?.Emit(new EventId(), LogLevel.Information, $"OnAction {message}: \"{obj}\""),
+			ex => log?.Emit(new EventId(), LogLevel.Error, $"OnException {message}: {ex}"),
+			() => log?.Emit(new EventId(), LogLevel.Information, $"OnCompleted {message}") );
 #else
 		return observable;
 #endif

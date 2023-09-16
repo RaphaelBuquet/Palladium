@@ -9,6 +9,13 @@ namespace Palladium.BuiltinActions.ImmersiveGame;
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public class WindowsDisplays : IDisplaySource
 {
+	private readonly Log log;
+
+	public WindowsDisplays(Log log)
+	{
+		this.log = log;
+	}
+
 	[Flags]
 	public enum DisplayDeviceStateFlags
 	{
@@ -60,7 +67,7 @@ public class WindowsDisplays : IDisplaySource
 	MiniLog IDisplaySource.DisableNonPrimaryDisplays()
 	{
 		int result = DisableNonPrimaryDisplays();
-		Log.Emit(new EventId(), LogLevel.Debug, $"{nameof(DisableNonPrimaryDisplays)} returned {result}");
+		log.Emit(new EventId(), LogLevel.Debug, $"{nameof(DisableNonPrimaryDisplays)} returned {result}");
 		
 		return InterpretResult(result);
 	}
@@ -69,7 +76,7 @@ public class WindowsDisplays : IDisplaySource
 	MiniLog IDisplaySource.RestoreSettings()
 	{
 		int result = RestoreSettings();
-		Log.Emit(new EventId(), LogLevel.Debug, $"{nameof(RestoreSettings)} returned {result}");
+		log.Emit(new EventId(), LogLevel.Debug, $"{nameof(RestoreSettings)} returned {result}");
 		
 		return InterpretResult(result);
 	}

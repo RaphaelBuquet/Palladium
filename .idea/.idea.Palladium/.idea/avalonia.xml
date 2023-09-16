@@ -20,6 +20,7 @@
         <entry key="AppSource/Palladium/Views/Home.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium/Views/LogsWindow.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium/Views/MainWindow.axaml" value="AppSource/Palladium/Palladium.csproj" />
+        <entry key="Palladium.Settings/SearchView.axaml" value="AppSource/Palladium/Palladium.csproj" />
       </map>
     </option>
   </component>

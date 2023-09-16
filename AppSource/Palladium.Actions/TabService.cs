@@ -4,7 +4,7 @@ namespace Palladium.ActionsService;
 
 public class TabsService
 {
-	private readonly Dictionary<Action<ContentControl>, TabItem> registeredActions = new();
+	private readonly Dictionary<Guid, TabItem> registeredActions = new();
 	
 	public TabControl? Target;
 
@@ -12,7 +12,7 @@ public class TabsService
 	{
 		if (Target == null) throw new InvalidOperationException("Target has not been set.");
 
-		if (!action.CanOpenMultiple && registeredActions.TryGetValue(action.OnStart, out TabItem? registeredAction))
+		if (!action.CanOpenMultiple && registeredActions.TryGetValue(action.Guid, out TabItem? registeredAction))
 		{
 			// change selected tab
 			Target.SelectedItem = registeredAction;
@@ -30,11 +30,11 @@ public class TabsService
 			Target.SelectedItem = newTab;
 			if (!action.CanOpenMultiple)
 			{
-				registeredActions.Add(action.OnStart, newTab);
+				registeredActions.Add(action.Guid, newTab);
 			}
 			
 			// invoke action
-			action.OnStart.Invoke(contentControl);
+			action.OnStart?.Invoke(contentControl);
 		}
 	}
 }
