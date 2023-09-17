@@ -5,9 +5,7 @@ using System.Xml;
 using DynamicData;
 using DynamicData.Binding;
 using LogViewer.Core;
-using Microsoft.Extensions.Logging;
 using Palladium.Logging;
-using ReactiveUI;
 
 namespace Palladium.Settings.Tests;
 
@@ -16,32 +14,29 @@ public class SettingsServiceTests
 	[Test]
 	public void ReadSettings_FromEmptyFile_Fails()
 	{
-		using var l = LogToConsole(out var log);
-		
+		using IDisposable l = LogToConsole(out Log log);
+
 		// arrange
 		string tempFile = Path.GetTempFileName();
 		var service = new SettingsService(log, tempFile);
 		var vm = new MockActionSettingsViewModel();
-		
+
 		// act
-		Assert.ThrowsAsync<XmlException>(async () =>
-		{
-			await service.Install(vm, "View", true);
-		});
+		Assert.ThrowsAsync<XmlException>(async () => { await service.Install(vm, () => "View", true); });
 	}
-	
+
 	[Test]
 	public async Task WriteSettings_ToEmptyFile()
 	{
-		using var l = LogToConsole(out var log);
-		
+		using IDisposable l = LogToConsole(out Log log);
+
 		// arrange
 		string tempFile = Path.GetTempFileName();
 		var service = new SettingsService(log, tempFile);
 		var vm = new MockActionSettingsViewModel { Value = 567 };
 
 		// act
-		_ = service.Install(vm, "View", false);
+		_ = service.Install(vm, () => "View", false);
 		await service.WriteCommand.Execute();
 
 		// assert
@@ -53,7 +48,7 @@ public class SettingsServiceTests
 	[Test]
 	public async Task ReadSettings()
 	{
-		using var l = LogToConsole(out var log);
+		using IDisposable l = LogToConsole(out Log log);
 
 		// arrange
 		string tempFile = Path.GetTempFileName();
@@ -67,12 +62,12 @@ public class SettingsServiceTests
 		                                         </ActionSettingsService>
 		                                       </PalladiumSettings>
 		                                       """);
-		
+
 		var service = new SettingsService(log, tempFile);
 		var vm = new MockActionSettingsViewModel();
-		
+
 		// act
-		await service.Install(vm, "View", true);
+		await service.Install(vm, () => "View", true);
 
 		// assert
 		Assert.IsNotNull(vm.Observable);
@@ -85,7 +80,7 @@ public class SettingsServiceTests
 	[Test]
 	public void Install_MakesViewAvailable()
 	{
-		using IDisposable? l = LogToConsole(out Log? log);
+		using IDisposable l = LogToConsole(out Log? log);
 
 		// arrange
 		string tempFile = Path.GetTempFileName();
@@ -93,12 +88,23 @@ public class SettingsServiceTests
 		var vm = new MockActionSettingsViewModel();
 
 		// act
-		_ = service.Install(vm, "View", false);
+		_ = service.Install(vm, () => "View", false);
 
 		// assert
 		Assert.AreEqual(1, service.SettingsViews.Count);
-		Assert.AreEqual("View", service.SettingsViews.Items.First().View);
+		Assert.AreEqual("View", service.SettingsViews.Items.First().CreateView.Invoke());
 		Assert.AreEqual(0, log.DataStore.Entries.Count);
+	}
+
+	private static IDisposable LogToConsole(out Log log)
+	{
+		log = new Log();
+		return log.DataStore.Entries
+			.ToObservableChangeSet()
+			.WhereReasonsAre(ListChangeReason.Add)
+			.SelectMany(change => change.Select(i => i.Item.Current))
+			.Where(changeSet => changeSet.Exception is not null)
+			.Subscribe(Observer.Create<LogModel>(e => Console.WriteLine(e.Exception)));
 	}
 
 	private class MockActionSettingsViewModel : IActionSettingsViewModel<int>
@@ -121,16 +127,4 @@ public class SettingsServiceTests
 			return Value;
 		}
 	}
-
-	private static IDisposable LogToConsole(out Log log)
-	{
-		log = new Log();
-		return log.DataStore.Entries
-			.ToObservableChangeSet()
-			.WhereReasonsAre(ListChangeReason.Add)
-			.SelectMany(change => change.Select(i => i.Item.Current))
-			.Where(changeSet => changeSet.Exception is not null)
-			.Subscribe(Observer.Create<LogModel>(e => Console.WriteLine(e.Exception)));
-	}
-	
 }

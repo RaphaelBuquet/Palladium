@@ -75,7 +75,7 @@ public  class App : Application
 	{
 		var actionsRepositoryService = new ActionsRepositoryService();
 
-		new SearchOverrideAction().Init(actionsRepositoryService, settingsService);
+		new SearchOverrideAction().Init(actionsRepositoryService, settingsService, log);
 		actionsRepositoryService.Actions.AddOrUpdate(new ImmersiveGameAction(log).Description);
 
 		return actionsRepositoryService;

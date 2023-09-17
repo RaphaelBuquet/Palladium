@@ -31,13 +31,16 @@ public class SettingsService
 
 	public ReactiveCommand<Unit, Unit> WriteCommand { get ; }
 
-	public SourceCache<(Guid ActionGuid, object View), Guid> SettingsViews { get; } = new (pair => pair.ActionGuid);
+	public SourceCache<(Guid ActionGuid, Func<object> CreateView), Guid> SettingsViews { get; } = new (pair => pair.ActionGuid);
 
 	/// <summary>
 	///     Install a view and a view model for an action's settings.
 	/// </summary>
 	/// <param name="viewModel">The view model for the settings page.</param>
-	/// <param name="view">The view for the settings page.</param>
+	/// <param name="createView">
+	///     A callback that creates the view for the settings page. The invocation of this callback is
+	///     delayed for performance reasons.
+	/// </param>
 	/// <param name="tryReadExistingSettings">
 	///     If true, will try to read any existing settings saved in user preferences. The
 	///     existing settings will be emitted through the observable in
@@ -48,7 +51,7 @@ public class SettingsService
 	///     You should implement <see cref="IActionSettingsViewModel{T}.ProcessDataObservable" /> to get the deserialized
 	///     value.
 	/// </returns>
-	public Task Install<T> (IActionSettingsViewModel<T> viewModel, object view, bool tryReadExistingSettings)
+	public Task Install<T> (IActionSettingsViewModel<T> viewModel, Func<object> createView, bool tryReadExistingSettings)
 	{
 		var writeFunction = delegate (XElement node) { WriteSerialize(node, viewModel.GetDataToSerialize()); };
 		serializers.Add(viewModel.ActionGuid, new SettingsSerializer { Type = typeof(T), SerializeFunction = writeFunction });
@@ -62,7 +65,7 @@ public class SettingsService
 			readTask.ContinueWith(task => { log.Emit(new EventId(), LogLevel.Warning, $"Failed to deserialize for {viewModel.ActionGuid} {typeof(T).Name}", task.Exception); }, TaskContinuationOptions.OnlyOnFaulted);
 		}
 		viewModel.ProcessDataObservable(subject);
-		SettingsViews.AddOrUpdate((viewModel.ActionGuid, view));
+		SettingsViews.AddOrUpdate((viewModel.ActionGuid, createView));
 
 		return readTask;
 	}

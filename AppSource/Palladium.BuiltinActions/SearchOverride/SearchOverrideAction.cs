@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using DynamicData;
 using Palladium.ActionsService;
+using Palladium.Logging;
 using Palladium.Settings;
 
 namespace Palladium.BuiltinActions.SearchOverride;
@@ -11,6 +12,7 @@ public class SearchOverrideAction
 {
 	public static readonly Guid Guid = new ("067fb8e2-fd37-49bc-b15b-6392fe75b550");
 	private SearchOverrideSettingsViewModel? settingsVm;
+	private Log? log;
 
 	public ActionDescription Description => new(Guid)
 	{
@@ -22,13 +24,14 @@ public class SearchOverrideAction
 		OnStart = Start
 	};
 
-	public void Init(ActionsRepositoryService repositoryService, SettingsService settingsService)
+	public void Init(ActionsRepositoryService repositoryService, SettingsService settingsService, Log log)
 	{
 		repositoryService.Actions.AddOrUpdate(Description);
 
+		this.log = log;
 		settingsVm = new SearchOverrideSettingsViewModel(settingsService);
-		var settingsView = new SearchOverrideSettingsView { DataContext = settingsVm };
-		_ = settingsService.Install(settingsVm, settingsView, true);
+		var createView = () => new SearchOverrideSettingsView { DataContext = settingsVm };
+		_ = settingsService.Install(settingsVm, createView, true);
 	}
 
 	private void Start(ContentControl container)
@@ -44,7 +47,7 @@ public class SearchOverrideAction
 
 		var view = new SearchOverrideView
 		{
-			DataContext = new SearchOverrideViewModel(settingsVm)
+			DataContext = new SearchOverrideViewModel(settingsVm, log)
 		};
 		container.Content = view;
 

@@ -49,11 +49,13 @@ public class SearchOverrideSettingsViewModel : ReactiveObject, IActivatableViewM
 	void IActionSettingsViewModel<SearchOverrideSettings>.ProcessDataObservable(IObservable<SearchOverrideSettings> observable)
 	{
 		dataSubscription?.Dispose();
-		dataSubscription = observable.Subscribe(settings =>
-		{
-			BrowserPath = settings.BrowserPath;
-			BrowserArguments = settings.BrowserArguments;
-		});
+		dataSubscription = observable
+			.ObserveOn(RxApp.MainThreadScheduler)
+			.Subscribe(settings =>
+			{
+				BrowserPath = settings.BrowserPath;
+				BrowserArguments = settings.BrowserArguments;
+			});
 	}
 
 	/// <inheritdoc />

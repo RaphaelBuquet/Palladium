@@ -23,11 +23,11 @@ public class SettingsViewModel : IActivatableViewModel
 				.InnerJoin(
 					actionsRepositoryService.Actions.Connect(),
 					actionDescription => actionDescription.Guid,
-					(pair, description) =>
-						new SettingsEntryViewModel(
-							description.Title ?? "",
-							$"{description.Emoji} {description.Title}", pair.View))
+					(tuple, description) => (description, tuple.CreateView))
 				.ObserveOn(RxApp.MainThreadScheduler)
+				.Transform(tuple => new SettingsEntryViewModel(
+					tuple.description.Title ?? "",
+					$"{tuple.description.Emoji} {tuple.description.Title}", tuple.CreateView.Invoke()))
 				.Bind(Settings)
 				.Subscribe()
 				.DisposeWith(disposables);

@@ -22,6 +22,5 @@ public class SettingsEntryViewModel : ReactiveObject
 
 	public string TitleText { get ; }
 	public string SectionText { get ; }
-
 	public object View { get ; }
 }
