@@ -16,7 +16,8 @@ public class MyExtension : ExtensionBase
 		// Keep this code fast to ensure extensions load quickly at startup.
 		
 		// Register actions. 
-		ActionsRepositoryService?.Actions.Add(new ActionDescription
+		// Make sure you use a unique GUID.
+		ActionsRepositoryService?.Actions.AddOrUpdate(new ActionDescription(new Guid("00000000-FFFF-EEEE-DDDD-000000000000"))
 			{
 				Title = "Example Extension Action",
 				Description = "Example extension description",
