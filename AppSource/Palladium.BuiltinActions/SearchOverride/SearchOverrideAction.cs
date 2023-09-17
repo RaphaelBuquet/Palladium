@@ -10,6 +10,7 @@ namespace Palladium.BuiltinActions.SearchOverride;
 public class SearchOverrideAction
 {
 	public static readonly Guid Guid = new ("067fb8e2-fd37-49bc-b15b-6392fe75b550");
+	private SearchOverrideSettingsViewModel? settingsVm;
 
 	public ActionDescription Description => new(Guid)
 	{
@@ -25,9 +26,9 @@ public class SearchOverrideAction
 	{
 		repositoryService.Actions.AddOrUpdate(Description);
 
-		var settingsVM = new SearchOverrideSettingsViewModel(settingsService);
-		var settingsView = new SearchOverrideSettingsView { DataContext = settingsVM };
-		_ = settingsService.Install(settingsVM, settingsView, true);
+		settingsVm = new SearchOverrideSettingsViewModel(settingsService);
+		var settingsView = new SearchOverrideSettingsView { DataContext = settingsVm };
+		_ = settingsService.Install(settingsVm, settingsView, true);
 	}
 
 	private void Start(ContentControl container)
@@ -43,7 +44,7 @@ public class SearchOverrideAction
 
 		var view = new SearchOverrideView
 		{
-			DataContext = new SearchOverrideViewModel()
+			DataContext = new SearchOverrideViewModel(settingsVm)
 		};
 		container.Content = view;
 

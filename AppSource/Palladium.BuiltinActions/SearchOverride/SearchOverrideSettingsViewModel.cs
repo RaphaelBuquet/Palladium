@@ -7,8 +7,6 @@ namespace Palladium.BuiltinActions.SearchOverride;
 
 public class SearchOverrideSettingsViewModel : ReactiveObject, IActivatableViewModel, IActionSettingsViewModel<SearchOverrideSettings>
 {
-	private readonly SettingsService? settingsService;
-
 	private IDisposable? dataSubscription;
 	private string browserPath = "";
 	private string browserArguments = "";
@@ -18,14 +16,13 @@ public class SearchOverrideSettingsViewModel : ReactiveObject, IActivatableViewM
 
 	public SearchOverrideSettingsViewModel(SettingsService? settingsService)
 	{
-		this.settingsService = settingsService;
 		this.WhenActivated(disposables =>
 		{
 			Disposable.Create(() => dataSubscription?.Dispose()).DisposeWith(disposables);
 
 			this.WhenAnyValue(x => x.BrowserPath, x => x.BrowserArguments)
 				.Skip(1) // skip initial value
-				.Subscribe(_ => settingsService?.WriteCommand.Execute().Subscribe())
+				.Subscribe(_ => { settingsService?.WriteCommand.Execute().Subscribe(); })
 				.DisposeWith(disposables);
 		});
 	}
@@ -61,6 +58,11 @@ public class SearchOverrideSettingsViewModel : ReactiveObject, IActivatableViewM
 
 	/// <inheritdoc />
 	SearchOverrideSettings IActionSettingsViewModel<SearchOverrideSettings>.GetDataToSerialize()
+	{
+		return GetCurrentSettings();
+	}
+
+	private SearchOverrideSettings GetCurrentSettings()
 	{
 		return new SearchOverrideSettings
 		{
