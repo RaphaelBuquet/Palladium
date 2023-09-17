@@ -1,0 +1,48 @@
+﻿<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Design.PreviewWith>
+        <Border Padding="20">
+            <StackPanel Orientation="Horizontal">
+                <Button Classes="CloseTab" />
+                <Button Classes="CloseTab" IsEnabled="False" />
+            </StackPanel>
+        </Border>
+    </Design.PreviewWith>
+
+    <Style Selector="Button.CloseTab">
+        <Setter Property="Theme">
+            <ControlTheme TargetType="Button">
+                <Setter Property="Template">
+                    <ControlTemplate>
+                        <Border
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            Background="{TemplateBinding Background}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            Padding="{TemplateBinding Padding}">
+                            <Viewbox>
+                                <PathIcon Data="{StaticResource CloseIcon}" />
+                            </Viewbox>
+                        </Border>
+                    </ControlTemplate>
+                </Setter>
+
+                <Setter Property="CornerRadius" Value="5" />
+                <Setter Property="Height" Value="10" />
+                <Setter Property="Width" Value="10" />
+                <Setter Property="Padding" Value="2" />
+                <Setter Property="Foreground" Value="{StaticResource Tone1-50}" />
+
+                <Style Selector="^:pointerover">
+                    <Setter Property="Background" Value="{StaticResource Tone2-75}" />
+                </Style>
+                <Style Selector="^:pressed">
+                    <Setter Property="Background" Value="{StaticResource Tone2}" />
+                </Style>
+                <Style Selector="^:disabled">
+                    <Setter Property="IsVisible" Value="False" />
+                </Style>
+            </ControlTheme>
+        </Setter>
+    </Style>
+</Styles>

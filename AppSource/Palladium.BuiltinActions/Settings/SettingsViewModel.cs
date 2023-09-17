@@ -18,6 +18,8 @@ public class SettingsViewModel : IActivatableViewModel
 	{
 		this.WhenActivated( disposables =>
 		{
+			Disposable.Create(() => Settings.Clear()).DisposeWith(disposables);
+			
 			settingsService.SettingsViews
 				.Connect()
 				.InnerJoin(

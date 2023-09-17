@@ -46,10 +46,10 @@
             </Grid>
         </Border>
         <TabControl Grid.Row="1" x:Name="Tabs" Classes="ApplicationTabs">
-            <TabItem Header="🏠 Home">
+            <controls:ApplicationTabItem Header="🏠 Home" AllowClose="False">
                 <views:Home x:Name="Home" />
                 <!-- DataContext is set in App.axaml.cs (as MainWindow should not have a dependency on that DataContext) -->
-            </TabItem>
+            </controls:ApplicationTabItem>
         </TabControl>
     </Grid>
 </Window>

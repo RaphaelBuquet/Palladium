@@ -47,6 +47,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Settings", "Palla
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Settings.Tests", "Palladium.Settings.Tests\Palladium.Settings.Tests.csproj", "{DFAB44C1-B58D-4C07-89D9-C0BE56808F54}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Actions.Tests", "Palladium.Actions.Tests\Palladium.Actions.Tests.csproj", "{C8CB0CEF-B7A1-4C5E-A332-EC57651EEB78}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|x64 = Release|x64
@@ -136,5 +138,9 @@ Global
 		{DFAB44C1-B58D-4C07-89D9-C0BE56808F54}.Release|x64.Build.0 = Release|Any CPU
 		{DFAB44C1-B58D-4C07-89D9-C0BE56808F54}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{DFAB44C1-B58D-4C07-89D9-C0BE56808F54}.Debug|x64.Build.0 = Debug|Any CPU
+		{C8CB0CEF-B7A1-4C5E-A332-EC57651EEB78}.Release|x64.ActiveCfg = Release|Any CPU
+		{C8CB0CEF-B7A1-4C5E-A332-EC57651EEB78}.Release|x64.Build.0 = Release|Any CPU
+		{C8CB0CEF-B7A1-4C5E-A332-EC57651EEB78}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C8CB0CEF-B7A1-4C5E-A332-EC57651EEB78}.Debug|x64.Build.0 = Debug|Any CPU
 	EndGlobalSection
 EndGlobal

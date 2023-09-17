@@ -4,11 +4,6 @@ namespace Palladium.ActionsService;
 
 public class ActionDescription
 {
-	public ActionDescription(Guid guid)
-	{
-		Guid = guid;
-	}
-
 	/// <summary>
 	///     Unique identifier.
 	/// </summary>
@@ -35,8 +30,20 @@ public class ActionDescription
 	public bool CanOpenMultiple;
 
 	/// <summary>
-	///     Called when the user starts the action. The given <see cref="ContentControl" /> is the newly created tab. The UI
-	///     can be added inside using <see cref="ContentControl.Content" />.
+	///     <para>
+	///         Called when the user starts the action. The given <see cref="ContentControl" /> is the newly created tab. The
+	///         UI
+	///         can be added inside using <see cref="ContentControl.Content" />.
+	///     </para>
+	///     <para>
+	///         When the tab for the action is closed, the <see cref="ContentControl.Content" /> will be disposed if it
+	///         implements <see cref="IDisposable" />.
+	///     </para>
 	/// </summary>
 	public Action<ContentControl>? OnStart;
+
+	public ActionDescription(Guid guid)
+	{
+		Guid = guid;
+	}
 }

@@ -1,14 +1,15 @@
 ﻿<Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:Palladium.Controls">
     <Design.PreviewWith>
         <Border Padding="0">
             <TabControl x:Name="Tabs" Classes="ApplicationTabs">
-                <TabItem Classes="ApplicationTabs" Header="🏠 Home">
+                <controls:ApplicationTabItem Classes="ApplicationTabs" Header="🏠 Home" AllowClose="False">
                     <TextBlock Background="Pink">Home content</TextBlock>
-                </TabItem>
-                <TabItem Classes="ApplicationTabs" Header="🚘 Supercars">
+                </controls:ApplicationTabItem>
+                <controls:ApplicationTabItem Classes="ApplicationTabs" Header="🚘 Supercars">
                     <TextBlock>Supercars content</TextBlock>
-                </TabItem>
+                </controls:ApplicationTabItem>
             </TabControl>
         </Border>
     </Design.PreviewWith>
@@ -23,10 +24,10 @@
         <Setter Property="Padding" Value="0" />
     </Style>
 
-    <Style Selector="TabControl.ApplicationTabs > TabItem">
+    <Style Selector="TabControl.ApplicationTabs > controls|ApplicationTabItem">
         <!-- Completely override default (fluent) styling by redefining the theme -->
         <Setter Property="Theme">
-            <ControlTheme TargetType="TabItem">
+            <ControlTheme TargetType="controls:ApplicationTabItem">
                 <Setter Property="Template">
                     <ControlTemplate>
                         <Border
@@ -36,22 +37,28 @@
                             BorderThickness="{TemplateBinding BorderThickness}"
                             CornerRadius="{TemplateBinding CornerRadius}"
                             Padding="{TemplateBinding Padding}">
-                            <ContentPresenter
-                                Name="PART_ContentPresenter"
-                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                Content="{TemplateBinding Header}"
-                                ContentTemplate="{TemplateBinding HeaderTemplate}"
-                                FontFamily="{TemplateBinding FontFamily}"
-                                FontSize="{TemplateBinding FontSize}"
-                                FontWeight="{TemplateBinding FontWeight}" />
+                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                <ContentPresenter
+                                    Name="PART_ContentPresenter"
+                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                    Content="{TemplateBinding Header}"
+                                    ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                    FontFamily="{TemplateBinding FontFamily}"
+                                    FontSize="{TemplateBinding FontSize}"
+                                    FontWeight="{TemplateBinding FontWeight}" />
+                                <Button Classes="CloseTab"
+                                        IsEnabled="{TemplateBinding AllowClose}"
+                                        Command="{TemplateBinding CloseTabCommand}"
+                                        Margin="0 0 -2 0" />
+                            </StackPanel>
                         </Border>
                     </ControlTemplate>
                 </Setter>
                 <Setter Property="FontSize" Value="10" />
                 <Setter Property="VerticalContentAlignment" Value="Center" />
                 <Setter Property="Foreground" Value="{StaticResource Tone1}" />
-                <Setter Property="Padding" Value="6 0" />
+                <Setter Property="Padding" Value="6 0 6 0" />
                 <Setter Property="Height" Value="23" /> <!-- 24 - 1 for the border at the bottom -->
                 <Setter Property="Background" Value="White" />
 

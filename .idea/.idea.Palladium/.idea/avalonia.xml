@@ -10,7 +10,9 @@
         <entry key="AppSource/Palladium.BuiltinActions/SearchOverride/SearchOverrideView.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.BuiltinActions/Settings/SettingsView.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.Controls/ApplicationTabItem.axaml" value="AppSource/Palladium/Palladium.csproj" />
+        <entry key="AppSource/Palladium.Controls/ApplicationTabItem2.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.Controls/Button.axaml" value="AppSource/Palladium/Palladium.csproj" />
+        <entry key="AppSource/Palladium.Controls/CloseTabButton.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.Controls/HeadedSection.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.Controls/IconButton.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.Controls/MiniLog.axaml" value="AppSource/Palladium/Palladium.csproj" />
