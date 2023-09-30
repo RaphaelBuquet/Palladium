@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Palladium.Builtin.Tests": {
+      "commandName": "Project",
+      "nativeDebugging": true
+    }
+  }
+}

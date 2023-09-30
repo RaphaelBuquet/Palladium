@@ -14,10 +14,10 @@
             <ExcludeAssets>runtime</ExcludeAssets>
             <HintPath>..\..\AppBinaries\Palladium.Actions.dll</HintPath>
         </Reference>
-        <Reference Include="Palladium.BuiltinActions">
+        <Reference Include="Palladium.Builtin">
             <Private>false</Private>
             <ExcludeAssets>runtime</ExcludeAssets>
-            <HintPath>..\..\AppBinaries\Palladium.BuiltinActions.dll</HintPath>
+            <HintPath>..\..\AppBinaries\Palladium.Builtin.dll</HintPath>
         </Reference>
         <Reference Include="Palladium.Controls">
             <Private>false</Private>

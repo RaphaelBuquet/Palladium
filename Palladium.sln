@@ -20,14 +20,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Logging", "AppSou
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Actions", "AppSource\Palladium.Actions\Palladium.Actions.csproj", "{8D9F9D0C-A8D8-4ECD-896D-70AB15A32700}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.BuiltinActions", "AppSource\Palladium.BuiltinActions\Palladium.BuiltinActions.csproj", "{144D4AF4-C1AA-4095-9E4F-EAC87FC9F38B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Builtin", "AppSource\Palladium.Builtin\Palladium.Builtin.csproj", "{144D4AF4-C1AA-4095-9E4F-EAC87FC9F38B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{34AC5BB5-4043-4E0A-8575-61E65399A0D4} = {34AC5BB5-4043-4E0A-8575-61E65399A0D4}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Palladium.NativeWindows", "AppSource\Palladium.NativeWindows\Palladium.NativeWindows.vcxproj", "{34AC5BB5-4043-4E0A-8575-61E65399A0D4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.BuiltinActions.Tests", "AppSource\Palladium.BuiltinActions.Tests\Palladium.BuiltinActions.Tests.csproj", "{0BFD82E9-E034-4F5A-BCF2-56DC4B883B2D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Builtin.Tests", "AppSource\Palladium.Builtin.Tests\Palladium.Builtin.Tests.csproj", "{0BFD82E9-E034-4F5A-BCF2-56DC4B883B2D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.ExtensionFunctions", "AppSource\Palladium.ExtensionFunctions\Palladium.ExtensionFunctions.csproj", "{D60311BB-5698-4665-8456-7A171C8A0794}"
 EndProject

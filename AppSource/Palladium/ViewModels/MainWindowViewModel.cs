@@ -4,7 +4,7 @@ using System.Reactive.Disposables;
 using Avalonia.Controls;
 using LogViewer.Core.ViewModels;
 using Palladium.ActionsService;
-using Palladium.BuiltinActions.Settings;
+using Palladium.Builtin.Settings;
 using Palladium.Settings;
 using Palladium.Views;
 using ReactiveUI;
