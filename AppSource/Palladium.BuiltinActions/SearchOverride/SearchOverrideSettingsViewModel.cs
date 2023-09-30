@@ -1,21 +1,23 @@
 ﻿using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using Palladium.ActionsService;
 using Palladium.Settings;
 using ReactiveUI;
 
 namespace Palladium.BuiltinActions.SearchOverride;
 
-public class SearchOverrideSettingsViewModel : ReactiveObject, IActivatableViewModel, IActionSettingsViewModel<SearchOverrideSettings>
+public class SearchOverrideSettingsViewModel : ReactiveObject, IActivatableViewModel, ISettings<SearchOverrideSettings>
 {
 	private IDisposable? dataSubscription;
 	private string browserPath = "";
 	private string browserArguments = "";
 
-	public SearchOverrideSettingsViewModel() : this(null)
+	public SearchOverrideSettingsViewModel() : this(null, null)
 	{ }
 
-	public SearchOverrideSettingsViewModel(SettingsService? settingsService)
+	public SearchOverrideSettingsViewModel(ActionDescription? actionDescription, SettingsService? settingsService)
 	{
+		SettingsText = SettingsText.FromActionDescription(actionDescription);
 		this.WhenActivated(disposables =>
 		{
 			Disposable.Create(() => dataSubscription?.Dispose()).DisposeWith(disposables);
@@ -43,10 +45,13 @@ public class SearchOverrideSettingsViewModel : ReactiveObject, IActivatableViewM
 	ViewModelActivator IActivatableViewModel.Activator { get ; } = new ();
 
 	/// <inheritdoc />
-	Guid IActionSettingsViewModel<SearchOverrideSettings>.ActionGuid => SearchOverrideAction.Guid;
+	Guid ISettings<SearchOverrideSettings>.SettingsGuid => SearchOverrideAction.Guid;
 
 	/// <inheritdoc />
-	void IActionSettingsViewModel<SearchOverrideSettings>.ProcessDataObservable(IObservable<SearchOverrideSettings> observable)
+	public SettingsText SettingsText { get; }
+
+	/// <inheritdoc />
+	void ISettings<SearchOverrideSettings>.ProcessDataObservable(IObservable<SearchOverrideSettings> observable)
 	{
 		dataSubscription?.Dispose();
 		dataSubscription = observable
@@ -59,7 +64,7 @@ public class SearchOverrideSettingsViewModel : ReactiveObject, IActivatableViewM
 	}
 
 	/// <inheritdoc />
-	SearchOverrideSettings IActionSettingsViewModel<SearchOverrideSettings>.GetDataToSerialize()
+	SearchOverrideSettings ISettings<SearchOverrideSettings>.GetDataToSerialize()
 	{
 		return GetCurrentSettings();
 	}

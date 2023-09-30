@@ -19,7 +19,7 @@ public class SettingsServiceTests
 		// arrange
 		string tempFile = Path.GetTempFileName();
 		var service = new SettingsService(log, tempFile);
-		var vm = new MockActionSettingsViewModel();
+		var vm = new MockSettings();
 
 		// act
 		Assert.ThrowsAsync<XmlException>(async () => { await service.Install(vm, () => "View", true); });
@@ -33,7 +33,7 @@ public class SettingsServiceTests
 		// arrange
 		string tempFile = Path.GetTempFileName();
 		var service = new SettingsService(log, tempFile);
-		var vm = new MockActionSettingsViewModel { Value = 567 };
+		var vm = new MockSettings { Value = 567 };
 
 		// act
 		_ = service.Install(vm, () => "View", false);
@@ -64,7 +64,7 @@ public class SettingsServiceTests
 		                                       """);
 
 		var service = new SettingsService(log, tempFile);
-		var vm = new MockActionSettingsViewModel();
+		var vm = new MockSettings();
 
 		// act
 		await service.Install(vm, () => "View", true);
@@ -85,7 +85,7 @@ public class SettingsServiceTests
 		// arrange
 		string tempFile = Path.GetTempFileName();
 		var service = new SettingsService(log, tempFile);
-		var vm = new MockActionSettingsViewModel();
+		var vm = new MockSettings();
 
 		// act
 		_ = service.Install(vm, () => "View", false);
@@ -107,13 +107,16 @@ public class SettingsServiceTests
 			.Subscribe(Observer.Create<LogModel>(e => Console.WriteLine(e.Exception)));
 	}
 
-	private class MockActionSettingsViewModel : IActionSettingsViewModel<int>
+	private class MockSettings : ISettings<int>
 	{
 		public IObservable<int>? Observable;
 		public int Value;
 
 		/// <inheritdoc />
-		public Guid ActionGuid => new ("1A2AD44E-8623-4799-8545-C8EAD5B6FECD");
+		public Guid SettingsGuid => new ("1A2AD44E-8623-4799-8545-C8EAD5B6FECD");
+
+		/// <inheritdoc />
+		public SettingsText SettingsText => new();
 
 		/// <inheritdoc />
 		public void ProcessDataObservable(IObservable<int> observable)

@@ -29,7 +29,7 @@ public class SearchOverrideAction
 		repositoryService.Actions.AddOrUpdate(Description);
 
 		this.log = log;
-		settingsVm = new SearchOverrideSettingsViewModel(settingsService);
+		settingsVm = new SearchOverrideSettingsViewModel(Description ,settingsService);
 		var createView = () => new SearchOverrideSettingsView { DataContext = settingsVm };
 		_ = settingsService.Install(settingsVm, createView, true);
 	}

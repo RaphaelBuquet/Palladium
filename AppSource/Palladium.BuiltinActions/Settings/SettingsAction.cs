@@ -19,9 +19,9 @@ public class SettingsAction
 		OnStart = Start
 	};
 
-	public void Init(ActionsRepositoryService actionsRepositoryService, SettingsService settingsService)
+	public void Init(SettingsService settingsService)
 	{
-		settingsViewModel = new SettingsViewModel(actionsRepositoryService, settingsService);
+		settingsViewModel = new SettingsViewModel(settingsService);
 	}
 
 	private void Start(ContentControl container)

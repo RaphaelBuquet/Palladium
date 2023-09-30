@@ -83,7 +83,7 @@ public class MainWindowViewModel : ReactiveObject, IActivatableViewModel
 		if (settingsAction == null)
 		{
 			settingsAction = new SettingsAction();
-			settingsAction.Init(actionsRepositoryService, settingsService);
+			settingsAction.Init(settingsService);
 		}
 		tabsService?.HandleStartAction(settingsAction.Description);
 	}

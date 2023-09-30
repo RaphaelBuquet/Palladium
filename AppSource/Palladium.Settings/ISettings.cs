@@ -1,11 +1,17 @@
 ﻿namespace Palladium.Settings;
 
-public interface IActionSettingsViewModel<T>
+public interface ISettings<T>
 {
 	/// <summary>
-	///     Maps settings to an action.
+	///     Identifier for these settings. Will be used when serializing and deserializing.
 	/// </summary>
-	Guid ActionGuid { get; }
+	Guid SettingsGuid { get; }
+
+	/// <summary>
+	///     User-facing text in the settings view. You should use <see cref="Settings.SettingsText.FromActionDescription" /> to
+	///     set this.
+	/// </summary>
+	SettingsText SettingsText { get; }
 
 	/// <summary>
 	///     Sets the observable that emits data serialized from disk.

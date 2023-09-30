@@ -6,7 +6,6 @@ using Avalonia.Layout;
 using Avalonia.Media;
 using DynamicData;
 using DynamicData.Binding;
-using Palladium.ActionsService;
 using Palladium.Settings;
 using ReactiveUI;
 
@@ -14,22 +13,18 @@ namespace Palladium.BuiltinActions.Settings;
 
 public class SettingsViewModel : IActivatableViewModel
 {
-	public SettingsViewModel(ActionsRepositoryService actionsRepositoryService, SettingsService settingsService)
+	public SettingsViewModel(SettingsService settingsService)
 	{
 		this.WhenActivated( disposables =>
 		{
 			Disposable.Create(() => Settings.Clear()).DisposeWith(disposables);
-			
 			settingsService.SettingsViews
 				.Connect()
-				.InnerJoin(
-					actionsRepositoryService.Actions.Connect(),
-					actionDescription => actionDescription.Guid,
-					(tuple, description) => (description, tuple.CreateView))
 				.ObserveOn(RxApp.MainThreadScheduler)
 				.Transform(tuple => new SettingsEntryViewModel(
-					tuple.description.Title ?? "",
-					$"{tuple.description.Emoji} {tuple.description.Title}", tuple.CreateView.Invoke()))
+					tuple.Text.Title ?? "Unknown",
+					tuple.Text.SectionTitle ?? $"Unknown {tuple.Guid}",
+					tuple.CreateView.Invoke()))
 				.Bind(Settings)
 				.Subscribe()
 				.DisposeWith(disposables);

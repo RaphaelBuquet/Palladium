@@ -31,12 +31,12 @@ public class SettingsService
 
 	public ReactiveCommand<Unit, Unit> WriteCommand { get ; }
 
-	public SourceCache<(Guid ActionGuid, Func<object> CreateView), Guid> SettingsViews { get; } = new (pair => pair.ActionGuid);
+	public SourceCache<SettingsEntry, Guid> SettingsViews { get; } = new (pair => pair.Guid);
 
 	/// <summary>
 	///     Install a view and a view model for an action's settings.
 	/// </summary>
-	/// <param name="viewModel">The view model for the settings page.</param>
+	/// <param name="settings">The view model for the settings page.</param>
 	/// <param name="createView">
 	///     A callback that creates the view for the settings page. The invocation of this callback is
 	///     delayed for performance reasons.
@@ -44,28 +44,33 @@ public class SettingsService
 	/// <param name="tryReadExistingSettings">
 	///     If true, will try to read any existing settings saved in user preferences. The
 	///     existing settings will be emitted through the observable in
-	///     <see cref="IActionSettingsViewModel{T}.ProcessDataObservable" />.
+	///     <see cref="ISettings{T}.ProcessDataObservable" />.
 	/// </param>
 	/// <returns>
 	///     A task for the deserialization of existing settings. This is useful to know if the settings are being deserialized.
-	///     You should implement <see cref="IActionSettingsViewModel{T}.ProcessDataObservable" /> to get the deserialized
+	///     You should implement <see cref="ISettings{T}.ProcessDataObservable" /> to get the deserialized
 	///     value.
 	/// </returns>
-	public Task Install<T> (IActionSettingsViewModel<T> viewModel, Func<object> createView, bool tryReadExistingSettings)
+	public Task Install<T> (ISettings<T> settings, Func<object> createView, bool tryReadExistingSettings)
 	{
-		var writeFunction = delegate (XElement node) { WriteSerialize(node, viewModel.GetDataToSerialize()); };
-		serializers.Add(viewModel.ActionGuid, new SettingsSerializer { Type = typeof(T), SerializeFunction = writeFunction });
+		var writeFunction = delegate (XElement node) { WriteSerialize(node, settings.GetDataToSerialize()); };
+		serializers.Add(settings.SettingsGuid, new SettingsSerializer { Type = typeof(T), SerializeFunction = writeFunction });
 
 		var subject = new ReplaySubject<T>(1);
 
 		var readTask = Task.CompletedTask;
 		if (tryReadExistingSettings)
 		{
-			readTask = DeserializeAsync(viewModel.ActionGuid, subject);
-			readTask.ContinueWith(task => { log.Emit(new EventId(), LogLevel.Warning, $"Failed to deserialize for {viewModel.ActionGuid} {typeof(T).Name}", task.Exception); }, TaskContinuationOptions.OnlyOnFaulted);
+			readTask = DeserializeAsync(settings.SettingsGuid, subject);
+			readTask.ContinueWith(task => { log.Emit(new EventId(), LogLevel.Warning, $"Failed to deserialize settings for {settings.SettingsGuid} {typeof(T).Name}", task.Exception); }, TaskContinuationOptions.OnlyOnFaulted);
 		}
-		viewModel.ProcessDataObservable(subject);
-		SettingsViews.AddOrUpdate((viewModel.ActionGuid, createView));
+		settings.ProcessDataObservable(subject);
+		SettingsViews.AddOrUpdate(new SettingsEntry
+		{
+			Text = settings.SettingsText,
+			Guid = settings.SettingsGuid,
+			CreateView = createView
+		});
 
 		return readTask;
 	}
