@@ -14,7 +14,7 @@
     </ItemGroup>
     
     <ItemGroup>
-      <ProjectReference Include="..\AppSource\Palladium.Controls\Palladium.Controls.csproj" />
+        <ProjectReference Include="..\Palladium.Controls\Palladium.Controls.csproj"/>
     </ItemGroup>
 
 </Project>

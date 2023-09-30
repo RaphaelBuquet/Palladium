@@ -37,17 +37,17 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PalladiumExtensionTemplate"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Tests", "AppSource\Palladium.Tests\Palladium.Tests.csproj", "{9987F6D0-72BD-4198-9681-FFD35A9E9623}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Controls.Tests", "Palladium.Controls.Tests\Palladium.Controls.Tests.csproj", "{E2C90E59-A5B7-4595-937B-6C3DBF6B02ED}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Controls.Tests", "AppSource\Palladium.Controls.Tests\Palladium.Controls.Tests.csproj", "{E2C90E59-A5B7-4595-937B-6C3DBF6B02ED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Headless", "Palladium.Headless\Palladium.Headless.csproj", "{08724A4C-6B94-449F-B1C2-782EB15419A2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Headless", "AppSource\Palladium.Headless\Palladium.Headless.csproj", "{08724A4C-6B94-449F-B1C2-782EB15419A2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.ExtensionFunctions.Tests", "Palladium.ExtensionFunctions.Tests\Palladium.ExtensionFunctions.Tests.csproj", "{D2276E1A-EB1E-406D-88AB-7382C557D572}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.ExtensionFunctions.Tests", "AppSource\Palladium.ExtensionFunctions.Tests\Palladium.ExtensionFunctions.Tests.csproj", "{D2276E1A-EB1E-406D-88AB-7382C557D572}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Settings", "Palladium.Settings\Palladium.Settings.csproj", "{1081D43F-0146-4BA1-8F1B-474CE8DF1B04}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Settings", "AppSource\Palladium.Settings\Palladium.Settings.csproj", "{1081D43F-0146-4BA1-8F1B-474CE8DF1B04}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Settings.Tests", "Palladium.Settings.Tests\Palladium.Settings.Tests.csproj", "{DFAB44C1-B58D-4C07-89D9-C0BE56808F54}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Settings.Tests", "AppSource\Palladium.Settings.Tests\Palladium.Settings.Tests.csproj", "{DFAB44C1-B58D-4C07-89D9-C0BE56808F54}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Actions.Tests", "Palladium.Actions.Tests\Palladium.Actions.Tests.csproj", "{C8CB0CEF-B7A1-4C5E-A332-EC57651EEB78}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Actions.Tests", "AppSource\Palladium.Actions.Tests\Palladium.Actions.Tests.csproj", "{C8CB0CEF-B7A1-4C5E-A332-EC57651EEB78}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
