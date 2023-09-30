@@ -11,8 +11,17 @@
         <ProjectReference Include="..\Palladium.Actions\Palladium.Actions.csproj"/>
         <ProjectReference Include="..\Palladium.Logging\Palladium.Logging.csproj"/>
         <ProjectReference Include="..\Palladium.ExtensionFunctions\Palladium.ExtensionFunctions.csproj" />
+        <!-- Build dependency on Palladium.NativeWindows -->
+        <ProjectReference Include="..\Palladium.NativeWindows\Palladium.NativeWindows.vcxproj"/>
     </ItemGroup>
-    
+
+    <ItemGroup>
+      <Content Include="..\Palladium.NativeWindows\bin\x64\$(Configuration)\Palladium.NativeWindows.dll">
+        <Link>Palladium.NativeWindows.dll</Link>
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
     <ItemGroup>
       <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.3" />
     </ItemGroup>
