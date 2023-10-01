@@ -12,6 +12,7 @@
     <StyleInclude Source="avares://Palladium.Controls/MiniLog.axaml"/>
     <StyleInclude Source="avares://Palladium.Controls/CloseTabButton.axaml" />
     <StyleInclude Source="avares://Palladium.Controls/ValidationMessage.axaml" />
+    <StyleInclude Source="avares://Palladium.Controls/ActivityIndicator.axaml" />
     
     <!-- Preview -->
     <Design.PreviewWith>
