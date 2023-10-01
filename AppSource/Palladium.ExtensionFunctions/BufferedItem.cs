@@ -1,4 +1,4 @@
-﻿namespace Palladium.ObservableExtensions;
+﻿namespace Palladium.ExtensionFunctions;
 
 public struct BufferedItem<T>
 {

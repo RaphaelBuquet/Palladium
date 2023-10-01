@@ -8,7 +8,7 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Metadata;
 using DynamicData;
 using DynamicData.Binding;
-using Palladium.ObservableExtensions;
+using Palladium.ExtensionFunctions;
 
 namespace Palladium.Controls;
 

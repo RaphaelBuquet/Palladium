@@ -4,9 +4,9 @@ using System.Reactive.Disposables;
 using Avalonia.Controls.Documents;
 using Microsoft.Extensions.Logging;
 using Palladium.Controls;
+using Palladium.ExtensionFunctions;
+using Palladium.ExtensionFunctions.Lifecycle;
 using Palladium.Logging;
-using Palladium.ObservableExtensions;
-using Palladium.ObservableExtensions.Lifecycle;
 using ReactiveUI;
 
 namespace Palladium.Builtin.SearchOverride;

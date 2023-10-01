@@ -4,7 +4,7 @@ using System.Reactive.Linq;
 using Microsoft.Extensions.Logging;
 using Palladium.Logging;
 
-namespace Palladium.ObservableExtensions;
+namespace Palladium.ExtensionFunctions;
 
 public static class ObservableExtensions
 {

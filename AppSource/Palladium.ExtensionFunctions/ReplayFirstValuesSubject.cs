@@ -1,6 +1,6 @@
 ﻿using System.Reactive.Subjects;
 
-namespace Palladium.ObservableExtensions;
+namespace Palladium.ExtensionFunctions;
 
 /// <summary>
 ///     Useful for view models that need to emit some values in their constructor, but the bindings with the view haven't

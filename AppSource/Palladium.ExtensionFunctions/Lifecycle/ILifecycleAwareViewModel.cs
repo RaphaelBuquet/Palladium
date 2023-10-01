@@ -2,7 +2,7 @@
 using System.Reactive.Linq;
 using Avalonia;
 
-namespace Palladium.ObservableExtensions.Lifecycle;
+namespace Palladium.ExtensionFunctions.Lifecycle;
 
 /// <summary>
 ///     <para>

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Reactive.Testing;
-using Palladium.ObservableExtensions;
 
 namespace Palladium.ExtensionFunctions.Tests;
 

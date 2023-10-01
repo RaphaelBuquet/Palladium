@@ -1,6 +1,5 @@
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using Palladium.ObservableExtensions;
 
 namespace Palladium.ExtensionFunctions.Tests;
 

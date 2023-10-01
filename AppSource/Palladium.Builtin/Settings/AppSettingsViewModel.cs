@@ -2,8 +2,8 @@
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Avalonia.Controls;
+using Palladium.ExtensionFunctions;
 using Palladium.Logging;
-using Palladium.ObservableExtensions;
 using Palladium.Settings;
 using ReactiveUI;
 using ReactiveUI.Validation.Abstractions;

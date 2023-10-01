@@ -1,5 +1,5 @@
 ﻿using Avalonia.ReactiveUI;
-using Palladium.ObservableExtensions.Lifecycle;
+using Palladium.ExtensionFunctions.Lifecycle;
 
 namespace Palladium.Builtin.ImmersiveGame;
 

@@ -5,8 +5,8 @@ using System.Reactive.Subjects;
 using Avalonia.Controls.Documents;
 using Palladium.ActionsService;
 using Palladium.Controls;
-using Palladium.ObservableExtensions;
-using Palladium.ObservableExtensions.Lifecycle;
+using Palladium.ExtensionFunctions;
+using Palladium.ExtensionFunctions.Lifecycle;
 using ReactiveUI;
 using MiniLog = Palladium.Logging.MiniLog;
 

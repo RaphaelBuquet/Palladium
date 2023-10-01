@@ -1,6 +1,6 @@
 ﻿using System;
 using Avalonia.ReactiveUI;
-using Palladium.ObservableExtensions.Lifecycle;
+using Palladium.ExtensionFunctions.Lifecycle;
 using Palladium.ViewModels;
 
 namespace Palladium.Views;

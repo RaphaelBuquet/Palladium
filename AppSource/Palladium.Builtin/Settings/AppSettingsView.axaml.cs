@@ -1,9 +1,9 @@
 ﻿using System.Reactive.Disposables;
 using Avalonia.Controls;
 using Avalonia.ReactiveUI;
+using Palladium.ExtensionFunctions;
 using ReactiveUI;
 using ReactiveUI.Validation.Extensions;
-using Palladium.ObservableExtensions;
 
 namespace Palladium.Builtin.Settings;
 

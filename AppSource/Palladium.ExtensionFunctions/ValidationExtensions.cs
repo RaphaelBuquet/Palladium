@@ -1,6 +1,6 @@
 ﻿using Avalonia.Controls;
 
-namespace Palladium.ObservableExtensions;
+namespace Palladium.ExtensionFunctions;
 
 public static class ValidationExtensions
 {
