@@ -1,9 +1,7 @@
 ﻿using System.Reactive.Disposables;
-using Avalonia.Controls;
 using Avalonia.ReactiveUI;
 using Palladium.ExtensionFunctions;
 using ReactiveUI;
-using ReactiveUI.Validation.Extensions;
 
 namespace Palladium.Builtin.Settings;
 
@@ -16,16 +14,10 @@ public partial class AppSettingsView : ReactiveUserControl<AppSettingsViewModel>
 		this.WhenActivated(disposables =>
 		{
 			this.BindValidation(
-				ViewModel,
-				vm => vm.LaunchAtStartup,
-				view => view.LaunchAtStartupErrors)
+					ViewModel,
+					vm => vm.LaunchAtStartup,
+					LaunchAtStartup)
 				.DisposeWith(disposables);
 		});
-	}
-
-	private string? LaunchAtStartupErrors
-	{
-		get => LaunchAtStartup.GetAttachedValidation();
-		set => LaunchAtStartup.SetAttachedValidation(value);
 	}
 }
