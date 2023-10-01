@@ -79,8 +79,7 @@ public class AppSettingsViewModel : ReactiveValidationObject, IActivatableViewMo
 			RemoveStartupShortcut.ThrownExceptions
 				.Subscribe(_ => SetLaunchAtStartupWithoutChangingShortcut(true))
 				.DisposeWith(disposables);
-
-
+			
 			// bind command result 
 			DoesStartupShortcutExist
 				.Subscribe(SetLaunchAtStartupWithoutChangingShortcut)

@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using System.Reactive.Disposables;
+using Avalonia.Controls;
 using Avalonia.ReactiveUI;
 using ReactiveUI;
 using ReactiveUI.Validation.Extensions;
@@ -17,7 +18,8 @@ public partial class AppSettingsView : ReactiveUserControl<AppSettingsViewModel>
 			this.BindValidation(
 				ViewModel,
 				vm => vm.LaunchAtStartup,
-				view => view.LaunchAtStartupErrors);
+				view => view.LaunchAtStartupErrors)
+				.DisposeWith(disposables);
 		});
 	}
 

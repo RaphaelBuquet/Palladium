@@ -1,5 +1,6 @@
 ﻿using System.Reactive;
-using Microsoft.Reactive.Testing;
+using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using NSubstitute;
 using Palladium.Builtin.Settings;
 using Palladium.Logging;
@@ -62,12 +63,11 @@ public class AppSettingsViewModelTests
 	}
 
 	[TestCase]
-	[Ignore("The tasks are watched on another thread and there isn't an easy wait to wait on the properties being changed.")]
-	public void LaunchAtStartupIsChanging_ReflectsHandlerTaskStatus()
+	[Timeout(1000)]
+	public async Task LaunchAtStartupIsChanging_ReflectsHandlerTaskStatus()
 	{
 		// arrange
 		using IDisposable l = TestLog.LogToConsole(out Log log);
-		var s = new TestScheduler();
 		var handler = Substitute.For<IShortcutHandler>();
 		var existsSource = new TaskCompletionSource<bool>();
 		var createSource = new TaskCompletionSource<Unit>();
@@ -84,42 +84,91 @@ public class AppSettingsViewModelTests
 		Assert.AreEqual(true, vm.LaunchAtStartupIsChanging);
 		Assert.AreEqual(false, vm.LaunchAtStartup);
 
-		// act
-		existsSource.SetResult(true);
-		// Thread.Sleep(10);
+		{
+			// act
+			// the command processes the task result on another thread sometimes, so we need to watch for property changes.
+			var launchAtStartup = vm.WhenAnyValue(x => x.LaunchAtStartup)
+				.Skip(1)
+				.FirstAsync()
+				.Timeout(TimeSpan.FromMilliseconds(10))
+				.ToTask();
+			var launchAtStartupIsChanging = vm.WhenAnyValue(x => x.LaunchAtStartupIsChanging)
+				.Skip(1)
+				.FirstAsync()
+				.Timeout(TimeSpan.FromMilliseconds(10))
+				.ToTask();
+			existsSource.SetResult(true);
 
-		// assert
-		Assert.AreEqual(false, vm.LaunchAtStartupIsChanging);
-		Assert.AreEqual(true, vm.LaunchAtStartup);
+			// assert
+			Assert.AreEqual(false, await launchAtStartupIsChanging);
+			Assert.AreEqual(true, await launchAtStartup);
+		}
 
-		// act
-		vm.LaunchAtStartup = false;
+		{
+			// act
+			var launchAtStartup = vm.WhenAnyValue(x => x.LaunchAtStartup)
+				.Skip(1)
+				.FirstAsync()
+				.Timeout(TimeSpan.FromMilliseconds(10))
+				.ToTask();
+			var launchAtStartupIsChanging = vm.WhenAnyValue(x => x.LaunchAtStartupIsChanging)
+				.Skip(1)
+				.FirstAsync()
+				.Timeout(TimeSpan.FromMilliseconds(10))
+				.ToTask();
+			vm.LaunchAtStartup = false;
 
-		// assert
-		Assert.AreEqual(true, vm.LaunchAtStartupIsChanging);
-		Assert.AreEqual(false, vm.LaunchAtStartup);
+			// assert
+			Assert.AreEqual(true, await launchAtStartupIsChanging);
+			Assert.AreEqual(false, await launchAtStartup);
+		}
 
-		// act
-		removeSource.SetResult(new Unit());
-		Thread.Sleep(10);
+		{
+			// act
+			var launchAtStartupIsChanging = vm.WhenAnyValue(x => x.LaunchAtStartupIsChanging)
+				.Skip(1)
+				.FirstAsync()
+				.Timeout(TimeSpan.FromMilliseconds(10))
+				.ToTask();
+			removeSource.SetResult(new Unit());
 
-		// assert
-		Assert.AreEqual(false, vm.LaunchAtStartupIsChanging);
-		Assert.AreEqual(false, vm.LaunchAtStartup);
+			// assert
+			Assert.AreEqual(false, await launchAtStartupIsChanging);
+			Assert.AreEqual(false, vm.LaunchAtStartup); // it's expected to stay the same so don't wait for a change
+		}
 
-		// act
-		vm.LaunchAtStartup = true;
+		{
+			// act
+			var launchAtStartup = vm.WhenAnyValue(x => x.LaunchAtStartup)
+				.Skip(1)
+				.FirstAsync()
+				.Timeout(TimeSpan.FromMilliseconds(10))
+				.ToTask();
+			var launchAtStartupIsChanging = vm.WhenAnyValue(x => x.LaunchAtStartupIsChanging)
+				.Skip(1)
+				.FirstAsync()
+				.Timeout(TimeSpan.FromMilliseconds(10))
+				.ToTask();
+			vm.LaunchAtStartup = true;
 
-		// assert
-		Assert.AreEqual(true, vm.LaunchAtStartupIsChanging);
-		Assert.AreEqual(true, vm.LaunchAtStartup);
+			// assert
+			Assert.AreEqual(true, await launchAtStartupIsChanging);
+			Assert.AreEqual(true, await launchAtStartup);
+		}
 
-		// act
-		createSource.SetResult(new Unit());
-		Thread.Sleep(10);
+		{
+			var launchAtStartupIsChanging = vm.WhenAnyValue(x => x.LaunchAtStartupIsChanging)
+				.Skip(1)
+				.FirstAsync()
+				.Timeout(TimeSpan.FromMilliseconds(10))
+				.ToTask();
 
-		// assert
-		Assert.AreEqual(false, vm.LaunchAtStartupIsChanging);
-		Assert.AreEqual(true, vm.LaunchAtStartup);
+			// act
+			createSource.SetResult(new Unit());
+
+			// assert
+			Assert.AreEqual(false, await launchAtStartupIsChanging);
+			Assert.AreEqual(true, vm.LaunchAtStartup); // it's expected to stay the same so don't wait for a change
+		}
 	}
 }
