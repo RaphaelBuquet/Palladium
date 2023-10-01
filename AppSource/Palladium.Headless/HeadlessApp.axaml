@@ -1,6 +1,5 @@
 ﻿<Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:palladium="clr-namespace:Palladium;assembly=Palladium"
              x:Class="Palladium.Headless.HeadlessApp">
 
     <Application.Styles>

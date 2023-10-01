@@ -8,11 +8,11 @@ namespace LogViewer.Avalonia;
 
 public static class ServicesExtension
 {
-    public static HostApplicationBuilder AddLogViewer(this HostApplicationBuilder builder)
-    {
-        builder.Services.AddSingleton<ILogDataStore, LogDataStore>();
-        builder.Services.AddSingleton<LogViewerControlViewModel>();
+	public static HostApplicationBuilder AddLogViewer(this HostApplicationBuilder builder)
+	{
+		builder.Services.AddSingleton<ILogDataStore, LogDataStore>();
+		builder.Services.AddSingleton<LogViewerControlViewModel>();
 
-        return builder;
-    }
+		return builder;
+	}
 }

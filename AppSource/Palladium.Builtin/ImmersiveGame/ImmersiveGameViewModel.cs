@@ -63,7 +63,7 @@ public class ImmersiveGameViewModel : ReactiveObject, IActivatableViewModel, ILi
 
 		outputStream.OnNext(new Run("Debug output"));
 		outputStream.OnNext(SmartLineBreak.Instance);
-		
+
 		this.WhenAttached(disposables =>
 		{
 			isWorking.DisposeWith(disposables);

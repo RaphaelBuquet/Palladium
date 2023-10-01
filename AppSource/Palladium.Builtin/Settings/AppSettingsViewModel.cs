@@ -51,7 +51,7 @@ public class AppSettingsViewModel : ReactiveValidationObject, IActivatableViewMo
 				.DisposeWith(disposables);
 
 			var control = new Control();
-			
+
 			// watch commands errors
 			// log exceptions
 			CreateStartupShortcut.ThrownExceptions.LogExceptions(log).DisposeWith(disposables);

@@ -14,7 +14,7 @@ public class MyExtension : ExtensionBase
 		// This is your extension's entry point (this class inherits ExtensionBase).
 		// Take a look at ExtensionBase to see what Palladium systems you have access to.
 		// Keep this code fast to ensure extensions load quickly at startup.
-		
+
 		// Register actions. 
 		// Make sure you use a unique GUID.
 		ActionsRepositoryService?.Actions.AddOrUpdate(new ActionDescription(new Guid("00000000-FFFF-EEEE-DDDD-000000000000"))
@@ -36,7 +36,7 @@ public class MyExtension : ExtensionBase
 		// Replace the TextBlock with your custom control, to build the view.
 		container.Content = new TextBlock
 		{
-			DataContext = viewModel, 
+			DataContext = viewModel,
 			Text = "Hello World!"
 		};
 	}

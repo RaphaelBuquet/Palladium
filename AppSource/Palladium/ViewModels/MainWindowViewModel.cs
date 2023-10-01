@@ -20,7 +20,7 @@ public class MainWindowViewModel : ReactiveObject, IActivatableViewModel
 	private readonly TabsService? tabsService;
 	private readonly SettingsService? settingsService;
 	private SettingsAction? settingsAction;
-	
+
 	private Window? logWindow;
 
 	/// <summary>

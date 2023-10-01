@@ -7,8 +7,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Palladium.Actions\Palladium.Actions.csproj" />
-      <ProjectReference Include="..\Palladium.Logging\Palladium.Logging.csproj" />
+        <ProjectReference Include="..\Palladium.Actions\Palladium.Actions.csproj"/>
+        <ProjectReference Include="..\Palladium.Logging\Palladium.Logging.csproj"/>
     </ItemGroup>
 
 </Project>

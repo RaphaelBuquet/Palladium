@@ -59,7 +59,7 @@ public class ReplayFirstValuesSubjectTest
 			ReactiveTest.OnNext(0, 1),
 			ReactiveTest.OnCompleted<int>(0));
 	}
-	
+
 	[Test]
 	public void FirstValue_EmittedEvenAfterError_WithNewSubscription()
 	{

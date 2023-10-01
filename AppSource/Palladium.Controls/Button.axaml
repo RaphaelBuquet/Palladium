@@ -30,7 +30,7 @@
                                           Height="{TemplateBinding Height}" />
                     </ControlTemplate>
                 </Setter>
-                
+
                 <Setter Property="HorizontalAlignment" Value="Left" />
                 <Setter Property="BorderThickness" Value="1" />
                 <Setter Property="BorderBrush" Value="{StaticResource Tone1}" />
@@ -52,7 +52,7 @@
                 </Style>
             </ControlTheme>
         </Setter>
-        
+
     </Style>
 
 </Styles>

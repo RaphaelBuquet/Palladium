@@ -1,19 +1,19 @@
 ﻿<Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:controls="clr-namespace:Palladium.Controls">
-    
+
     <!-- This file loads all of the styles of Palladium.Controls, and applies additional styling (such as global font family). -->
-    <StyleInclude Source="avares://Palladium.Controls/IconButton.axaml"/>
-    <StyleInclude Source="avares://Palladium.Controls/SearchBar.axaml"/>
-    <StyleInclude Source="avares://Palladium.Controls/HeadedSection.axaml"/>
-    <StyleInclude Source="avares://Palladium.Controls/ApplicationTabItem.axaml"/>
-    <StyleInclude Source="avares://Palladium.Controls/Button.axaml"/>
+    <StyleInclude Source="avares://Palladium.Controls/IconButton.axaml" />
+    <StyleInclude Source="avares://Palladium.Controls/SearchBar.axaml" />
+    <StyleInclude Source="avares://Palladium.Controls/HeadedSection.axaml" />
+    <StyleInclude Source="avares://Palladium.Controls/ApplicationTabItem.axaml" />
+    <StyleInclude Source="avares://Palladium.Controls/Button.axaml" />
     <StyleInclude Source="avares://Palladium.Controls/CheckBox.axaml" />
-    <StyleInclude Source="avares://Palladium.Controls/MiniLog.axaml"/>
+    <StyleInclude Source="avares://Palladium.Controls/MiniLog.axaml" />
     <StyleInclude Source="avares://Palladium.Controls/CloseTabButton.axaml" />
     <StyleInclude Source="avares://Palladium.Controls/ValidationMessage.axaml" />
     <StyleInclude Source="avares://Palladium.Controls/ActivityIndicator.axaml" />
-    
+
     <!-- Preview -->
     <Design.PreviewWith>
         <Border Padding="20">

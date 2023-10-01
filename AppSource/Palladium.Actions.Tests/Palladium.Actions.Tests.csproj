@@ -21,7 +21,7 @@
     <ItemGroup>
         <ProjectReference Include="..\Palladium.Actions\Palladium.Actions.csproj"/>
     </ItemGroup>
-    
+
     <PropertyGroup>
         <NoWarn>NUnit2005</NoWarn>
     </PropertyGroup>

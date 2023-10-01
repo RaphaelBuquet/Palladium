@@ -10,22 +10,22 @@
                 <CheckBox IsChecked="True" IsEnabled="False" />
                 <CheckBox IsChecked="True">
                     <DataValidationErrors.Error>
-                        <system:Exception/>
+                        <system:Exception />
                     </DataValidationErrors.Error>
                 </CheckBox>
                 <CheckBox IsChecked="False">
                     <DataValidationErrors.Error>
-                        <system:Exception/>
+                        <system:Exception />
                     </DataValidationErrors.Error>
                 </CheckBox>
                 <CheckBox IsChecked="False" IsEnabled="False">
                     <DataValidationErrors.Error>
-                        <system:Exception/>
+                        <system:Exception />
                     </DataValidationErrors.Error>
                 </CheckBox>
                 <CheckBox IsChecked="True" IsEnabled="False">
                     <DataValidationErrors.Error>
-                        <system:Exception/>
+                        <system:Exception />
                     </DataValidationErrors.Error>
                 </CheckBox>
             </StackPanel>
@@ -53,7 +53,7 @@
                         </Border>
                     </ControlTemplate>
                 </Setter>
-    
+
                 <Setter Property="HorizontalAlignment" Value="Left" />
                 <Setter Property="CornerRadius" Value="2" />
                 <Setter Property="Height" Value="14" />
@@ -62,14 +62,14 @@
                 <Setter Property="BorderBrush" Value="{StaticResource Tone1}" />
                 <Setter Property="BorderThickness" Value="1" />
                 <Setter Property="Foreground" Value="White" />
-    
+
                 <Style Selector="^:pointerover">
                     <Setter Property="Background" Value="{StaticResource Tone2-50}" />
                 </Style>
                 <Style Selector="^:pressed">
                     <Setter Property="Background" Value="{StaticResource Tone2-75}" />
                 </Style>
-    
+
                 <Style Selector="^:checked">
                     <Setter Property="Background" Value="{StaticResource Tone1}" />
                     <Style Selector="^:pointerover">
@@ -83,7 +83,7 @@
                 </Style>
                 <Style Selector="^:disabled">
                     <Setter Property="BorderBrush" Value="{StaticResource Tone2}" />
-    
+
                     <Style Selector="^:checked">
                         <Setter Property="Background" Value="{StaticResource Tone1-25-Fill}" />
                         <Setter Property="BorderBrush" Value="{StaticResource Tone1-25-Fill}" />
@@ -91,20 +91,20 @@
                 </Style>
                 <Style Selector="^:error">
                     <Setter Property="BorderBrush" Value="{StaticResource Validation-Error}" />
-                    <Setter Property="Background" Value="{StaticResource Validation-Error-Background}"/>
+                    <Setter Property="Background" Value="{StaticResource Validation-Error-Background}" />
 
                     <Style Selector="^:checked">
-                        <Setter Property="Background" Value="{StaticResource Validation-Error}"/>
+                        <Setter Property="Background" Value="{StaticResource Validation-Error}" />
                     </Style>
                     <Style Selector="^:disabled">
-                        <Setter Property="BorderBrush" Value="{StaticResource Validation-Error-25-Fill}"/>
+                        <Setter Property="BorderBrush" Value="{StaticResource Validation-Error-25-Fill}" />
                         <Style Selector="^:checked">
-                            <Setter Property="Background" Value="{StaticResource Validation-Error-25-Fill}"/>
+                            <Setter Property="Background" Value="{StaticResource Validation-Error-25-Fill}" />
                         </Style>
                     </Style>
                 </Style>
             </ControlTheme>
         </Setter>
-    
+
     </Style>
 </Styles>

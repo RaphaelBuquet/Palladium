@@ -4,6 +4,6 @@ namespace LogViewer.Core;
 
 public interface ILogDataStore
 {
-    ObservableCollection<LogModel> Entries { get; }
-    void AddEntry(LogModel logModel);
+	ObservableCollection<LogModel> Entries { get; }
+	void AddEntry(LogModel logModel);
 }

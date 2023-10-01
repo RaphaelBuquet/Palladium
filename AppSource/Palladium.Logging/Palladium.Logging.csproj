@@ -7,11 +7,11 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\LogViewerControl\CSharp\Core\LogViewer.Core\LogViewer.Core.csproj" />
+        <ProjectReference Include="..\LogViewerControl\CSharp\Core\LogViewer.Core\LogViewer.Core.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="System.Reactive" Version="6.0.0" />
+        <PackageReference Include="System.Reactive" Version="6.0.0"/>
     </ItemGroup>
-    
+
 </Project>

@@ -74,9 +74,9 @@ public class MiniLogTests
 		control.Inlines.Add(inline);
 		var window = new Window();
 		window.Show(); // for some reason the window has to be loaded before the MiniLog is added, otherwise the custom fonts used in MiniLog won't be loaded yet.
-		window.Content = control; 
+		window.Content = control;
 		Dispatcher.UIThread.RunJobs(); // ensure visual children of MiniLog are populated
-		
+
 		// assert
 		TextBlock? textBlock = control.GetTemplateChildren().OfType<TextBlock>().FirstOrDefault();
 		Assert.IsNotNull(textBlock);

@@ -5,44 +5,47 @@ using Microsoft.Extensions.Options;
 
 namespace MsLogger.Core;
 
-public class DataStoreLoggerProvider: ILoggerProvider
+public class DataStoreLoggerProvider : ILoggerProvider
 {
+	#region Constructor
 
-    #region Constructor
-    
-    public DataStoreLoggerProvider(IOptionsMonitor<DataStoreLoggerConfiguration> config, ILogDataStore dataStore)
-    {
-        _dataStore = dataStore;
-        _currentConfig = config.CurrentValue;
-        _onChangeToken = config.OnChange(updatedConfig => _currentConfig = updatedConfig);
-    }
+	public DataStoreLoggerProvider(IOptionsMonitor<DataStoreLoggerConfiguration> config, ILogDataStore dataStore)
+	{
+		_dataStore = dataStore;
+		_currentConfig = config.CurrentValue;
+		_onChangeToken = config.OnChange(updatedConfig => _currentConfig = updatedConfig);
+	}
 
-    #endregion
+	#endregion
 
-    #region fields
-    
-    private DataStoreLoggerConfiguration _currentConfig;
+	#region fields
 
-    private readonly IDisposable? _onChangeToken;
-    protected readonly ILogDataStore _dataStore;
+	private DataStoreLoggerConfiguration _currentConfig;
 
-    protected readonly ConcurrentDictionary<string, DataStoreLogger> _loggers = new();
-    
-    #endregion
+	private readonly IDisposable? _onChangeToken;
+	protected readonly ILogDataStore _dataStore;
 
-    #region Methods
-    
-    public ILogger CreateLogger(string categoryName)
-        => _loggers.GetOrAdd(categoryName, name => new DataStoreLogger(name, GetCurrentConfig, _dataStore));
+	protected readonly ConcurrentDictionary<string, DataStoreLogger> _loggers = new();
 
-    protected DataStoreLoggerConfiguration GetCurrentConfig()
-        => _currentConfig;
+	#endregion
 
-    public void Dispose()
-    {
-        _loggers.Clear();
-        _onChangeToken?.Dispose();
-    } 
+	#region Methods
 
-    #endregion
+	public ILogger CreateLogger(string categoryName)
+	{
+		return _loggers.GetOrAdd(categoryName, name => new DataStoreLogger(name, GetCurrentConfig, _dataStore));
+	}
+
+	protected DataStoreLoggerConfiguration GetCurrentConfig()
+	{
+		return _currentConfig;
+	}
+
+	public void Dispose()
+	{
+		_loggers.Clear();
+		_onChangeToken?.Dispose();
+	}
+
+	#endregion
 }

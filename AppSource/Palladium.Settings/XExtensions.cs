@@ -6,7 +6,7 @@ public static class XExtensions
 {
 	public static XElement GetElementOrCreate(this XElement element, XName name)
 	{
-		var target = element.Element(name);
+		XElement? target = element.Element(name);
 		if (target != null)
 		{
 			return target;

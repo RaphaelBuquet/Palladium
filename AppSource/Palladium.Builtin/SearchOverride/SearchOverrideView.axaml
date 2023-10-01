@@ -9,7 +9,7 @@
     <Design.DataContext>
         <searchOverride:SearchOverrideViewModel />
     </Design.DataContext>
-    
+
     <ScrollViewer>
         <StackPanel Orientation="Vertical" Margin="14 40" Spacing="14">
             <StackPanel Orientation="Horizontal" Spacing="4">

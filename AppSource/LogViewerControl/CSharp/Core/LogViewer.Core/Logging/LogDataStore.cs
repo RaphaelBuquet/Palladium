@@ -4,29 +4,29 @@ namespace LogViewer.Core;
 
 public class LogDataStore : ILogDataStore
 {
-    #region Fields
+	#region Fields
 
-    private static readonly SemaphoreSlim _semaphore = new(initialCount: 1);
+	private static readonly SemaphoreSlim _semaphore = new(1);
 
-    #endregion
+	#endregion
 
-    #region Properties
+	#region Properties
 
-    public ObservableCollection<LogModel> Entries { get; } = new();
+	public ObservableCollection<LogModel> Entries { get; } = new();
 
-    #endregion
+	#endregion
 
-    #region Methods
+	#region Methods
 
-    public virtual void AddEntry(LogModel logModel)
-    {
-        // ensure only one operation at time from multiple threads
-        _semaphore.Wait();
+	public virtual void AddEntry(LogModel logModel)
+	{
+		// ensure only one operation at time from multiple threads
+		_semaphore.Wait();
 
-        Entries.Add(logModel);
+		Entries.Add(logModel);
 
-        _semaphore.Release();
-    }
+		_semaphore.Release();
+	}
 
-    #endregion
+	#endregion
 }

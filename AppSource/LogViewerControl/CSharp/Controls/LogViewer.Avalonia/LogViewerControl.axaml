@@ -1,7 +1,7 @@
 <UserControl x:Class="LogViewer.Avalonia.LogViewerControl"
              xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             
+
              xmlns:converters="clr-namespace:LogViewer.Avalonia.Converters"
 
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -16,16 +16,18 @@
         </Grid.RowDefinitions>
         <Grid.Resources>
             <converters:ChangeColorTypeConverter x:Key="ColorConverter" />
-            <converters:EventIdConverter x:Key="EventIdConverter"/>
+            <converters:EventIdConverter x:Key="EventIdConverter" />
             <SolidColorBrush x:Key="ColorBlack">Black</SolidColorBrush>
             <SolidColorBrush x:Key="ColorTransparent">Transparent</SolidColorBrush>
         </Grid.Resources>
         <Grid.Styles>
             <Style Selector="DataGridRow">
                 <Setter Property="Padding" Value="0" />
-                <Setter Property="Foreground" Value="{Binding Color.Foreground,
+                <Setter Property="Foreground"
+                        Value="{Binding Color.Foreground,
                         Converter={StaticResource ColorConverter}, ConverterParameter={StaticResource ColorBlack}}" />
-                <Setter Property="Background" Value="{Binding Color.Background,
+                <Setter Property="Background"
+                        Value="{Binding Color.Background,
                         Converter={StaticResource ColorConverter}, ConverterParameter={StaticResource ColorTransparent}}" />
             </Style>
             <Style Selector="DataGridCell.size">
@@ -39,11 +41,16 @@
                   CanUserResizeColumns="True"
                   LayoutUpdated="OnLayoutUpdated">
             <DataGrid.Columns>
-                <DataGridTextColumn CellStyleClasses="size" Header="Time" Width="150" CanUserResize="True" Binding="{Binding Timestamp}"/>
-                <DataGridTextColumn CellStyleClasses="size" Header="Level" Width="90" CanUserResize="True" Binding="{Binding LogLevel}" />
-                <DataGridTextColumn CellStyleClasses="size" Header="Event Id" Width="120" CanUserResize="True" Binding="{Binding EventId, Converter={StaticResource EventIdConverter}}" />
-                <DataGridTextColumn CellStyleClasses="size" Header="State" Width="300" CanUserResize="True" Binding="{Binding State}" />
-                <DataGridTextColumn CellStyleClasses="size" Header="Exception" Width="300" CanUserResize="True" Binding="{Binding Exception}" />
+                <DataGridTextColumn CellStyleClasses="size" Header="Time" Width="150" CanUserResize="True"
+                                    Binding="{Binding Timestamp}" />
+                <DataGridTextColumn CellStyleClasses="size" Header="Level" Width="90" CanUserResize="True"
+                                    Binding="{Binding LogLevel}" />
+                <DataGridTextColumn CellStyleClasses="size" Header="Event Id" Width="120" CanUserResize="True"
+                                    Binding="{Binding EventId, Converter={StaticResource EventIdConverter}}" />
+                <DataGridTextColumn CellStyleClasses="size" Header="State" Width="300" CanUserResize="True"
+                                    Binding="{Binding State}" />
+                <DataGridTextColumn CellStyleClasses="size" Header="Exception" Width="300" CanUserResize="True"
+                                    Binding="{Binding Exception}" />
             </DataGrid.Columns>
         </DataGrid>
 

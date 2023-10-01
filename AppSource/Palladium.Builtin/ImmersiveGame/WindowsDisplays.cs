@@ -68,16 +68,16 @@ public class WindowsDisplays : IDisplaySource
 	{
 		int result = DisableNonPrimaryDisplays();
 		log.Emit(new EventId(), LogLevel.Debug, $"{nameof(DisableNonPrimaryDisplays)} returned {result}");
-		
+
 		return InterpretResult(result);
 	}
-	
+
 	/// <inheritdoc />
 	MiniLog IDisplaySource.RestoreSettings()
 	{
 		int result = RestoreSettings();
 		log.Emit(new EventId(), LogLevel.Debug, $"{nameof(RestoreSettings)} returned {result}");
-		
+
 		return InterpretResult(result);
 	}
 
@@ -106,7 +106,7 @@ public class WindowsDisplays : IDisplaySource
 		[MarshalAs(UnmanagedType.ByValTStr, SizeConst = 128)]
 		public string DeviceKey;
 	}
-	
+
 	private static MiniLog InterpretResult(int result)
 	{
 		var miniLogProvider = new MiniLogProvider();

@@ -35,7 +35,7 @@
                                                   VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
                             </ControlTemplate>
                         </Setter>
-                        
+
                         <Setter Property="CornerRadius" Value="4" />
                         <Setter Property="BorderThickness" Value="1" />
                         <Setter Property="BorderBrush" Value="{StaticResource Tone1}" />

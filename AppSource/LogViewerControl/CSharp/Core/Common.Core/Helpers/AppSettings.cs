@@ -4,89 +4,89 @@ namespace Common.Core;
 
 public class AppSettings<TOption>
 {
-    #region Constructors
-    
-    public AppSettings(IConfigurationSection configSection, string? key = null)
-    {
-        _configSection = configSection;
+	#region Constructors
 
-        // ReSharper disable once VirtualMemberCallInConstructor
-        GetValue(key);
-    }
+	public AppSettings(IConfigurationSection configSection, string? key = null)
+	{
+		_configSection = configSection;
 
-    #endregion
+		// ReSharper disable once VirtualMemberCallInConstructor
+		GetValue(key);
+	}
 
-    #region Fields
+	#endregion
 
-    protected static AppSettings<TOption>? _appSetting;
+	#region Fields
 
-    // ReSharper disable once StaticMemberInGenericType
-    protected static IConfigurationSection? _configSection;
+	protected static AppSettings<TOption>? _appSetting;
 
-    #endregion
+	// ReSharper disable once StaticMemberInGenericType
+	protected static IConfigurationSection? _configSection;
 
-    #region Properties
-    
-    public TOption? Value { get; set; }
+	#endregion
 
-    #endregion
+	#region Properties
 
-    #region Methods
-    
-    public static TOption? Current(string section, string? key = null)
-    {
-        _appSetting = GetCurrentSettings(section, key);
-        return _appSetting.Value;
-    }
+	public TOption? Value { get; set; }
 
-    public static AppSettings<TOption> GetCurrentSettings(string section, string? key = null)
-    {
-        string env = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? "Production";
+	#endregion
 
-        IConfigurationBuilder builder = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-            .AddJsonFile($"appsettings.{env}.json", optional: true, reloadOnChange: true)
-            .AddEnvironmentVariables();
+	#region Methods
 
-        IConfigurationRoot configuration = builder.Build();
+	public static TOption? Current(string section, string? key = null)
+	{
+		_appSetting = GetCurrentSettings(section, key);
+		return _appSetting.Value;
+	}
 
-        if (string.IsNullOrEmpty(section))
-            section = "AppSettings"; // default
+	public static AppSettings<TOption> GetCurrentSettings(string section, string? key = null)
+	{
+		string env = Environment.GetEnvironmentVariable("DOTNET_ENVIRONMENT") ?? "Production";
 
-        AppSettings<TOption> settings = new AppSettings<TOption>(configuration.GetSection(section), key);
+		IConfigurationBuilder builder = new ConfigurationBuilder()
+			.SetBasePath(Directory.GetCurrentDirectory())
+			.AddJsonFile("appsettings.json", true, true)
+			.AddJsonFile($"appsettings.{env}.json", true, true)
+			.AddEnvironmentVariables();
 
-        return settings;
-    }
+		IConfigurationRoot configuration = builder.Build();
 
-    protected virtual void GetValue(string? key)
-    {
-        if (key is null)
-        {
-            // no key, so must be a class/strut object
-            Value = Activator.CreateInstance<TOption>();
-            _configSection!.Bind(Value);
-            return;
-        }
+		if (string.IsNullOrEmpty(section))
+			section = "AppSettings"; // default
 
-        Type optionType = typeof(TOption);
+		AppSettings<TOption> settings = new (configuration.GetSection(section), key);
 
-        if ((optionType == typeof(string) ||
-             optionType == typeof(int) ||
-             optionType == typeof(long) ||
-             optionType == typeof(decimal) ||
-             optionType == typeof(float) ||
-             optionType == typeof(double)) 
-            && _configSection != null)
-        {
-            // we must be retrieving a value
-            Value = _configSection.GetValue<TOption>(key);
-            return;
-        }
+		return settings;
+	}
 
-        // Could not find a supported type
-        throw new InvalidCastException($"Type {typeof(TOption).Name} is invalid");
-    }
+	protected virtual void GetValue(string? key)
+	{
+		if (key is null)
+		{
+			// no key, so must be a class/strut object
+			Value = Activator.CreateInstance<TOption>();
+			_configSection!.Bind(Value);
+			return;
+		}
 
-    #endregion
+		Type optionType = typeof(TOption);
+
+		if ((optionType == typeof(string) ||
+		     optionType == typeof(int) ||
+		     optionType == typeof(long) ||
+		     optionType == typeof(decimal) ||
+		     optionType == typeof(float) ||
+		     optionType == typeof(double))
+		    && _configSection != null)
+		{
+			// we must be retrieving a value
+			Value = _configSection.GetValue<TOption>(key);
+			return;
+		}
+
+		// Could not find a supported type
+		throw new InvalidCastException($"Type {typeof(TOption).Name} is invalid");
+	}
+
+	#endregion
 }

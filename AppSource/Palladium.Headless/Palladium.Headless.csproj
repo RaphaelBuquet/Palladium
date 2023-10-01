@@ -5,14 +5,14 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
-    
+
     <ItemGroup>
-      <PackageReference Include="Avalonia" Version="11.0.3" />
-      <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.0.3" />
-      <PackageReference Include="Avalonia.Headless" Version="11.0.3" />
-      <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.3" />
+        <PackageReference Include="Avalonia" Version="11.0.3"/>
+        <PackageReference Include="Avalonia.Controls.DataGrid" Version="11.0.3"/>
+        <PackageReference Include="Avalonia.Headless" Version="11.0.3"/>
+        <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.3"/>
     </ItemGroup>
-    
+
     <ItemGroup>
         <ProjectReference Include="..\Palladium.Controls\Palladium.Controls.csproj"/>
     </ItemGroup>

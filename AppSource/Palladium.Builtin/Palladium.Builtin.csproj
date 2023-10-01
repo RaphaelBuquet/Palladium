@@ -10,7 +10,7 @@
         <ProjectReference Include="..\Palladium.Settings\Palladium.Settings.csproj"/>
         <ProjectReference Include="..\Palladium.Actions\Palladium.Actions.csproj"/>
         <ProjectReference Include="..\Palladium.Logging\Palladium.Logging.csproj"/>
-        <ProjectReference Include="..\Palladium.ExtensionFunctions\Palladium.ExtensionFunctions.csproj" />
+        <ProjectReference Include="..\Palladium.ExtensionFunctions\Palladium.ExtensionFunctions.csproj"/>
         <!-- Build dependency on Palladium.NativeWindows -->
         <ProjectReference Include="..\Palladium.NativeWindows\Palladium.NativeWindows.vcxproj">
             <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
@@ -27,7 +27,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="ReactiveUI.Validation" Version="3.1.7" />
+        <PackageReference Include="ReactiveUI.Validation" Version="3.1.7"/>
     </ItemGroup>
 
 </Project>

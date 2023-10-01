@@ -6,17 +6,19 @@ namespace LogViewer.Avalonia.Converters;
 
 public class EventIdConverter : IValueConverter
 {
-    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-    {
-        if (value is null)
-            return "0";
+	public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
+	{
+		if (value is null)
+			return "0";
 
-        EventId eventId = (EventId)value;
+		var eventId = (EventId)value;
 
-        return eventId.ToString();
-    }
+		return eventId.ToString();
+	}
 
-    // If not implemented, an error is thrown
-    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
-        => new EventId(0, value?.ToString() ?? string.Empty);
+	// If not implemented, an error is thrown
+	public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
+	{
+		return new EventId(0, value?.ToString() ?? string.Empty);
+	}
 }

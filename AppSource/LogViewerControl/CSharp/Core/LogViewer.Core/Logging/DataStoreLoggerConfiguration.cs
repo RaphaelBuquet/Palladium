@@ -5,20 +5,20 @@ namespace LogViewer.Core;
 
 public class DataStoreLoggerConfiguration
 {
-    #region Properties
-    
-    public EventId EventId { get; set; }
+	#region Properties
 
-    public Dictionary<LogLevel, LogEntryColor> Colors { get; } = new()
-    {
-        [LogLevel.Trace] = new() { Foreground = Color.DarkGray },
-        [LogLevel.Debug] = new() { Foreground = Color.Gray },
-        [LogLevel.Information] = new(),
-        [LogLevel.Warning] = new() { Foreground = Color.Orange},
-        [LogLevel.Error] = new() { Foreground = Color.White, Background = Color.OrangeRed },
-        [LogLevel.Critical] = new() { Foreground=Color.White, Background = Color.Red },
-        [LogLevel.None] = new(),
-    };
+	public EventId EventId { get; set; }
 
-    #endregion
+	public Dictionary<LogLevel, LogEntryColor> Colors { get; } = new()
+	{
+		[LogLevel.Trace] = new LogEntryColor { Foreground = Color.DarkGray },
+		[LogLevel.Debug] = new LogEntryColor { Foreground = Color.Gray },
+		[LogLevel.Information] = new LogEntryColor(),
+		[LogLevel.Warning] = new LogEntryColor { Foreground = Color.Orange },
+		[LogLevel.Error] = new LogEntryColor { Foreground = Color.White, Background = Color.OrangeRed },
+		[LogLevel.Critical] = new LogEntryColor { Foreground = Color.White, Background = Color.Red },
+		[LogLevel.None] = new LogEntryColor()
+	};
+
+	#endregion
 }

@@ -4,10 +4,12 @@ namespace LogViewer.Avalonia.Logging;
 
 public class LogDataStore : Core.LogDataStore
 {
-    #region Methods
+	#region Methods
 
-    public override async void AddEntry(Core.LogModel logModel)
-        => await Dispatcher.UIThread.InvokeAsync(() => base.AddEntry(logModel));
+	public override async void AddEntry(Core.LogModel logModel)
+	{
+		await Dispatcher.UIThread.InvokeAsync(() => base.AddEntry(logModel));
+	}
 
-    #endregion
+	#endregion
 }

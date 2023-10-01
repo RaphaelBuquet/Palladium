@@ -15,5 +15,4 @@ public struct SettingsText
 			SectionTitle = $"{actionDescription?.Emoji} {actionDescription?.Title}"
 		};
 	}
-
 }

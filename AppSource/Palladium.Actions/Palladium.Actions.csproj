@@ -8,15 +8,14 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Avalonia" Version="11.0.3" />
-      <PackageReference Include="ReactiveUI" Version="19.4.1" />
+        <PackageReference Include="Avalonia" Version="11.0.3"/>
+        <PackageReference Include="ReactiveUI" Version="19.4.1"/>
     </ItemGroup>
 
 
-
     <ItemGroup>
-      <ProjectReference Include="..\Palladium.Controls\Palladium.Controls.csproj" />
-      <ProjectReference Include="..\Palladium.Logging\Palladium.Logging.csproj" />
+        <ProjectReference Include="..\Palladium.Controls\Palladium.Controls.csproj"/>
+        <ProjectReference Include="..\Palladium.Logging\Palladium.Logging.csproj"/>
     </ItemGroup>
 
 </Project>

@@ -14,7 +14,7 @@
             <CheckBox Name="LaunchAtStartup" VerticalAlignment="Center" IsChecked="{Binding LaunchAtStartup}"
                       IsEnabled="{Binding !LaunchAtStartupIsChanging}" />
             <TextBlock VerticalAlignment="Center" Text="Launch at Startup" />
-            <controls:ActivityIndicator IsVisible="{Binding LaunchAtStartupIsChanging}"/>
+            <controls:ActivityIndicator IsVisible="{Binding LaunchAtStartupIsChanging}" />
             <controls:ValidationMessage
                 Errors="{Binding Path=(DataValidationErrors.Errors), ElementName=LaunchAtStartup}" />
         </StackPanel>

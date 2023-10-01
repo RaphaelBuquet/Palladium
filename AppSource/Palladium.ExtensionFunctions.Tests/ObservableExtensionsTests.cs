@@ -11,9 +11,9 @@ public class ObservableExtensionsTests
 	{
 		var s = new Subject<int>();
 		s.OnCompleted();
-		bool itDoes = false;
+		var itDoes = false;
 		s.Subscribe(i => { },
-			() => { itDoes = true;});
+			() => { itDoes = true; });
 
 		Assert.IsTrue(itDoes);
 	}

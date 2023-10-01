@@ -10,5 +10,5 @@ public partial class LogsWindow : Window
 	public LogsWindow()
 	{
 		InitializeComponent();
-	} 
+	}
 }

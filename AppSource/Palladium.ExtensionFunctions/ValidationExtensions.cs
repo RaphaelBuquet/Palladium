@@ -13,7 +13,7 @@ public static class ValidationExtensions
 	// perhaps this could be improved by generating an expression, thereby avoiding the need to create a property on the view?
 	public static void SetAttachedValidation(this Control control, string? value)
 	{
-		var enumerable = string.IsNullOrEmpty(value) ? null : new [] { value };
+		string[]? enumerable = string.IsNullOrEmpty(value) ? null : new [] { value };
 		control.SetValue(DataValidationErrors.ErrorsProperty, enumerable);
 	}
 }

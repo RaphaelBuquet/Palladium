@@ -154,10 +154,10 @@ public class WindowsKeyboardTests
 
 		// press key
 		Assert.IsFalse(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, key, key, modifier, scheduler, callback));
-		
+
 		// release key
 		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYUP, key, key, modifier, scheduler, callback));
-		
+
 		// assert
 		scheduler.AdvanceBy(1);
 		Assert.AreEqual(2, calledCount);
@@ -207,11 +207,11 @@ public class WindowsKeyboardTests
 		// shortcut
 		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, modifier, key, modifier, scheduler, callback));
 		Assert.IsFalse(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, key, key, modifier, scheduler, callback));
-		
+
 		// release
 		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYUP, key, key, modifier, scheduler, callback));
 		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYUP, modifier, key, modifier, scheduler, callback));
-		
+
 		// unrelated keys
 		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, 435345, key, modifier, scheduler, callback));
 		Assert.IsTrue(windowsKeyboard.ProcessKeyBlocking(WindowsKeyboard.WM_KEYDOWN, 734598, key, modifier, scheduler, callback));

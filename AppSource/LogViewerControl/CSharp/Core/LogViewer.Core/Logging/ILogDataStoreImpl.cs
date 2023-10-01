@@ -2,5 +2,5 @@
 
 public interface ILogDataStoreImpl
 {
-    public ILogDataStore DataStore { get; }
+	public ILogDataStore DataStore { get; }
 }

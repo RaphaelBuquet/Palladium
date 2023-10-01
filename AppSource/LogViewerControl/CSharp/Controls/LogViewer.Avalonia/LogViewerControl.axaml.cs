@@ -7,36 +7,40 @@ namespace LogViewer.Avalonia;
 
 public partial class LogViewerControl : UserControl
 {
-    public LogViewerControl()
-        => InitializeComponent();
+	public LogViewerControl()
+	{
+		InitializeComponent();
+	}
 
-    private ILogDataStoreImpl? vm;
-    private LogModel? item;
-  
-    private void OnDataContextChanged(object? sender, EventArgs e)
-    {
-        if (DataContext is null)
-            return;
+	private ILogDataStoreImpl? vm;
+	private LogModel? item;
 
-        vm = (ILogDataStoreImpl)DataContext;
-        vm.DataStore.Entries.CollectionChanged += OnCollectionChanged;
-    }
+	private void OnDataContextChanged(object? sender, EventArgs e)
+	{
+		if (DataContext is null)
+			return;
 
-    private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-        => item = MyDataGrid.ItemsSource.Cast<LogModel>().LastOrDefault();
+		vm = (ILogDataStoreImpl)DataContext;
+		vm.DataStore.Entries.CollectionChanged += OnCollectionChanged;
+	}
 
-    private void OnLayoutUpdated(object? sender, EventArgs e)
-    {
-        if (CanAutoScroll.IsChecked != true || item is null)
-            return;
+	private void OnCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+	{
+		item = MyDataGrid.ItemsSource.Cast<LogModel>().LastOrDefault();
+	}
 
-        MyDataGrid.ScrollIntoView(item, null);
-        item = null;
-    }
+	private void OnLayoutUpdated(object? sender, EventArgs e)
+	{
+		if (CanAutoScroll.IsChecked != true || item is null)
+			return;
 
-    private void OnDetachedFromLogicalTree(object? sender, LogicalTreeAttachmentEventArgs e)
-    {
-        if (vm is null) return;
-        vm.DataStore.Entries.CollectionChanged -= OnCollectionChanged;
-    }
+		MyDataGrid.ScrollIntoView(item, null);
+		item = null;
+	}
+
+	private void OnDetachedFromLogicalTree(object? sender, LogicalTreeAttachmentEventArgs e)
+	{
+		if (vm is null) return;
+		vm.DataStore.Entries.CollectionChanged -= OnCollectionChanged;
+	}
 }

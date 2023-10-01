@@ -23,7 +23,7 @@ public partial class AppSettingsView : ReactiveUserControl<AppSettingsViewModel>
 
 	private string? LaunchAtStartupErrors
 	{
-		get => LaunchAtStartup.GetAttachedValidation(); 
+		get => LaunchAtStartup.GetAttachedValidation();
 		set => LaunchAtStartup.SetAttachedValidation(value);
 	}
 }

@@ -32,7 +32,7 @@
                     <controls:IconButton Content="Debug"
                                          IconData="{StaticResource SettingsIcon}"
                                          Command="{Binding DebugCommand}"
-                                         IsVisible="{Binding ShowDebug}"/>
+                                         IsVisible="{Binding ShowDebug}" />
                 </StackPanel>
                 <controls:SearchBar Grid.Column="1" Width="200" Watermark="Search..." />
                 <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="4">
