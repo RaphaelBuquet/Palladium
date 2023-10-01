@@ -23,7 +23,7 @@ public class SearchOverrideSettingsViewModel : ReactiveObject, IActivatableViewM
 			Disposable.Create(() => dataSubscription?.Dispose()).DisposeWith(disposables);
 
 			this.WhenAnyValue(x => x.BrowserPath, x => x.BrowserArguments)
-				.Skip(1) // skip initial value
+				.Skip(1) // skip initial value to only get user-driven changes
 				.Subscribe(_ => { settingsService?.WriteCommand.Execute().Subscribe(); })
 				.DisposeWith(disposables);
 		});

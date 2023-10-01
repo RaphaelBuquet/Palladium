@@ -39,7 +39,7 @@ public class Log
 		};
 	}
 
-	public void Emit(EventId eventId, LogLevel logLevel, string message, Exception? exception = null)
+	public void Emit(EventId eventId, LogLevel logLevel, string? message, Exception? exception = null)
 	{
 		// // check if we are logging for passed log level
 		// if (!IsEnabled(logLevel))

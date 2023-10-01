@@ -1,5 +1,9 @@
 ﻿namespace Palladium.Settings;
 
+/// <summary>
+///     Implementations of this will typically be view models, which will be used when displaying an action's settings.
+/// </summary>
+/// <typeparam name="T">Type of the data to serialize.</typeparam>
 public interface ISettings<T>
 {
 	/// <summary>

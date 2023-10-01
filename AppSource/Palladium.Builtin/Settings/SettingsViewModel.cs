@@ -20,11 +20,11 @@ public class SettingsViewModel : IActivatableViewModel
 			Disposable.Create(() => Settings.Clear()).DisposeWith(disposables);
 			settingsService.SettingsViews
 				.Connect()
-				.ObserveOn(RxApp.MainThreadScheduler)
 				.Transform(tuple => new SettingsEntryViewModel(
 					tuple.Text.Title ?? "Unknown",
 					tuple.Text.SectionTitle ?? $"Unknown {tuple.Guid}",
 					tuple.CreateView.Invoke()))
+				.ObserveOn(RxApp.MainThreadScheduler)
 				.Bind(Settings)
 				.Subscribe()
 				.DisposeWith(disposables);
@@ -51,7 +51,7 @@ public class SettingsViewModel : IActivatableViewModel
 				Orientation = Orientation.Horizontal,
 				Children =
 				{
-					new ToggleButton(),
+					new CheckBox(),
 					new TextBlock { Text = "Launch at startup" }
 				}
 			})

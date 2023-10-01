@@ -182,6 +182,11 @@ public static class ObservableExtensions
 		});
 	}
 
+	public static IDisposable LogExceptions<T>(this IObservable<T> observable, Log? log, string? message = null)
+	{
+		return observable.Subscribe(_ => { }, exception => log?.Emit(new EventId(), LogLevel.Error, message, exception));
+	}
+
 	public static IObservable<T> DebugToLogs<T>(this IObservable<T> observable, Log? log, string? message = null)
 	{
 #if DEBUG

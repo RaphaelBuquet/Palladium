@@ -18,5 +18,8 @@
     <Color x:Key="Validation-Success">#FF1E722B</Color>
     <Color x:Key="Validation-Success-Background">#FFE1F1E4</Color>
     <Color x:Key="Validation-Error">#FFEC3636</Color>
+    <Color x:Key="Validation-Error-75-Fill">#FFF16969</Color>
+    <Color x:Key="Validation-Error-50-Fill">#FFF69B9B</Color>
+    <Color x:Key="Validation-Error-25-Fill">#FFFACDCD</Color>
     <Color x:Key="Validation-Error-Background">#FFFDEDED</Color>
 </ResourceDictionary>

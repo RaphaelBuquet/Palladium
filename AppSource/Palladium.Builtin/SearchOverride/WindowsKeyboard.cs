@@ -37,6 +37,9 @@ public class WindowsKeyboard
 	[DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
 	private static extern IntPtr CallNextHookEx(IntPtr hhk, int nCode, IntPtr wParam, IntPtr lParam);
 
+	[DllImport("user32.dll")]
+	private static extern short GetKeyState(int nVirtKey);
+
 	/// <summary>
 	///     Add a keyboard shortcut listener.
 	/// </summary>
@@ -149,6 +152,11 @@ public class WindowsKeyboard
 		keyboardCallback = null;
 
 		shortcutKeyboardState = new ShortcutKeyboardState ();
+	}
+
+	public static bool IsKeyDown(int vKey)
+	{
+		return (GetKeyState((int)vKey) & 0x8000) == 0x8000;
 	}
 
 	private struct ShortcutKeyboardState

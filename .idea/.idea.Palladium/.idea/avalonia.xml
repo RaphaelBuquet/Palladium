@@ -5,13 +5,18 @@
       <map>
         <entry key="AppSource/Palladium.Actions/Views/Action.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.Actions/Views/MiniLog.axaml" value="AppSource/Palladium/Palladium.csproj" />
+        <entry key="AppSource/Palladium.Builtin/SearchOverride/SearchOverrideSettingsView.axaml" value="AppSource/Palladium/Palladium.csproj" />
+        <entry key="AppSource/Palladium.Builtin/Settings/AppSettingsView.axaml" value="AppSource/Palladium/Palladium.csproj" />
+        <entry key="AppSource/Palladium.Builtin/Settings/SettingsView.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.BuiltinActions/ImmersiveGame/ImmersiveGameControl.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.BuiltinActions/SearchOverride/SearchOverrideSettingsView.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.BuiltinActions/SearchOverride/SearchOverrideView.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.BuiltinActions/Settings/SettingsView.axaml" value="AppSource/Palladium/Palladium.csproj" />
+        <entry key="AppSource/Palladium.Controls/ActivityIndicator.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.Controls/ApplicationTabItem.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.Controls/ApplicationTabItem2.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.Controls/Button.axaml" value="AppSource/Palladium/Palladium.csproj" />
+        <entry key="AppSource/Palladium.Controls/CheckBox.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.Controls/CloseTabButton.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.Controls/HeadedSection.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.Controls/IconButton.axaml" value="AppSource/Palladium/Palladium.csproj" />
@@ -22,6 +27,7 @@
         <entry key="AppSource/Palladium.Controls/Resources/Styles.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.Controls/SearchBar.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.Controls/ToggleButton.axaml" value="AppSource/Palladium/Palladium.csproj" />
+        <entry key="AppSource/Palladium.Controls/ValidationMessage.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium.Settings/SearchView.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium/App.axaml" value="AppSource/Palladium/Palladium.csproj" />
         <entry key="AppSource/Palladium/Views/Home.axaml" value="AppSource/Palladium/Palladium.csproj" />

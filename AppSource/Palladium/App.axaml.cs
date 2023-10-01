@@ -14,6 +14,7 @@ using MsBox.Avalonia.Enums;
 using Palladium.ActionsService;
 using Palladium.Builtin.ImmersiveGame;
 using Palladium.Builtin.SearchOverride;
+using Palladium.Builtin.Settings;
 using Palladium.Extensions;
 using Palladium.Logging;
 using Palladium.Settings;
@@ -47,6 +48,8 @@ public  class App : Application
 			var tabsService = new TabsService();
 			var settingsService = new SettingsService(log, settingsFilePath);
 			ActionsRepositoryService actionsRepositoryService = InstallActions(log, settingsService);
+			var appSettingsViewModel = new AppSettingsViewModel(new WindowsShortcutHandler(), log);
+			settingsService.Install(appSettingsViewModel, () => new AppSettingsView { DataContext = appSettingsViewModel }, false);
 
 			// main window
 			var mainWindow = new MainWindow();

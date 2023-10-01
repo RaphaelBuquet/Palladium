@@ -6,6 +6,7 @@ using DynamicData;
 using DynamicData.Binding;
 using LogViewer.Core;
 using Palladium.Logging;
+using TestUtilities;
 
 namespace Palladium.Settings.Tests;
 
@@ -14,7 +15,7 @@ public class SettingsServiceTests
 	[Test]
 	public void ReadSettings_FromEmptyFile_Fails()
 	{
-		using IDisposable l = LogToConsole(out Log log);
+		using IDisposable l = TestLog.LogToConsole(out Log log);
 
 		// arrange
 		string tempFile = Path.GetTempFileName();
@@ -28,7 +29,7 @@ public class SettingsServiceTests
 	[Test]
 	public async Task WriteSettings_ToEmptyFile()
 	{
-		using IDisposable l = LogToConsole(out Log log);
+		using IDisposable l = TestLog.LogToConsole(out Log log);
 
 		// arrange
 		string tempFile = Path.GetTempFileName();
@@ -48,7 +49,7 @@ public class SettingsServiceTests
 	[Test]
 	public async Task ReadSettings()
 	{
-		using IDisposable l = LogToConsole(out Log log);
+		using IDisposable l = TestLog.LogToConsole(out Log log);
 
 		// arrange
 		string tempFile = Path.GetTempFileName();
@@ -80,7 +81,7 @@ public class SettingsServiceTests
 	[Test]
 	public void Install_MakesViewAvailable()
 	{
-		using IDisposable l = LogToConsole(out Log? log);
+		using IDisposable l = TestLog.LogToConsole(out Log? log);
 
 		// arrange
 		string tempFile = Path.GetTempFileName();
@@ -94,17 +95,6 @@ public class SettingsServiceTests
 		Assert.AreEqual(1, service.SettingsViews.Count);
 		Assert.AreEqual("View", service.SettingsViews.Items.First().CreateView.Invoke());
 		Assert.AreEqual(0, log.DataStore.Entries.Count);
-	}
-
-	private static IDisposable LogToConsole(out Log log)
-	{
-		log = new Log();
-		return log.DataStore.Entries
-			.ToObservableChangeSet()
-			.WhereReasonsAre(ListChangeReason.Add)
-			.SelectMany(change => change.Select(i => i.Item.Current))
-			.Where(changeSet => changeSet.Exception is not null)
-			.Subscribe(Observer.Create<LogModel>(e => Console.WriteLine(e.Exception)));
 	}
 
 	private class MockSettings : ISettings<int>
