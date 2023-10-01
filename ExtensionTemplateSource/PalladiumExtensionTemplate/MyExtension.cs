@@ -6,6 +6,7 @@ using Palladium.Extensions;
 namespace PalladiumExtensionTemplate;
 
 // This class is instantiated at runtime by Palladium after the extension DLL is loaded.
+// TODO: Rename this.
 public class MyExtension : ExtensionBase
 {
 	/// <inheritdoc />
@@ -16,28 +17,28 @@ public class MyExtension : ExtensionBase
 		// Keep this code fast to ensure extensions load quickly at startup.
 
 		// Register actions. 
-		// Make sure you use a unique GUID.
+		// TODO: Generate a GUID.
 		ActionsRepositoryService?.Actions.AddOrUpdate(new ActionDescription(new Guid("00000000-FFFF-EEEE-DDDD-000000000000"))
 			{
-				Title = "Example Extension Action",
-				Description = "Example extension description",
-				Emoji = "⚠️",
-				CanOpenMultiple = false,
-				OnStart = StartExampleAction
+				Title = "Example Extension Action", // TODO
+				Description = "Example extension description", // TODO
+				Emoji = "⚠️", // TODO
+				CanOpenMultiple = false, // TODO
+				OnStart = StartAction
 			}
 		);
 	}
 
-	private void StartExampleAction(ContentControl container)
+	private void StartAction(ContentControl container)
 	{
-		// Build and set your view model here
+		// TODO: Build and set your view model here (replace with your view model type).
 		var viewModel = new object();
 
-		// Replace the TextBlock with your custom control, to build the view.
+		// TODO: Replace the TextBlock with your custom control, to build the view.
 		container.Content = new TextBlock
 		{
 			DataContext = viewModel,
-			Text = "Hello World!"
+			Text = "Hello World!" // TODO: Remove this.
 		};
 	}
 }

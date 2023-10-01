@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reactive.Linq;
 using DynamicData;
+using DynamicData.Alias;
 using DynamicData.Binding;
 using Palladium.ActionsService;
 using Palladium.ActionsService.ViewModels;
@@ -25,6 +26,7 @@ public class HomeViewModel : ReactiveObject, IActivatableViewModel, ILifecycleAw
 		{
 			connection = actionsRepositoryService.Actions
 				.Connect()
+				.Where(x => x.Guid != new Guid("00000000-FFFF-EEEE-DDDD-000000000000")) // prevent adding extension actions that are using the default GUID because someone forgot to update it.
 				.Transform(description => new ActionViewModel(description, tabsService))
 				.ObserveOn(RxApp.MainThreadScheduler) // this seems to solve actions being created multiple times by the ItemsControl
 				.Bind(Actions)
