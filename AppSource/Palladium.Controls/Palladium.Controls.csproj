@@ -39,6 +39,7 @@
     </ItemGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\Palladium.Converters\Palladium.Converters.csproj"/>
         <ProjectReference Include="..\Palladium.ExtensionFunctions\Palladium.ExtensionFunctions.csproj"/>
     </ItemGroup>
 

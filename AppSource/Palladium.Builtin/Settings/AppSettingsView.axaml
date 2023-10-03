@@ -10,11 +10,13 @@
         <settings:AppSettingsViewModel />
     </Design.DataContext>
     <StackPanel Orientation="Vertical" Margin="0, 0, 2, 0" Spacing="6">
-        <StackPanel Orientation="Horizontal" Spacing="6">
-            <CheckBox Name="LaunchAtStartup" VerticalAlignment="Center" IsChecked="{Binding LaunchAtStartup}"
-                      IsEnabled="{Binding !LaunchAtStartupIsChanging}" />
-            <TextBlock VerticalAlignment="Center" Text="Launch at Startup" />
-            <controls:ActivityIndicator IsVisible="{Binding LaunchAtStartupIsChanging}" />
+        <StackPanel Orientation="Vertical" Spacing="6">
+            <StackPanel Orientation="Horizontal" Spacing="6">
+                <CheckBox Name="LaunchAtStartup" VerticalAlignment="Center" IsChecked="{Binding LaunchAtStartup}"
+                          IsEnabled="{Binding !LaunchAtStartupIsChanging}" />
+                <TextBlock VerticalAlignment="Center" Text="Launch at Startup" />
+                <controls:ActivityIndicator IsVisible="{Binding LaunchAtStartupIsChanging}" />
+            </StackPanel>
             <controls:ValidationMessage
                 Errors="{Binding Path=(DataValidationErrors.Errors), ElementName=LaunchAtStartup}" />
         </StackPanel>

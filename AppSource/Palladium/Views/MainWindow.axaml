@@ -9,7 +9,9 @@
         x:Class="Palladium.Views.MainWindow"
         Icon="/Assets/v3.ico"
         Title="Palladium"
-        x:Name="MainWindowName">
+        x:Name="MainWindowName"
+        Width="850"
+        Height="500">
 
     <Design.DataContext>
         <viewModels:MainWindowViewModel />
