@@ -1,4 +1,5 @@
-﻿using System.Reactive;
+﻿using System.Collections.Concurrent;
+using System.Reactive;
 using System.Reactive.Subjects;
 using System.Xml;
 using System.Xml.Linq;
@@ -12,7 +13,7 @@ namespace Palladium.Settings;
 
 public class SettingsService
 {
-	private readonly Dictionary<Guid, SettingsSerializer> serializers = new ();
+	private readonly ConcurrentDictionary<Guid, SettingsSerializer> serializers = new ();
 	private readonly Log log;
 	private readonly string path;
 
@@ -53,16 +54,41 @@ public class SettingsService
 	/// </returns>
 	public Task Install<T> (ISettings<T> settings, Func<object> createView, bool tryReadExistingSettings)
 	{
+		return Task.Run(async () =>
+		{
+			try
+			{
+				await InstallImplementation(settings, createView, tryReadExistingSettings);
+			}
+			catch (Exception e)
+			{
+				log.Emit(new EventId(), LogLevel.Error, "An error occured when installing settings.", e);
+			}
+		});
+	}
+
+	private async Task InstallImplementation<T>(ISettings<T> settings, Func<object> createView, bool tryReadExistingSettings)
+	{
 		var writeFunction = delegate (XElement node) { WriteSerialize(node, settings.GetDataToSerialize()); };
-		serializers.Add(settings.SettingsGuid, new SettingsSerializer { Type = typeof(T), SerializeFunction = writeFunction });
+		if (!serializers.TryAdd(settings.SettingsGuid, new SettingsSerializer { Type = typeof(T), SerializeFunction = writeFunction }))
+		{
+			log.Emit(new EventId(), LogLevel.Warning, $"Settings with GUID {settings.SettingsGuid} were already installed, cannot install settings of type {settings.GetType().AssemblyQualifiedName}.");
+			return;
+		}
 
 		var subject = new ReplaySubject<T>(1);
 
-		var readTask = Task.CompletedTask;
 		if (tryReadExistingSettings)
 		{
-			readTask = DeserializeAsync(settings.SettingsGuid, subject);
-			readTask.ContinueWith(task => { log.Emit(new EventId(), LogLevel.Warning, $"Failed to deserialize settings for {settings.SettingsGuid} {typeof(T).Name}", task.Exception); }, TaskContinuationOptions.OnlyOnFaulted);
+			try
+			{
+				await DeserializeAsync(settings.SettingsGuid, subject);
+			}
+			catch (Exception e)
+			{
+				log.Emit(new EventId(), LogLevel.Warning, $"Failed to deserialize settings for {settings.SettingsGuid} {settings.GetType().AssemblyQualifiedName}", e);
+				return;
+			}
 		}
 		settings.ProcessDataObservable(subject);
 		SettingsViews.AddOrUpdate(new SettingsEntry
@@ -71,8 +97,6 @@ public class SettingsService
 			Guid = settings.SettingsGuid,
 			CreateView = createView
 		});
-
-		return readTask;
 	}
 
 	private async Task Write(CancellationToken cancellationToken)

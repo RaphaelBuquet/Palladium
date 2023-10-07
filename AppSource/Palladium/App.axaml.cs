@@ -47,9 +47,7 @@ public  class App : Application
 				"Settings.xml");
 			var tabsService = new TabsService();
 			var settingsService = new SettingsService(log, settingsFilePath);
-			ActionsRepositoryService actionsRepositoryService = InstallActions(log, settingsService);
-			var appSettingsViewModel = new AppSettingsViewModel(new WindowsShortcutHandler(), log);
-			settingsService.Install(appSettingsViewModel, () => new AppSettingsView { DataContext = appSettingsViewModel }, false);
+			var actionsRepositoryService = new ActionsRepositoryService();
 
 			// main window
 			var mainWindow = new MainWindow();
@@ -64,6 +62,11 @@ public  class App : Application
 			// background load
 			Task.Run(() =>
 			{
+				InstallActions(actionsRepositoryService, log, settingsService);
+
+				var appSettingsViewModel = new AppSettingsViewModel(new WindowsShortcutHandler(), log);
+				settingsService.Install(appSettingsViewModel, () => new AppSettingsView { DataContext = appSettingsViewModel }, false);
+
 				LogStartingMode();
 
 				new ExtensionsLoader(Path.Combine(Environment.CurrentDirectory, "Extensions"))
@@ -74,14 +77,10 @@ public  class App : Application
 		base.OnFrameworkInitializationCompleted();
 	}
 
-	private ActionsRepositoryService InstallActions(Log log, SettingsService settingsService)
+	private void InstallActions(  ActionsRepositoryService actionsRepositoryService, Log log, SettingsService settingsService)
 	{
-		var actionsRepositoryService = new ActionsRepositoryService();
-
 		new SearchOverrideAction().Init(actionsRepositoryService, settingsService, log);
 		actionsRepositoryService.Actions.AddOrUpdate(new ImmersiveGameAction(log).Description);
-
-		return actionsRepositoryService;
 	}
 
 	private void InstallLogging(out LogViewerControlViewModel vm, out Log log)
