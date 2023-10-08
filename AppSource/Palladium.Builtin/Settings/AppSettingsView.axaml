@@ -27,15 +27,18 @@
                     </MultiBinding>
                 </CheckBox.IsEnabled>
             </CheckBox>
-            <TextBlock VerticalAlignment="Center" Text="Launch Minimised" />
+            <TextBlock VerticalAlignment="Center" Text="Launch Minimised at Startup" />
         </StackPanel>
         <StackPanel Orientation="Horizontal" Spacing="6">
             <controls:ActivityIndicator IsVisible="{Binding ShortcutIsChanging}" />
             <TextBlock FontSize="{Binding FontSize, ElementName=ValidationMessage}"
-                       IsVisible="{Binding ShortcutIsChanging}" Foreground="{StaticResource Tone1-75}"
+                       IsVisible="{Binding ShortcutIsChanging}"
+                       Foreground="{StaticResource Tone1-75}"
                        Text="Applying changes..." />
             <controls:ValidationMessage Name="ValidationMessage"
                                         Errors="{Binding Path=(DataValidationErrors.Errors), ElementName=LaunchAtStartupCheckbox}" />
+            <!-- Invisible text to make sure this always takes up some space -->
+            <TextBlock Opacity="0" FontSize="{Binding FontSize, ElementName=ValidationMessage}">.</TextBlock>
         </StackPanel>
     </StackPanel>
 </UserControl>
