@@ -1,10 +1,9 @@
 using Avalonia.Controls;
-using Avalonia.ReactiveUI;
-using Palladium.ViewModels;
 
 namespace Palladium.Views;
 
-public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
+// note: using Window instead of ReactiveWindow for performance reasons. ReactiveWindow functionality is not needed here.
+public partial class MainWindow : Window
 {
 	public MainWindow()
 	{

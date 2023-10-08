@@ -1,6 +1,5 @@
 ﻿using System.Diagnostics;
 using System.Reactive;
-using System.Reactive.Disposables;
 using Avalonia.Controls;
 using LogViewer.Core.ViewModels;
 using Palladium.ActionsService;
@@ -40,13 +39,6 @@ public class MainWindowViewModel : ReactiveObject, IActivatableViewModel
 		OpenLogsCommand = ReactiveCommand.Create(OpenLogs);
 		OpenSettingsCommand = ReactiveCommand.Create(OpenSettings);
 		DebugCommand = ReactiveCommand.Create(Debug);
-
-		this.WhenActivated(disposables =>
-		{
-			OpenLogsCommand.DisposeWith(disposables);
-			OpenSettingsCommand.DisposeWith(disposables);
-			DebugCommand.DisposeWith(disposables);
-		});
 	}
 
 	public ReactiveCommand<Unit, Unit> OpenLogsCommand { get ; }
