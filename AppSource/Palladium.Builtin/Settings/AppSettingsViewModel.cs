@@ -100,8 +100,18 @@ public class AppSettingsViewModel : ReactiveValidationObject, IActivatableViewMo
 					}
 
 					if (blockChanges) return;
-					if (LaunchAtStartup) CreateStartupShortcut.Execute(CreateShortcutDescription()).Subscribe();
-					else RemoveStartupShortcut.Execute().Subscribe();
+					if (LaunchAtStartup)
+					{
+						CreateStartupShortcut.Execute(CreateShortcutDescription())
+							.IgnoreErrors() // already handled in ThrownExceptions
+							.Subscribe();
+					}
+					else
+					{
+						RemoveStartupShortcut.Execute()
+							.IgnoreErrors() // already handled in ThrownExceptions
+							.Subscribe();
+					}
 				}).DisposeWith(disposables);
 
 			Disposable.Create(() => dataSubscription?.Dispose()).DisposeWith(disposables);

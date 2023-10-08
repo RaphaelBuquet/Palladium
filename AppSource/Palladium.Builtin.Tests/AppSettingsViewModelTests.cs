@@ -26,6 +26,7 @@ public class AppSettingsViewModelTests
 
 		// assert
 		Assert.AreEqual(initialValue, vm.LaunchAtStartup);
+		Assert.AreEqual(0, log.DataStore.Entries.Count);
 	}
 
 	[TestCase]
@@ -43,6 +44,7 @@ public class AppSettingsViewModelTests
 
 		// assert
 		handler.Received().CreateStartupShortcut(Arg.Any<Shortcut>());
+		Assert.AreEqual(0, log.DataStore.Entries.Count);
 	}
 
 	[TestCase]
@@ -60,6 +62,37 @@ public class AppSettingsViewModelTests
 
 		// assert
 		handler.Received().RemoveStartupShortcut();
+		Assert.AreEqual(0, log.DataStore.Entries.Count);
+	}
+
+	[TestCase]
+	public async Task Toggle_LaunchAtStartup_CheckErrorHandling()
+	{
+		// arrange
+		using IDisposable l = TestLog.LogToConsole(out Log log);
+		var handler = Substitute.For<IShortcutHandler>();
+		handler.TryGetStartupShortcut().Returns(Task.FromResult<Shortcut?>(new Shortcut()));
+		handler.RemoveStartupShortcut().Returns(Task.FromException(new Exception()));
+		var vm = new AppSettingsViewModel(handler, log);
+
+		// assert
+		Assert.AreEqual(true, await vm.ValidationContext.Valid.FirstAsync());
+
+		// act
+		((IActivatableViewModel)vm).Activator.Activate();
+		vm.LaunchAtStartup = false;
+
+		// assert
+		Assert.AreEqual(true, vm.LaunchAtStartup, "LaunchAtStartup isn't supposed to be changed when turning it off fails.");
+		Assert.AreEqual(false, await vm.ValidationContext.Valid.FirstAsync());
+
+		// act - do it again to make sure the thrown exception didn't break the VM
+		vm.LaunchAtStartup = false;
+
+		// assert
+		Assert.AreEqual(true, vm.LaunchAtStartup, "LaunchAtStartup isn't supposed to be changed when turning it off fails.");
+		Assert.AreEqual(false, await vm.ValidationContext.Valid.FirstAsync());
+		Assert.AreEqual(2, log.DataStore.Entries.Count);
 	}
 
 	[TestCase]
@@ -77,6 +110,7 @@ public class AppSettingsViewModelTests
 
 		// assert argument was added
 		handler.Received().CreateStartupShortcut(Arg.Is<Shortcut>(arg => arg == new Shortcut { Arguments = "--minimised" }));
+		Assert.AreEqual(0, log.DataStore.Entries.Count);
 	}
 
 	[TestCase]
@@ -94,6 +128,7 @@ public class AppSettingsViewModelTests
 
 		// assert argument was removed
 		handler.Received().CreateStartupShortcut(Arg.Is<Shortcut>(arg => arg == new Shortcut()));
+		Assert.AreEqual(0, log.DataStore.Entries.Count);
 	}
 
 	[TestCase]
@@ -111,6 +146,7 @@ public class AppSettingsViewModelTests
 
 		// assert
 		Assert.AreEqual(false, vm.StartMinimised);
+		Assert.AreEqual(0, log.DataStore.Entries.Count);
 	}
 
 	[TestCase]
@@ -128,6 +164,7 @@ public class AppSettingsViewModelTests
 
 		// assert
 		Assert.AreEqual(false, vm.StartMinimised);
+		Assert.AreEqual(0, log.DataStore.Entries.Count);
 	}
 
 	[TestCase]
@@ -238,5 +275,7 @@ public class AppSettingsViewModelTests
 			Assert.AreEqual(false, await launchAtStartupIsChanging);
 			Assert.AreEqual(true, vm.LaunchAtStartup); // it's expected to stay the same so don't wait for a change
 		}
+
+		Assert.AreEqual(0, log.DataStore.Entries.Count);
 	}
 }
