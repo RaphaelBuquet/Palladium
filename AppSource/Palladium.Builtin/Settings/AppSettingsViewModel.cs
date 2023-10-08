@@ -1,13 +1,10 @@
 ﻿using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using Avalonia.Controls;
 using Palladium.ExtensionFunctions;
 using Palladium.Logging;
 using Palladium.Settings;
 using ReactiveUI;
-using ReactiveUI.Validation.Abstractions;
-using ReactiveUI.Validation.Contexts;
 using ReactiveUI.Validation.Extensions;
 using ReactiveUI.Validation.Helpers;
 
@@ -15,13 +12,17 @@ namespace Palladium.Builtin.Settings;
 
 public class AppSettingsViewModel : ReactiveValidationObject, IActivatableViewModel, ISettings<AppSettings>
 {
+	public const string StartMinimisedArgs = "--minimised";
+
 	private IDisposable? dataSubscription;
 
 	private bool launchAtStartup;
-	private bool launchAtStartupIsChanging;
+	private bool shortcutIsChanging;
 
 	private bool hasBeenActivated = false;
 	private bool blockChanges = false;
+
+	private bool startMinimised;
 
 	public AppSettingsViewModel() : this(null, null)
 	{ }
@@ -31,31 +32,29 @@ public class AppSettingsViewModel : ReactiveValidationObject, IActivatableViewMo
 	{
 		if (shortcutHandler != null)
 		{
-			CreateStartupShortcut = ReactiveCommand.CreateFromTask(shortcutHandler.CreateStartupShortcut);
-			DoesStartupShortcutExist = ReactiveCommand.CreateFromTask(shortcutHandler.DoesStartupShortcutExist);
+			CreateStartupShortcut = ReactiveCommand.CreateFromTask<Shortcut>(shortcutHandler.CreateStartupShortcut);
+			TryGetStartupShortcut = ReactiveCommand.CreateFromTask(shortcutHandler.TryGetStartupShortcut);
 			RemoveStartupShortcut = ReactiveCommand.CreateFromTask(shortcutHandler.RemoveStartupShortcut);
 		}
 		else
 		{
-			DoesStartupShortcutExist = ReactiveCommand.Create(() => false);
-			CreateStartupShortcut = ReactiveCommand.Create(delegate {  });
+			CreateStartupShortcut = ReactiveCommand.Create<Shortcut>(delegate {  });
+			TryGetStartupShortcut = ReactiveCommand.Create(() => (Shortcut?)null);
 			RemoveStartupShortcut = ReactiveCommand.Create(delegate {  });
 		}
 
 		this.WhenActivated(disposables =>
 		{
 			// watch commands
-			Observable.CombineLatest( CreateStartupShortcut.IsExecuting, DoesStartupShortcutExist.IsExecuting, RemoveStartupShortcut.IsExecuting,
+			CreateStartupShortcut.IsExecuting.CombineLatest(  TryGetStartupShortcut.IsExecuting, RemoveStartupShortcut.IsExecuting,
 					(b1, b2, b3) => b1 || b2 || b3)
-				.BindTo(this, x => x.LaunchAtStartupIsChanging)
+				.BindTo(this, x => x.ShortcutIsChanging)
 				.DisposeWith(disposables);
-
-			var control = new Control();
 
 			// watch commands errors
 			// log exceptions
 			CreateStartupShortcut.ThrownExceptions.LogExceptions(log).DisposeWith(disposables);
-			DoesStartupShortcutExist.ThrownExceptions.LogExceptions(log).DisposeWith(disposables);
+			TryGetStartupShortcut.ThrownExceptions.LogExceptions(log).DisposeWith(disposables);
 			RemoveStartupShortcut.ThrownExceptions.LogExceptions(log).DisposeWith(disposables);
 			// display error to use on exception
 			var errorMessages = Observable.Merge(
@@ -63,8 +62,8 @@ public class AppSettingsViewModel : ReactiveValidationObject, IActivatableViewMo
 				CreateStartupShortcut.Select(_ => (string?)null),
 				RemoveStartupShortcut.ThrownExceptions.Select(_ => "Failed to disable launching app at startup."),
 				RemoveStartupShortcut.Select(_ => (string?)null),
-				DoesStartupShortcutExist.ThrownExceptions.Select(_ => "Failed to retrieve current settings."),
-				DoesStartupShortcutExist.Select(_ => (string?)null)
+				TryGetStartupShortcut.ThrownExceptions.Select(_ => "Failed to retrieve current settings."),
+				TryGetStartupShortcut.Select(_ => (string?)null)
 			);
 			this.ValidationRule(
 					x => x.LaunchAtStartup,
@@ -79,18 +78,29 @@ public class AppSettingsViewModel : ReactiveValidationObject, IActivatableViewMo
 			RemoveStartupShortcut.ThrownExceptions
 				.Subscribe(_ => SetLaunchAtStartupWithoutChangingShortcut(true))
 				.DisposeWith(disposables);
-			
+
 			// bind command result 
-			DoesStartupShortcutExist
+			TryGetStartupShortcut
+				.Select(x => x.HasValue)
 				.Subscribe(SetLaunchAtStartupWithoutChangingShortcut)
 				.DisposeWith(disposables);
+			TryGetStartupShortcut
+				.Select(x => x?.Arguments?.Contains(StartMinimisedArgs, StringComparison.OrdinalIgnoreCase) == true)
+				.Subscribe(SetStartMinimisedWithoutChangingShortcut)
+				.DisposeWith(disposables);
 
-			this.WhenAnyValue(x => x.LaunchAtStartup)
+			this.WhenAnyValue(x => x.LaunchAtStartup, x => x.StartMinimised)
 				.Skip(1) // skip initial property value
-				.Subscribe(newValue =>
+				.Subscribe(newValues =>
 				{
+					if (LaunchAtStartup is false && StartMinimised is true)
+					{
+						StartMinimised = false;
+						return; // return because setting the value above will call this code again
+					}
+
 					if (blockChanges) return;
-					if (newValue) CreateStartupShortcut.Execute().Subscribe();
+					if (LaunchAtStartup) CreateStartupShortcut.Execute(CreateShortcutDescription()).Subscribe();
 					else RemoveStartupShortcut.Execute().Subscribe();
 				}).DisposeWith(disposables);
 
@@ -99,13 +109,13 @@ public class AppSettingsViewModel : ReactiveValidationObject, IActivatableViewMo
 			if (!hasBeenActivated)
 			{
 				hasBeenActivated = true;
-				DoesStartupShortcutExist.Execute().Subscribe();
+				TryGetStartupShortcut.Execute().Subscribe();
 			}
 		});
 	}
 
-	public ReactiveCommand<Unit, bool> DoesStartupShortcutExist { get; }
-	public ReactiveCommand<Unit, Unit> CreateStartupShortcut { get; }
+	public ReactiveCommand<Unit, Shortcut?> TryGetStartupShortcut { get; }
+	public ReactiveCommand<Shortcut, Unit> CreateStartupShortcut { get; }
 	public ReactiveCommand<Unit, Unit> RemoveStartupShortcut { get; }
 
 	/// <summary>
@@ -118,12 +128,30 @@ public class AppSettingsViewModel : ReactiveValidationObject, IActivatableViewMo
 	}
 
 	/// <summary>
+	///     When true the shortcut for the app will have an argument to start the app minimised.
+	///     This is faster than having to load the settings file to check if the app needs to be minimised.
+	/// </summary>
+	public bool StartMinimised
+	{
+		get => startMinimised;
+		set
+		{
+			// cannot be set to true if LaunchAtStartup is false 
+			if (!LaunchAtStartup && value)
+			{
+				return;
+			}
+			this.RaiseAndSetIfChanged(ref startMinimised, value);
+		}
+	}
+
+	/// <summary>
 	///     Represents a write (create shortcut) or read (check if shortcut exists) task.
 	/// </summary>
-	public bool LaunchAtStartupIsChanging
+	public bool ShortcutIsChanging
 	{
-		get => launchAtStartupIsChanging;
-		set => this.RaiseAndSetIfChanged(ref launchAtStartupIsChanging, value);
+		get => shortcutIsChanging;
+		set => this.RaiseAndSetIfChanged(ref shortcutIsChanging, value);
 	}
 
 	/// <inheritdoc />
@@ -154,5 +182,21 @@ public class AppSettingsViewModel : ReactiveValidationObject, IActivatableViewMo
 		blockChanges = true;
 		LaunchAtStartup = newValue;
 		blockChanges = false;
+	}
+
+	private void SetStartMinimisedWithoutChangingShortcut(bool newValue)
+	{
+		blockChanges = true;
+		StartMinimised = newValue;
+		blockChanges = false;
+	}
+
+	private Shortcut CreateShortcutDescription()
+	{
+		if (StartMinimised)
+		{
+			return new Shortcut { Arguments = StartMinimisedArgs };
+		}
+		return new Shortcut();
 	}
 }

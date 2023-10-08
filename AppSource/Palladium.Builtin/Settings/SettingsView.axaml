@@ -46,7 +46,7 @@
                     <DataTemplate DataType="{x:Type settings:SettingsEntryViewModel}">
                         <Border BorderThickness="1 0 0 0"
                                 BorderBrush="{StaticResource Tone2}">
-                            <StackPanel Orientation="Vertical" Spacing="14" Margin="10 4 0 14">
+                            <StackPanel Orientation="Vertical" Spacing="14" Margin="10 4 0 6">
                                 <TextBlock Text="{Binding SectionText}" FontSize="14" Margin="-3 0 0 0"
                                            FontWeight="SemiBold" />
                                 <ContentControl Content="{Binding View}" />

@@ -1,6 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Buffers;
 using System.Runtime.InteropServices;
-using Palladium.Builtin.SearchOverride;
 
 namespace Palladium.Builtin.Settings;
 
@@ -17,14 +16,31 @@ public class WindowsShortcutHandler : IShortcutHandler
 	}
 
 	/// <inheritdoc />
-	public Task<bool> DoesStartupShortcutExist()
+	public Task<Shortcut?> TryGetStartupShortcut()
 	{
-		string shortcutPath = ShortcutPath();
-		return Task.FromResult(File.Exists(shortcutPath));
+		return Task.Run<Shortcut?>(() =>
+		{
+			string shortcutPath = ShortcutPath();
+			if (!File.Exists(shortcutPath))
+			{
+				return null;
+			}
+			char[] buffer = ArrayPool<char>.Shared.Rent(1000);
+			try
+			{
+				int hr = GetShellLinkArguments(shortcutPath, buffer, buffer.Length);
+				if (hr < 0) Marshal.ThrowExceptionForHR(hr);
+				return new Shortcut { Arguments = buffer.ToString() };
+			}
+			finally
+			{
+				ArrayPool<char>.Shared.Return(buffer);
+			}
+		});
 	}
 
 	/// <inheritdoc />
-	public Task CreateStartupShortcut()
+	public Task CreateStartupShortcut(Shortcut shortcut)
 	{
 		return Task.Run(() =>
 		{
@@ -33,7 +49,7 @@ public class WindowsShortcutHandler : IShortcutHandler
 			{
 				throw new Exception("Unable to get the path to the executing application. A startup shortcut can therefore not be created.");
 			}
-			int hr = CreateShellLink(ShortcutPath(), exePath);
+			int hr = CreateShellLink(ShortcutPath(), exePath, shortcut.Arguments);
 			if (hr < 0) Marshal.ThrowExceptionForHR(hr);
 		});
 	}
@@ -50,5 +66,8 @@ public class WindowsShortcutHandler : IShortcutHandler
 	}
 
 	[DllImport("Palladium.NativeWindows.dll", CharSet = CharSet.Unicode)]
-	public static extern int CreateShellLink(string lpszShortcutPath, string lpszFilePath);
+	public static extern int CreateShellLink(string lpszShortcutPath, string lpszFilePath, string? lpszArgs);
+
+	[DllImport("Palladium.NativeWindows.dll", CharSet = CharSet.Unicode)]
+	public static extern int GetShellLinkArguments(string lpszShortcutPath, [Out] char[] lpszArgs, int nArgSize);
 }

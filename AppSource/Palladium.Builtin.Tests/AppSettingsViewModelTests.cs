@@ -18,7 +18,7 @@ public class AppSettingsViewModelTests
 		// arrange
 		using IDisposable l = TestLog.LogToConsole(out Log log);
 		var handler = Substitute.For<IShortcutHandler>();
-		handler.DoesStartupShortcutExist().Returns(Task.FromResult(initialValue));
+		handler.TryGetStartupShortcut().Returns(Task.FromResult<Shortcut?>(initialValue ? new Shortcut() : null));
 		var vm = new AppSettingsViewModel(handler, log);
 
 		// act
@@ -34,7 +34,7 @@ public class AppSettingsViewModelTests
 		// arrange
 		using IDisposable l = TestLog.LogToConsole(out Log log);
 		var handler = Substitute.For<IShortcutHandler>();
-		handler.DoesStartupShortcutExist().Returns(Task.FromResult(false));
+		handler.TryGetStartupShortcut().Returns(Task.FromResult<Shortcut?>(null));
 		var vm = new AppSettingsViewModel(handler, log);
 
 		// act
@@ -42,7 +42,7 @@ public class AppSettingsViewModelTests
 		vm.LaunchAtStartup = true;
 
 		// assert
-		handler.Received().CreateStartupShortcut();
+		handler.Received().CreateStartupShortcut(Arg.Any<Shortcut>());
 	}
 
 	[TestCase]
@@ -51,7 +51,7 @@ public class AppSettingsViewModelTests
 		// arrange
 		using IDisposable l = TestLog.LogToConsole(out Log log);
 		var handler = Substitute.For<IShortcutHandler>();
-		handler.DoesStartupShortcutExist().Returns(Task.FromResult(true));
+		handler.TryGetStartupShortcut().Returns(Task.FromResult<Shortcut?>(new Shortcut()));
 		var vm = new AppSettingsViewModel(handler, log);
 
 		// act
@@ -63,17 +63,85 @@ public class AppSettingsViewModelTests
 	}
 
 	[TestCase]
+	public void ToggleOn_LaunchMinimised_UpdatesExistingShortcut()
+	{
+		// arrange
+		using IDisposable l = TestLog.LogToConsole(out Log log);
+		var handler = Substitute.For<IShortcutHandler>();
+		handler.TryGetStartupShortcut().Returns(Task.FromResult<Shortcut?>(new Shortcut()));
+		var vm = new AppSettingsViewModel(handler, log);
+
+		// act
+		((IActivatableViewModel)vm).Activator.Activate();
+		vm.StartMinimised = true;
+
+		// assert argument was added
+		handler.Received().CreateStartupShortcut(Arg.Is<Shortcut>(arg => arg == new Shortcut { Arguments = "--minimised" }));
+	}
+
+	[TestCase]
+	public void ToggleOff_LaunchMinimised_UpdatesExistingShortcut()
+	{
+		// arrange
+		using IDisposable l = TestLog.LogToConsole(out Log log);
+		var handler = Substitute.For<IShortcutHandler>();
+		handler.TryGetStartupShortcut().Returns(Task.FromResult<Shortcut?>(new Shortcut { Arguments = "--minimised" }));
+		var vm = new AppSettingsViewModel(handler, log);
+
+		// act
+		((IActivatableViewModel)vm).Activator.Activate();
+		vm.StartMinimised = false;
+
+		// assert argument was removed
+		handler.Received().CreateStartupShortcut(Arg.Is<Shortcut>(arg => arg == new Shortcut()));
+	}
+
+	[TestCase]
+	public void LaunchMinimised_AlwaysOff_WhenLaunchAtStartup_IsOff()
+	{
+		// arrange
+		using IDisposable l = TestLog.LogToConsole(out Log log);
+		var handler = Substitute.For<IShortcutHandler>();
+		handler.TryGetStartupShortcut().Returns(Task.FromResult<Shortcut?>(null));
+		var vm = new AppSettingsViewModel(handler, log);
+
+		// act
+		((IActivatableViewModel)vm).Activator.Activate();
+		vm.StartMinimised = true;
+
+		// assert
+		Assert.AreEqual(false, vm.StartMinimised);
+	}
+
+	[TestCase]
+	public void ToggleOff_LaunchAtStartup_TogglesOff_LaunchMinimised()
+	{
+		// arrange
+		using IDisposable l = TestLog.LogToConsole(out Log log);
+		var handler = Substitute.For<IShortcutHandler>();
+		handler.TryGetStartupShortcut().Returns(Task.FromResult<Shortcut?>(new Shortcut { Arguments = "--minimised" }));
+		var vm = new AppSettingsViewModel(handler, log);
+
+		// act
+		((IActivatableViewModel)vm).Activator.Activate();
+		vm.LaunchAtStartup = false;
+
+		// assert
+		Assert.AreEqual(false, vm.StartMinimised);
+	}
+
+	[TestCase]
 	[Timeout(1000)]
 	public async Task LaunchAtStartupIsChanging_ReflectsHandlerTaskStatus()
 	{
 		// arrange
 		using IDisposable l = TestLog.LogToConsole(out Log log);
 		var handler = Substitute.For<IShortcutHandler>();
-		var existsSource = new TaskCompletionSource<bool>();
+		var existsSource = new TaskCompletionSource<Shortcut?>();
 		var createSource = new TaskCompletionSource<Unit>();
 		var removeSource = new TaskCompletionSource<Unit>();
-		handler.DoesStartupShortcutExist().Returns(existsSource.Task);
-		handler.CreateStartupShortcut().Returns(createSource.Task);
+		handler.TryGetStartupShortcut().Returns(existsSource.Task);
+		handler.CreateStartupShortcut(Arg.Any<Shortcut>()).Returns(createSource.Task);
 		handler.RemoveStartupShortcut().Returns(removeSource.Task);
 		var vm = new AppSettingsViewModel(handler, log);
 
@@ -81,7 +149,7 @@ public class AppSettingsViewModelTests
 		((IActivatableViewModel)vm).Activator.Activate();
 
 		// assert
-		Assert.AreEqual(true, vm.LaunchAtStartupIsChanging);
+		Assert.AreEqual(true, vm.ShortcutIsChanging);
 		Assert.AreEqual(false, vm.LaunchAtStartup);
 
 		{
@@ -92,12 +160,12 @@ public class AppSettingsViewModelTests
 				.FirstAsync()
 				.Timeout(TimeSpan.FromMilliseconds(10))
 				.ToTask();
-			var launchAtStartupIsChanging = vm.WhenAnyValue(x => x.LaunchAtStartupIsChanging)
+			var launchAtStartupIsChanging = vm.WhenAnyValue(x => x.ShortcutIsChanging)
 				.Skip(1)
 				.FirstAsync()
 				.Timeout(TimeSpan.FromMilliseconds(10))
 				.ToTask();
-			existsSource.SetResult(true);
+			existsSource.SetResult(new Shortcut());
 
 			// assert
 			Assert.AreEqual(false, await launchAtStartupIsChanging);
@@ -111,7 +179,7 @@ public class AppSettingsViewModelTests
 				.FirstAsync()
 				.Timeout(TimeSpan.FromMilliseconds(10))
 				.ToTask();
-			var launchAtStartupIsChanging = vm.WhenAnyValue(x => x.LaunchAtStartupIsChanging)
+			var launchAtStartupIsChanging = vm.WhenAnyValue(x => x.ShortcutIsChanging)
 				.Skip(1)
 				.FirstAsync()
 				.Timeout(TimeSpan.FromMilliseconds(10))
@@ -125,7 +193,7 @@ public class AppSettingsViewModelTests
 
 		{
 			// act
-			var launchAtStartupIsChanging = vm.WhenAnyValue(x => x.LaunchAtStartupIsChanging)
+			var launchAtStartupIsChanging = vm.WhenAnyValue(x => x.ShortcutIsChanging)
 				.Skip(1)
 				.FirstAsync()
 				.Timeout(TimeSpan.FromMilliseconds(10))
@@ -144,7 +212,7 @@ public class AppSettingsViewModelTests
 				.FirstAsync()
 				.Timeout(TimeSpan.FromMilliseconds(10))
 				.ToTask();
-			var launchAtStartupIsChanging = vm.WhenAnyValue(x => x.LaunchAtStartupIsChanging)
+			var launchAtStartupIsChanging = vm.WhenAnyValue(x => x.ShortcutIsChanging)
 				.Skip(1)
 				.FirstAsync()
 				.Timeout(TimeSpan.FromMilliseconds(10))
@@ -157,7 +225,7 @@ public class AppSettingsViewModelTests
 		}
 
 		{
-			var launchAtStartupIsChanging = vm.WhenAnyValue(x => x.LaunchAtStartupIsChanging)
+			var launchAtStartupIsChanging = vm.WhenAnyValue(x => x.ShortcutIsChanging)
 				.Skip(1)
 				.FirstAsync()
 				.Timeout(TimeSpan.FromMilliseconds(10))

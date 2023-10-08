@@ -2,7 +2,9 @@
 
 public interface IShortcutHandler
 {
-	Task<bool> DoesStartupShortcutExist();
-	Task CreateStartupShortcut();
+	/// <returns>The shortcut if it exists, null otherwise.</returns>
+	Task<Shortcut?> TryGetStartupShortcut();
+
+	Task CreateStartupShortcut(Shortcut shortcut);
 	Task RemoveStartupShortcut();
 }

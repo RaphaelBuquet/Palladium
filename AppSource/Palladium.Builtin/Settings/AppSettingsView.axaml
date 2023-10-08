@@ -12,13 +12,30 @@
     <StackPanel Orientation="Vertical" Margin="0, 0, 2, 0" Spacing="6">
         <StackPanel Orientation="Vertical" Spacing="6">
             <StackPanel Orientation="Horizontal" Spacing="6">
-                <CheckBox Name="LaunchAtStartup" VerticalAlignment="Center" IsChecked="{Binding LaunchAtStartup}"
-                          IsEnabled="{Binding !LaunchAtStartupIsChanging}" />
+                <CheckBox Name="LaunchAtStartupCheckbox" VerticalAlignment="Center"
+                          IsChecked="{Binding LaunchAtStartup}"
+                          IsEnabled="{Binding !ShortcutIsChanging}" />
                 <TextBlock VerticalAlignment="Center" Text="Launch at Startup" />
-                <controls:ActivityIndicator IsVisible="{Binding LaunchAtStartupIsChanging}" />
             </StackPanel>
-            <controls:ValidationMessage
-                Errors="{Binding Path=(DataValidationErrors.Errors), ElementName=LaunchAtStartup}" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Spacing="6">
+            <CheckBox Name="StartMinimisedCheckbox" VerticalAlignment="Center" IsChecked="{Binding StartMinimised}">
+                <CheckBox.IsEnabled>
+                    <MultiBinding Converter="{x:Static BoolConverters.And}">
+                        <Binding Path="!ShortcutIsChanging" />
+                        <Binding Path="LaunchAtStartup" />
+                    </MultiBinding>
+                </CheckBox.IsEnabled>
+            </CheckBox>
+            <TextBlock VerticalAlignment="Center" Text="Launch Minimised" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Spacing="6">
+            <controls:ActivityIndicator IsVisible="{Binding ShortcutIsChanging}" />
+            <TextBlock FontSize="{Binding FontSize, ElementName=ValidationMessage}"
+                       IsVisible="{Binding ShortcutIsChanging}" Foreground="{StaticResource Tone1-75}"
+                       Text="Applying changes..." />
+            <controls:ValidationMessage Name="ValidationMessage"
+                                        Errors="{Binding Path=(DataValidationErrors.Errors), ElementName=LaunchAtStartupCheckbox}" />
         </StackPanel>
     </StackPanel>
 </UserControl>

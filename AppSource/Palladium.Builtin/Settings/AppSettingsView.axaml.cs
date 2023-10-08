@@ -13,10 +13,16 @@ public partial class AppSettingsView : ReactiveUserControl<AppSettingsViewModel>
 
 		this.WhenActivated(disposables =>
 		{
+			// bind validation to checkboxes so they appear red when there is a validation error
 			this.BindValidation(
 					ViewModel,
 					vm => vm.LaunchAtStartup,
-					LaunchAtStartup)
+					LaunchAtStartupCheckbox)
+				.DisposeWith(disposables);
+			this.BindValidation(
+					ViewModel,
+					vm => vm.LaunchAtStartup,
+					StartMinimisedCheckbox)
 				.DisposeWith(disposables);
 		});
 	}
