@@ -24,7 +24,7 @@ public class SearchOverrideAction
 		OnStart = Start
 	};
 
-	public void Init(ActionsRepositoryService repositoryService, SettingsService settingsService, Log log)
+	public void Init(ActionsRepositoryService repositoryService, SettingsService settingsService, Log? log)
 	{
 		repositoryService.Actions.AddOrUpdate(Description);
 

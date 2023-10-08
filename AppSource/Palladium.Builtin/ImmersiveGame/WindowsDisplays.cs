@@ -9,9 +9,9 @@ namespace Palladium.Builtin.ImmersiveGame;
 [SuppressMessage("ReSharper", "InconsistentNaming")]
 public class WindowsDisplays : IDisplaySource
 {
-	private readonly Log log;
+	private readonly Log? log;
 
-	public WindowsDisplays(Log log)
+	public WindowsDisplays(Log? log)
 	{
 		this.log = log;
 	}
@@ -67,7 +67,7 @@ public class WindowsDisplays : IDisplaySource
 	MiniLog IDisplaySource.DisableNonPrimaryDisplays()
 	{
 		int result = DisableNonPrimaryDisplays();
-		log.Emit(new EventId(), LogLevel.Debug, $"{nameof(DisableNonPrimaryDisplays)} returned {result}");
+		log?.Emit(new EventId(), LogLevel.Debug, $"{nameof(DisableNonPrimaryDisplays)} returned {result}");
 
 		return InterpretResult(result);
 	}
@@ -76,7 +76,7 @@ public class WindowsDisplays : IDisplaySource
 	MiniLog IDisplaySource.RestoreSettings()
 	{
 		int result = RestoreSettings();
-		log.Emit(new EventId(), LogLevel.Debug, $"{nameof(RestoreSettings)} returned {result}");
+		log?.Emit(new EventId(), LogLevel.Debug, $"{nameof(RestoreSettings)} returned {result}");
 
 		return InterpretResult(result);
 	}

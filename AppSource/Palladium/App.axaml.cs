@@ -4,6 +4,7 @@ using System.Reactive;
 using System.Reflection;
 using System.Threading.Tasks;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using DynamicData;
@@ -27,6 +28,7 @@ namespace Palladium;
 public  class App : Application
 {
 	private Log? log;
+	private LogViewerControlViewModel? logVm;
 
 	public override void Initialize()
 	{
@@ -38,68 +40,92 @@ public  class App : Application
 		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
 		{
 			// logging
-			InstallLogging(out LogViewerControlViewModel logVm, out log);
+			InstallLogging();
 
-			// services
-			string settingsFilePath = Path.Combine(
-				Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-				"Palladium",
-				"Settings.xml");
-			var tabsService = new TabsService();
-			var settingsService = new SettingsService(log, settingsFilePath);
-			var actionsRepositoryService = new ActionsRepositoryService();
+			ParseArgs(desktop, out bool minimised);
 
-			// main window
-			var mainWindow = new MainWindow();
-			mainWindow.DataContext = new MainWindowViewModel(logVm, mainWindow, actionsRepositoryService, tabsService, settingsService);
-			desktop.MainWindow = mainWindow;
-			tabsService.Target = mainWindow.Tabs;
-
-			// home
-			var homeViewModel = new HomeViewModel(actionsRepositoryService, tabsService);
-			mainWindow.Home.DataContext = homeViewModel;
-
-			// background load
-			Task.Run(() =>
+			if (!minimised)
 			{
-				InstallActions(actionsRepositoryService, log, settingsService);
-
-				var appSettingsViewModel = new AppSettingsViewModel(new WindowsShortcutHandler(), log);
-				settingsService.Install(appSettingsViewModel, () => new AppSettingsView { DataContext = appSettingsViewModel }, false);
-
-				LogStartingMode();
-
-				new ExtensionsLoader(Path.Combine(Environment.CurrentDirectory, "Extensions"))
-					.LoadExtensions(actionsRepositoryService, log);
-			});
+				CreateMainWindow(desktop);
+			}
 		}
 
 		base.OnFrameworkInitializationCompleted();
 	}
 
-	private void InstallActions(  ActionsRepositoryService actionsRepositoryService, Log log, SettingsService settingsService)
+	private static void ParseArgs(IClassicDesktopStyleApplicationLifetime desktop, out bool startMinimised)
+	{
+		startMinimised = false;
+
+		// note: don't use LINQ as this needs maximum performance (app startup) 
+		if (desktop.Args == null) return;
+		foreach (string arg in desktop.Args)
+		{
+			if (arg.Contains(AppSettingsViewModel.StartMinimisedArgs, StringComparison.OrdinalIgnoreCase))
+			{
+				startMinimised = true;
+			}
+		}
+	}
+
+	private void InstallActions(ActionsRepositoryService actionsRepositoryService, Log? log, SettingsService settingsService)
 	{
 		new SearchOverrideAction().Init(actionsRepositoryService, settingsService, log);
 		actionsRepositoryService.Actions.AddOrUpdate(new ImmersiveGameAction(log).Description);
 	}
 
-	private void InstallLogging(out LogViewerControlViewModel vm, out Log log)
+	private void InstallLogging()
 	{
 		// catch all unhandled errors
 		AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
 		TaskScheduler.UnobservedTaskException += OnUnobservedTaskException;
 		RxApp.DefaultExceptionHandler = Observer.Create<Exception>(OnUnhandledRxException);
 
-
 		// For debugging purposes only. Register the Random Logging Service
 		// builder.AddRandomBackgroundService();
 
 		// visual debugging tools
 		log = new Log();
-		vm = new LogViewerControlViewModel(log.DataStore);
+		logVm = new LogViewerControlViewModel(log.DataStore);
 
 		// Microsoft Logger
 		// builder.Logging.AddDefaultDataStoreLogger();
+	}
+
+	private void CreateMainWindow(IClassicDesktopStyleApplicationLifetime desktop)
+	{
+		// services
+		string settingsFilePath = Path.Combine(
+			Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+			"Palladium",
+			"Settings.xml");
+		var settingsService = new SettingsService(log, settingsFilePath);
+		var actionsRepositoryService = new ActionsRepositoryService();
+		var tabsService = new TabsService();
+
+		// main window
+		var mainWindow = new MainWindow();
+		mainWindow.DataContext = new MainWindowViewModel(logVm, mainWindow, actionsRepositoryService, tabsService, settingsService);
+		desktop.MainWindow = mainWindow;
+		tabsService.Target = mainWindow.Tabs;
+
+		// home
+		var homeViewModel = new HomeViewModel(actionsRepositoryService, tabsService);
+		mainWindow.Home.DataContext = homeViewModel;
+
+		// background load
+		Task.Run(() =>
+		{
+			InstallActions(actionsRepositoryService, log, settingsService);
+
+			var appSettingsViewModel = new AppSettingsViewModel(new WindowsShortcutHandler(), log);
+			settingsService.Install(appSettingsViewModel, () => new AppSettingsView { DataContext = appSettingsViewModel }, false);
+
+			LogStartingMode();
+
+			new ExtensionsLoader(Path.Combine(Environment.CurrentDirectory, "Extensions"))
+				.LoadExtensions(actionsRepositoryService, log);
+		});
 	}
 
 	private void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)
@@ -148,5 +174,32 @@ public  class App : Application
 
 		// log that we have started...
 		log?.Emit(eventId, LogLevel.Information, $"Running in {(isDevelopment ? "Debug" : "Release")} mode");
+	}
+
+	private void TrayIcon_OnClicked(object? sender, EventArgs e)
+	{
+		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+		{
+			if (desktop.MainWindow == null)
+			{
+				CreateMainWindow(desktop);
+			}
+			else
+			{
+				desktop.MainWindow.Show();
+				if (desktop.MainWindow.WindowState == WindowState.Minimized)
+				{
+					desktop.MainWindow.WindowState = WindowState.Normal;
+				}
+			}
+		}
+	}
+
+	private void TrayIcon_Exit_OnClicked(object? sender, EventArgs e)
+	{
+		if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+		{
+			desktop.TryShutdown();
+		}
 	}
 }

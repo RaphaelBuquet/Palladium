@@ -14,13 +14,13 @@ public class ExtensionsLoader
 		this.extensionsDirectory = extensionsDirectory;
 	}
 
-	public void LoadExtensions(ActionsRepositoryService actionsRepositoryService, Log log)
+	public void LoadExtensions(ActionsRepositoryService actionsRepositoryService, Log? log)
 	{
 		var extensionsToInvoke = new List<Type>();
 
 		if (!Path.Exists(extensionsDirectory))
 		{
-			log.Emit(new EventId(), LogLevel.Information, $"Could not load extensions as \"{extensionsDirectory}\" does not exist.");
+			log?.Emit(new EventId(), LogLevel.Information, $"Could not load extensions as \"{extensionsDirectory}\" does not exist.");
 			return;
 		}
 

@@ -14,10 +14,10 @@ namespace Palladium.Settings;
 public class SettingsService
 {
 	private readonly ConcurrentDictionary<Guid, SettingsSerializer> serializers = new ();
-	private readonly Log log;
+	private readonly Log? log;
 	private readonly string path;
 
-	public SettingsService(Log log, string path)
+	public SettingsService(Log? log, string path)
 	{
 		this.log = log;
 		this.path = path;
@@ -26,7 +26,7 @@ public class SettingsService
 		WriteCommand.ThrownExceptions.Subscribe(e =>
 		{
 			canExecute.OnNext(false);
-			this.log.Emit(new EventId(), LogLevel.Error, "Failed to write settings.", e);
+			this.log?.Emit(new EventId(), LogLevel.Error, "Failed to write settings.", e);
 		});
 	}
 
@@ -62,7 +62,7 @@ public class SettingsService
 			}
 			catch (Exception e)
 			{
-				log.Emit(new EventId(), LogLevel.Error, "An error occured when installing settings.", e);
+				log?.Emit(new EventId(), LogLevel.Error, "An error occured when installing settings.", e);
 			}
 		});
 	}
@@ -72,7 +72,7 @@ public class SettingsService
 		var writeFunction = delegate (XElement node) { WriteSerialize(node, settings.GetDataToSerialize()); };
 		if (!serializers.TryAdd(settings.SettingsGuid, new SettingsSerializer { Type = typeof(T), SerializeFunction = writeFunction }))
 		{
-			log.Emit(new EventId(), LogLevel.Warning, $"Settings with GUID {settings.SettingsGuid} were already installed, cannot install settings of type {settings.GetType().AssemblyQualifiedName}.");
+			log?.Emit(new EventId(), LogLevel.Warning, $"Settings with GUID {settings.SettingsGuid} were already installed, cannot install settings of type {settings.GetType().AssemblyQualifiedName}.");
 			return;
 		}
 
@@ -86,7 +86,7 @@ public class SettingsService
 			}
 			catch (Exception e)
 			{
-				log.Emit(new EventId(), LogLevel.Warning, $"Failed to deserialize settings for {settings.SettingsGuid} {settings.GetType().AssemblyQualifiedName}", e);
+				log?.Emit(new EventId(), LogLevel.Warning, $"Failed to deserialize settings for {settings.SettingsGuid} {settings.GetType().AssemblyQualifiedName}", e);
 				return;
 			}
 		}
@@ -143,7 +143,7 @@ public class SettingsService
 			}
 			catch (Exception e)
 			{
-				log.Emit(new EventId(), LogLevel.Error, $"Failed to serialize for {pair.Key} {pair.Value.Type.Name}", e);
+				log?.Emit(new EventId(), LogLevel.Error, $"Failed to serialize for {pair.Key} {pair.Value.Type.Name}", e);
 			}
 			actionSettingsRoot.Add(newElement);
 		}

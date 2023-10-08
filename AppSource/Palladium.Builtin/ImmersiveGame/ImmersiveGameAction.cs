@@ -6,9 +6,9 @@ namespace Palladium.Builtin.ImmersiveGame;
 
 public class ImmersiveGameAction
 {
-	private readonly Log log;
+	private readonly Log? log;
 
-	public ImmersiveGameAction(Log log)
+	public ImmersiveGameAction(Log? log)
 	{
 		this.log = log;
 	}
