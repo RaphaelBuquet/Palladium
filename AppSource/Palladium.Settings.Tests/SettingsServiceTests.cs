@@ -1,10 +1,5 @@
-using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Threading.Tasks;
-using System.Xml;
-using DynamicData;
-using DynamicData.Binding;
-using LogViewer.Core;
 using Palladium.Logging;
 using TestUtilities;
 
@@ -13,7 +8,7 @@ namespace Palladium.Settings.Tests;
 public class SettingsServiceTests
 {
 	[Test]
-	public void ReadSettings_FromEmptyFile_Fails()
+	public async Task ReadSettings_FromEmptyFile_Fails()
 	{
 		using IDisposable l = TestLog.LogToConsole(out Log log);
 
@@ -23,7 +18,9 @@ public class SettingsServiceTests
 		var vm = new MockSettings();
 
 		// act
-		Assert.ThrowsAsync<XmlException>(async () => { await service.Install(vm, () => "View", true); });
+		await service.Install(vm, () => "View", true);
+		// assert
+		Assert.AreEqual(1, log.DataStore.Entries.Count);
 	}
 
 	[Test]
@@ -79,7 +76,7 @@ public class SettingsServiceTests
 	}
 
 	[Test]
-	public void Install_MakesViewAvailable()
+	public async Task Install_MakesViewAvailable()
 	{
 		using IDisposable l = TestLog.LogToConsole(out Log? log);
 
@@ -89,7 +86,7 @@ public class SettingsServiceTests
 		var vm = new MockSettings();
 
 		// act
-		_ = service.Install(vm, () => "View", false);
+		await service.Install(vm, () => "View", false);
 
 		// assert
 		Assert.AreEqual(1, service.SettingsViews.Count);
