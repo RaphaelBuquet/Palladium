@@ -212,6 +212,45 @@ public class SettingsServiceTests
 		Assert.AreEqual(0, log.DataStore.Entries.Count);
 	}
 
+	[Test]
+	public async Task WriteSpam()
+	{
+		using IDisposable l = TestLog.LogToConsole(out Log log);
+
+		// arrange
+		string tempFile = Path.GetTempFileName();
+		await File.WriteAllTextAsync(tempFile, """
+		                                       <?xml version="1.0" encoding="utf-8" standalone="yes"?>
+		                                       <PalladiumSettings>
+		                                       </PalladiumSettings>
+		                                       """);
+		var service = new SettingsService(log, tempFile);
+		var vm = new MockSettings("1A2AD44E-8623-4799-8545-C8EAD5B6FECD");
+		await service.Install(vm, () => "View1", true);
+
+		// act
+		vm.Value = 1;
+		var t1 = service.WriteCommand.Execute().ToTask();
+		var t2 = service.WriteCommand.Execute().ToTask();
+		var t3 = service.WriteCommand.Execute().ToTask();
+		var t4 = service.WriteCommand.Execute().ToTask();
+		await Task.WhenAll(t1, t2, t3, t4);
+
+		// assert
+		string fileContents = await File.ReadAllTextAsync(tempFile);
+		Assert.AreEqual("""
+		                <?xml version="1.0" encoding="utf-8" standalone="yes"?>
+		                <PalladiumSettings>
+		                  <ActionSettingsService>
+		                    <ActionSettings Guid="1a2ad44e-8623-4799-8545-c8ead5b6fecd" Type="System.Int32">
+		                      <int>1</int>
+		                    </ActionSettings>
+		                  </ActionSettingsService>
+		                </PalladiumSettings>
+		                """, fileContents);
+		Assert.AreEqual(0, log.DataStore.Entries.Count);
+	}
+
 	private class MockSettings : ISettings<int>
 	{
 		public IObservable<int>? Observable;
