@@ -131,7 +131,8 @@ public class SettingsService
 		XElement actionSettingsRoot = root.GetElementOrCreate("ActionSettingsService");
 
 		// serialize settings
-		foreach (var pair in serializers)
+		// order by GUID to make order of data in settings deterministic (useful when testing)
+		foreach (var pair in serializers.OrderBy(s => s.Key))
 		{
 			var newElement = new XElement("ActionSettings");
 			newElement.SetAttributeValue("Guid", pair.Key);
@@ -158,11 +159,6 @@ public class SettingsService
 			await using var xmlWriter = XmlWriter.Create(stream, new XmlWriterSettings { Async = true, Indent = true });
 			await document.WriteToAsync(xmlWriter, cancellationToken);
 		}
-
-		// parse file
-		// each existing xml node with an associated serializer will be removed from the parent xml node for this SettingsService
-		// run serializers, add generated xml nodes into the parent xml node
-		// write to file
 	}
 
 	private static IEnumerable<XElement> EnumerateActionSettings(XDocument doc)
@@ -194,7 +190,7 @@ public class SettingsService
 		{
 			if (!x.TryGetGuidAttribute(out Guid guid)) return false;
 			return serializers.ContainsKey(guid);
-		});
+		}).ToList();
 
 		foreach (XElement element in settingsToRemove)
 		{
@@ -270,7 +266,6 @@ public class SettingsService
 	private static void WriteSerialize<T>(XElement xmlNode, T data)
 	{
 		using var stream = new MemoryStream();
-		// using var xmlWriter = XmlWriter.Create(new XmlTextWriter(stream, Encoding.UTF8));
 		var serializer = new XmlSerializer(typeof(T));
 		var xns = new XmlSerializerNamespaces();
 		xns.Add(string.Empty, string.Empty);
