@@ -1,3 +1,4 @@
+using Avalonia;
 using Avalonia.Controls;
 
 namespace Palladium.Views;
@@ -8,5 +9,18 @@ public partial class MainWindow : Window
 	public MainWindow()
 	{
 		InitializeComponent();
+		// using event pattern instead of Reactive pattern for performance reasons
+		PropertyChanged += OnPropertyChanged;
+	}
+
+	private void OnPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)
+	{
+		if (e.Property == WindowStateProperty)
+		{
+			if (WindowState == WindowState.Minimized)
+			{
+				Hide();
+			}
+		}
 	}
 }
