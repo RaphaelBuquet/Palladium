@@ -24,6 +24,7 @@ public class SearchOverrideSettingsViewModel : ReactiveObject, IActivatableViewM
 
 			this.WhenAnyValue(x => x.BrowserPath, x => x.BrowserArguments)
 				.Skip(1) // skip initial value to only get user-driven changes
+				.ObserveOn(RxApp.TaskpoolScheduler) // write settings in background
 				.Subscribe(_ => { settingsService?.WriteCommand.Execute().Subscribe(); })
 				.DisposeWith(disposables);
 		});

@@ -17,6 +17,6 @@ public static class TestLog
 			.WhereReasonsAre(ListChangeReason.Add)
 			.SelectMany(change => change.Select(i => i.Item.Current))
 			.Where(changeSet => changeSet.Exception is not null)
-			.Subscribe(Observer.Create<LogModel>(e => Console.WriteLine((string?)e.Exception)));
+			.Subscribe(Observer.Create<LogModel>(e => Console.WriteLine($"{e.State}{Environment.NewLine}Exception: {e.Exception}")));
 	}
 }

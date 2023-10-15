@@ -16,11 +16,13 @@ public class SettingsService
 	private readonly ConcurrentDictionary<Guid, SettingsSerializer> serializers = new ();
 	private readonly Log? log;
 	private readonly string path;
+	private readonly SemaphoreSlim semaphore; // note: cannot use ReaderWriterLockSlim as it can cause deadlocks because of how async/await is used.
 
 	public SettingsService(Log? log, string path)
 	{
 		this.log = log;
 		this.path = path;
+		semaphore = new SemaphoreSlim(1, 1);
 		var canExecute = new BehaviorSubject<bool>(true);
 		WriteCommand = ReactiveCommand.CreateFromTask(Write, canExecute);
 		WriteCommand.ThrownExceptions.Subscribe(e =>
@@ -101,63 +103,71 @@ public class SettingsService
 
 	private async Task Write(CancellationToken cancellationToken)
 	{
-		XDocument? document = null;
-		if (File.Exists(path))
+		await semaphore.WaitAsync(cancellationToken);
+		try
 		{
-			await using (FileStream stream = File.Open(path, FileMode.Open, FileAccess.Read))
+			XDocument? document = null;
+			if (File.Exists(path))
 			{
-				document = await ReadExistingSettings(cancellationToken, stream);
+				await using (FileStream stream = File.Open(path, FileMode.Open, FileAccess.Read))
+				{
+					document = await ReadExistingSettings(cancellationToken, stream);
+				}
+
+				// if the contents cannot be read, rename the file so new settings can be created
+				if (document == null)
+				{
+					string newPath = Path.Combine(Path.GetDirectoryName(path) ?? "", "Settings-Backup.xml");
+					if (File.Exists(newPath))
+					{
+						File.Delete(newPath);
+					}
+					File.Move(path, newPath);
+				}
 			}
 
-			// if the contents cannot be read, rename the file so new settings can be created
 			if (document == null)
 			{
-				string newPath = Path.Combine(Path.GetDirectoryName(path) ?? "", "Settings-Backup.xml");
-				if (File.Exists(newPath))
+				document = new XDocument(new XDeclaration("1.0", "utf-8", null));
+				document.Add(new XElement("PalladiumSettings"));
+			}
+
+			XElement root = document.Element("PalladiumSettings")!;
+			XElement actionSettingsRoot = root.GetElementOrCreate("ActionSettingsService");
+
+			// serialize settings
+			// order by GUID to make order of data in settings deterministic (useful when testing)
+			foreach (var pair in serializers.OrderBy(s => s.Key))
+			{
+				var newElement = new XElement("ActionSettings");
+				newElement.SetAttributeValue("Guid", pair.Key);
+				newElement.SetAttributeValue("Type", pair.Value.Type.FullName);
+
+				try
 				{
-					File.Delete(newPath);
+					pair.Value.SerializeFunction.Invoke(newElement);
 				}
-				File.Move(path, newPath);
+				catch (Exception e)
+				{
+					log?.Emit(new EventId(), LogLevel.Error, $"Failed to serialize for {pair.Key} {pair.Value.Type.Name}", e);
+				}
+				actionSettingsRoot.Add(newElement);
 			}
-		}
 
-		if (document == null)
-		{
-			document = new XDocument(new XDeclaration("1.0", "utf-8", null));
-			document.Add(new XElement("PalladiumSettings"));
-		}
+			cancellationToken.ThrowIfCancellationRequested();
 
-		XElement root = document.Element("PalladiumSettings")!;
-		XElement actionSettingsRoot = root.GetElementOrCreate("ActionSettingsService");
-
-		// serialize settings
-		// order by GUID to make order of data in settings deterministic (useful when testing)
-		foreach (var pair in serializers.OrderBy(s => s.Key))
-		{
-			var newElement = new XElement("ActionSettings");
-			newElement.SetAttributeValue("Guid", pair.Key);
-			newElement.SetAttributeValue("Type", pair.Value.Type.FullName);
-
-			try
+			// write back
+			string? directory = Path.GetDirectoryName(path);
+			if (directory is not null) Directory.CreateDirectory(directory);
+			await using (FileStream stream = File.Open(path, FileMode.Create, FileAccess.Write))
 			{
-				pair.Value.SerializeFunction.Invoke(newElement);
+				await using var xmlWriter = XmlWriter.Create(stream, new XmlWriterSettings { Async = true, Indent = true });
+				await document.WriteToAsync(xmlWriter, cancellationToken);
 			}
-			catch (Exception e)
-			{
-				log?.Emit(new EventId(), LogLevel.Error, $"Failed to serialize for {pair.Key} {pair.Value.Type.Name}", e);
-			}
-			actionSettingsRoot.Add(newElement);
 		}
-
-		cancellationToken.ThrowIfCancellationRequested();
-
-		// write back
-		string? directory = Path.GetDirectoryName(path);
-		if (directory is not null) Directory.CreateDirectory(directory);
-		await using (FileStream stream = File.Open(path, FileMode.Create, FileAccess.Write))
+		finally
 		{
-			await using var xmlWriter = XmlWriter.Create(stream, new XmlWriterSettings { Async = true, Indent = true });
-			await document.WriteToAsync(xmlWriter, cancellationToken);
+			semaphore.Release();
 		}
 	}
 
@@ -202,17 +212,18 @@ public class SettingsService
 
 	private async Task DeserializeAsync<T>(Guid guid, IObserver<T> observer)
 	{
-		if (!File.Exists(path))
-		{
-			return;
-		}
-
-		const int maxAttempts = 5;
 		FileStream? stream = null;
-		var attemptsCount = 0;
-		var exceptions = new List<Exception>(5);
+		await semaphore.WaitAsync();
 		try
 		{
+			if (!File.Exists(path))
+			{
+				return;
+			}
+
+			const int maxAttempts = 5;
+			var attemptsCount = 0;
+			var exceptions = new List<Exception>(5);
 			do
 			{
 				try
@@ -227,18 +238,28 @@ public class SettingsService
 				attemptsCount++;
 			} while (stream == null && attemptsCount < maxAttempts);
 
-			if (exceptions.Any() || stream == null)
+			if (stream == null)
 			{
 				throw new AggregateException($"Failed to read settings at \"{path}\"", exceptions);
 			}
-
+			if (exceptions.Any())
+			{
+				log?.Emit(new EventId(), LogLevel.Warning, $"Failed to read settings {exceptions.Count} times.", new AggregateException(exceptions));
+			}
 			await DeserializeAsync(stream, guid, observer);
 		}
 		finally
 		{
-			if (stream != null)
+			try
 			{
-				await stream.DisposeAsync();
+				if (stream != null)
+				{
+					await stream.DisposeAsync();
+				}
+			}
+			finally
+			{
+				semaphore.Release();
 			}
 		}
 	}

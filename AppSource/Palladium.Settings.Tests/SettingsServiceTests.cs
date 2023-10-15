@@ -5,6 +5,7 @@ using TestUtilities;
 
 namespace Palladium.Settings.Tests;
 
+[Timeout(5000)]
 public class SettingsServiceTests
 {
 	[Test]
