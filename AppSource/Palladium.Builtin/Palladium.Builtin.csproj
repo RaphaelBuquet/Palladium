@@ -1,33 +1,33 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\Palladium.Settings\Palladium.Settings.csproj"/>
-        <ProjectReference Include="..\Palladium.Actions\Palladium.Actions.csproj"/>
-        <ProjectReference Include="..\Palladium.Logging\Palladium.Logging.csproj"/>
-        <ProjectReference Include="..\Palladium.ExtensionFunctions\Palladium.ExtensionFunctions.csproj"/>
-        <!-- Build dependency on Palladium.NativeWindows -->
-        <ProjectReference Include="..\Palladium.NativeWindows\Palladium.NativeWindows.vcxproj">
-            <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-            <OutputItemType>Content</OutputItemType>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </ProjectReference>
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Palladium.Settings\Palladium.Settings.csproj"/>
+    <ProjectReference Include="..\Palladium.Actions\Palladium.Actions.csproj"/>
+    <ProjectReference Include="..\Palladium.Logging\Palladium.Logging.csproj"/>
+    <ProjectReference Include="..\Palladium.ExtensionFunctions\Palladium.ExtensionFunctions.csproj"/>
+    <!-- Build dependency on Palladium.NativeWindows -->
+    <ProjectReference Include="..\Palladium.NativeWindows\Palladium.NativeWindows.vcxproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <OutputItemType>Content</OutputItemType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </ProjectReference>
+  </ItemGroup>
 
-    <ItemGroup>
-        <Content Include="..\Palladium.NativeWindows\bin\x64\$(Configuration)\Palladium.NativeWindows.dll">
-            <Link>Palladium.NativeWindows.dll</Link>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
-    </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\Palladium.NativeWindows\bin\x64\$(Configuration)\Palladium.NativeWindows.dll">
+      <Link>Palladium.NativeWindows.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
 
-    <ItemGroup>
-        <PackageReference Include="ReactiveUI.Validation" Version="3.1.7"/>
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="ReactiveUI.Validation" Version="3.1.7"/>
+  </ItemGroup>
 
 </Project>

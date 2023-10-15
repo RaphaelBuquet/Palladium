@@ -1,14 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\Palladium.Actions\Palladium.Actions.csproj"/>
-        <ProjectReference Include="..\Palladium.Logging\Palladium.Logging.csproj"/>
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Palladium.Actions\Palladium.Actions.csproj"/>
+    <ProjectReference Include="..\Palladium.Logging\Palladium.Logging.csproj"/>
+  </ItemGroup>
 
 </Project>

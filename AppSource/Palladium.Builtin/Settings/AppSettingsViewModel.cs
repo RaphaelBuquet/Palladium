@@ -46,7 +46,7 @@ public class AppSettingsViewModel : ReactiveValidationObject, IActivatableViewMo
 		this.WhenActivated(disposables =>
 		{
 			// watch commands
-			CreateStartupShortcut.IsExecuting.CombineLatest(  TryGetStartupShortcut.IsExecuting, RemoveStartupShortcut.IsExecuting,
+			Observable.CombineLatest(CreateStartupShortcut.IsExecuting, TryGetStartupShortcut.IsExecuting, RemoveStartupShortcut.IsExecuting,
 					(b1, b2, b3) => b1 || b2 || b3)
 				.BindTo(this, x => x.ShortcutIsChanging)
 				.DisposeWith(disposables);

@@ -1,47 +1,47 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-    <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
-    </PropertyGroup>
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Avalonia" Version="11.0.3"/>
-        <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.3"/>
-        <PackageReference Include="ReactiveUI" Version="19.4.1"/>
-        <PackageReference Include="System.Reactive" Version="6.0.0"/>
-    </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.0.3"/>
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="11.0.3"/>
+    <PackageReference Include="ReactiveUI" Version="19.4.1"/>
+    <PackageReference Include="System.Reactive" Version="6.0.0"/>
+  </ItemGroup>
 
-    <ItemGroup>
-        <Compile Update="IconButton.axaml.cs">
-            <DependentUpon>IconButton.axaml</DependentUpon>
-        </Compile>
-    </ItemGroup>
+  <ItemGroup>
+    <Compile Update="IconButton.axaml.cs">
+      <DependentUpon>IconButton.axaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
 
-    <ItemGroup>
-        <AvaloniaResource Include="Resources\Fonts\JetBrainsMono-Bold.ttf"/>
-        <AvaloniaResource Include="Resources\Fonts\JetBrainsMono-BoldItalic.ttf"/>
-        <AvaloniaResource Include="Resources\Fonts\JetBrainsMono-ExtraBold.ttf"/>
-        <AvaloniaResource Include="Resources\Fonts\JetBrainsMono-ExtraBoldItalic.ttf"/>
-        <AvaloniaResource Include="Resources\Fonts\JetBrainsMono-ExtraLight.ttf"/>
-        <AvaloniaResource Include="Resources\Fonts\JetBrainsMono-ExtraLightItalic.ttf"/>
-        <AvaloniaResource Include="Resources\Fonts\JetBrainsMono-Italic.ttf"/>
-        <AvaloniaResource Include="Resources\Fonts\JetBrainsMono-Light.ttf"/>
-        <AvaloniaResource Include="Resources\Fonts\JetBrainsMono-LightItalic.ttf"/>
-        <AvaloniaResource Include="Resources\Fonts\JetBrainsMono-Medium.ttf"/>
-        <AvaloniaResource Include="Resources\Fonts\JetBrainsMono-MediumItalic.ttf"/>
-        <AvaloniaResource Include="Resources\Fonts\JetBrainsMono-Regular.ttf"/>
-        <AvaloniaResource Include="Resources\Fonts\JetBrainsMono-SemiBold.ttf"/>
-        <AvaloniaResource Include="Resources\Fonts\JetBrainsMono-SemiBoldItalic.ttf"/>
-        <AvaloniaResource Include="Resources\Fonts\JetBrainsMono-Thin.ttf"/>
-        <AvaloniaResource Include="Resources\Fonts\JetBrainsMono-ThinItalic.ttf"/>
-    </ItemGroup>
+  <ItemGroup>
+    <AvaloniaResource Include="Resources\Fonts\JetBrainsMono-Bold.ttf"/>
+    <AvaloniaResource Include="Resources\Fonts\JetBrainsMono-BoldItalic.ttf"/>
+    <AvaloniaResource Include="Resources\Fonts\JetBrainsMono-ExtraBold.ttf"/>
+    <AvaloniaResource Include="Resources\Fonts\JetBrainsMono-ExtraBoldItalic.ttf"/>
+    <AvaloniaResource Include="Resources\Fonts\JetBrainsMono-ExtraLight.ttf"/>
+    <AvaloniaResource Include="Resources\Fonts\JetBrainsMono-ExtraLightItalic.ttf"/>
+    <AvaloniaResource Include="Resources\Fonts\JetBrainsMono-Italic.ttf"/>
+    <AvaloniaResource Include="Resources\Fonts\JetBrainsMono-Light.ttf"/>
+    <AvaloniaResource Include="Resources\Fonts\JetBrainsMono-LightItalic.ttf"/>
+    <AvaloniaResource Include="Resources\Fonts\JetBrainsMono-Medium.ttf"/>
+    <AvaloniaResource Include="Resources\Fonts\JetBrainsMono-MediumItalic.ttf"/>
+    <AvaloniaResource Include="Resources\Fonts\JetBrainsMono-Regular.ttf"/>
+    <AvaloniaResource Include="Resources\Fonts\JetBrainsMono-SemiBold.ttf"/>
+    <AvaloniaResource Include="Resources\Fonts\JetBrainsMono-SemiBoldItalic.ttf"/>
+    <AvaloniaResource Include="Resources\Fonts\JetBrainsMono-Thin.ttf"/>
+    <AvaloniaResource Include="Resources\Fonts\JetBrainsMono-ThinItalic.ttf"/>
+  </ItemGroup>
 
-    <ItemGroup>
-        <ProjectReference Include="..\Palladium.Converters\Palladium.Converters.csproj"/>
-        <ProjectReference Include="..\Palladium.ExtensionFunctions\Palladium.ExtensionFunctions.csproj"/>
-    </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Palladium.Converters\Palladium.Converters.csproj"/>
+    <ProjectReference Include="..\Palladium.ExtensionFunctions\Palladium.ExtensionFunctions.csproj"/>
+  </ItemGroup>
 
 
 </Project>
