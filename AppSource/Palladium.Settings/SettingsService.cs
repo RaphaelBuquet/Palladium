@@ -11,7 +11,7 @@ using ReactiveUI;
 
 namespace Palladium.Settings;
 
-public class SettingsService
+public class SettingsService : ISettingsService
 {
 	private readonly ConcurrentDictionary<Guid, SettingsSerializer> serializers = new ();
 	private readonly Log? log;

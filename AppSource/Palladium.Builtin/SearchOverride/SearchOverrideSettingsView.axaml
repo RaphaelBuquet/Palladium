@@ -9,25 +9,32 @@
         <local:SearchOverrideSettingsViewModel />
     </Design.DataContext>
 
-    <Grid Margin="0, 0, 2, 0">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="6" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+    <StackPanel Orientation="Vertical" Spacing="6">
+        <Grid Margin="0, 0, 2, 0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="6" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="6" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="6" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-        <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="Browser Path:" />
-        <TextBox Grid.Row="0" Grid.Column="2" VerticalAlignment="Center"
-                 Text="{Binding BrowserPath}" />
+            <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="Browser Path:" />
+            <TextBox Grid.Row="0" Grid.Column="2" VerticalAlignment="Center"
+                     Text="{Binding BrowserPath}" />
 
-        <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Text="Browser Arguments:" />
-        <TextBox Grid.Row="2" Grid.Column="2" VerticalAlignment="Center"
-                 Text="{Binding BrowserArguments, Mode=TwoWay}" />
-    </Grid>
+            <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Text="Browser Arguments:" />
+            <TextBox Grid.Row="2" Grid.Column="2" VerticalAlignment="Center"
+                     Text="{Binding BrowserArguments, Mode=TwoWay}" />
+        </Grid>
+        <StackPanel Orientation="Horizontal" Spacing="6" Margin="0 6 0 0">
+            <CheckBox Name="LaunchAtStartupCheckbox" VerticalAlignment="Center"
+                      IsChecked="{Binding EnableOnAppStart}" />
+            <TextBlock VerticalAlignment="Center" Text="Enable When Application Starts" />
+        </StackPanel>
+    </StackPanel>
 </UserControl>

@@ -29,12 +29,14 @@ public class SearchOverrideViewModel : ReactiveObject, IActivatableViewModel, IL
 		ActivateCommand = ReactiveCommand.Create(Activate);
 		DeactivateCommand = ReactiveCommand.Create(Deactivate);
 
-		outputStream.OnNext(new Run("Debug output"));
-		outputStream.OnNext(SmartLineBreak.Instance);
-
 		this.WhenAttached(disposables =>
 		{
+			outputStream.OnNext(new Run("Debug output"));
+			outputStream.OnNext(SmartLineBreak.Instance);
+
 			Disposable.Create(windowsKeyboard.UnsetHook).DisposeWith(disposables);
+			ActivateCommand.ThrownExceptions.LoggedCatch(log, "An error occured while processing Activate").DisposeWith(disposables);
+			DeactivateCommand.ThrownExceptions.LoggedCatch(log, "An error occured while processing Deactivate").DisposeWith(disposables);
 			ActivateCommand.DisposeWith(disposables);
 			DeactivateCommand.DisposeWith(disposables);
 		});

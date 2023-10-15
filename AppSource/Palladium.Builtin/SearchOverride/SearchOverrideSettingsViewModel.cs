@@ -1,5 +1,7 @@
-﻿using System.Reactive.Disposables;
+﻿using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using Palladium.ActionsService;
 using Palladium.Settings;
 using ReactiveUI;
@@ -11,24 +13,35 @@ public class SearchOverrideSettingsViewModel : ReactiveObject, IActivatableViewM
 	private IDisposable? dataSubscription;
 	private string browserPath = "";
 	private string browserArguments = "";
+	private bool enableOnAppStart;
+	private readonly ReplaySubject<SearchOverrideSettings> loadedSettingsObservable = new (1);
 
 	public SearchOverrideSettingsViewModel() : this(null, null)
 	{ }
 
-	public SearchOverrideSettingsViewModel(ActionDescription? actionDescription, SettingsService? settingsService)
+	public SearchOverrideSettingsViewModel(ActionDescription? actionDescription, ISettingsService? settingsService, IScheduler? writeToSettingsScheduler = null)
 	{
+		writeToSettingsScheduler ??= RxApp.TaskpoolScheduler; // write settings in background
 		SettingsText = SettingsText.FromActionDescription(actionDescription);
 		this.WhenActivated(disposables =>
 		{
 			Disposable.Create(() => dataSubscription?.Dispose()).DisposeWith(disposables);
 
-			this.WhenAnyValue(x => x.BrowserPath, x => x.BrowserArguments)
+			this.WhenAnyValue(
+					x => x.BrowserPath,
+					x => x.BrowserArguments,
+					x => x.EnableOnAppStart)
 				.Skip(1) // skip initial value to only get user-driven changes
-				.ObserveOn(RxApp.TaskpoolScheduler) // write settings in background
+				.ObserveOn(writeToSettingsScheduler)
 				.Subscribe(_ => { settingsService?.WriteCommand.Execute().Subscribe(); })
 				.DisposeWith(disposables);
 		});
 	}
+
+	/// <summary>
+	///     Emits settings loaded from the settings files. This does not emit when the user changes the values.
+	/// </summary>
+	public IObservable<SearchOverrideSettings> LoadedSettingsObservable => loadedSettingsObservable;
 
 	public string BrowserPath
 	{
@@ -40,6 +53,12 @@ public class SearchOverrideSettingsViewModel : ReactiveObject, IActivatableViewM
 	{
 		get => browserArguments;
 		set => this.RaiseAndSetIfChanged(ref browserArguments, value);
+	}
+
+	public bool EnableOnAppStart
+	{
+		get => enableOnAppStart;
+		set => this.RaiseAndSetIfChanged(ref enableOnAppStart, value);
 	}
 
 	/// <inheritdoc />
@@ -61,6 +80,8 @@ public class SearchOverrideSettingsViewModel : ReactiveObject, IActivatableViewM
 			{
 				BrowserPath = settings.BrowserPath;
 				BrowserArguments = settings.BrowserArguments;
+				EnableOnAppStart = settings.EnableOnAppStart;
+				loadedSettingsObservable.OnNext(settings);
 			});
 	}
 
@@ -75,7 +96,8 @@ public class SearchOverrideSettingsViewModel : ReactiveObject, IActivatableViewM
 		return new SearchOverrideSettings
 		{
 			BrowserPath = BrowserPath,
-			BrowserArguments = BrowserArguments
+			BrowserArguments = BrowserArguments,
+			EnableOnAppStart = EnableOnAppStart
 		};
 	}
 }

@@ -116,15 +116,23 @@ public  class App : Application
 		// background load
 		Task.Run(() =>
 		{
-			InstallActions(actionsRepositoryService, log, settingsService);
+			try
+			{
+				InstallActions(actionsRepositoryService, log, settingsService);
 
-			var appSettingsViewModel = new AppSettingsViewModel(new WindowsShortcutHandler(), log);
-			settingsService.Install(appSettingsViewModel, () => new AppSettingsView { DataContext = appSettingsViewModel }, false);
+				var appSettingsViewModel = new AppSettingsViewModel(new WindowsShortcutHandler(), log);
+				settingsService.Install(appSettingsViewModel, () => new AppSettingsView { DataContext = appSettingsViewModel }, false);
 
-			LogStartingMode();
+				LogStartingMode();
 
-			new ExtensionsLoader(Path.Combine(Environment.CurrentDirectory, "Extensions"))
-				.LoadExtensions(actionsRepositoryService, log);
+				new ExtensionsLoader(Path.Combine(Environment.CurrentDirectory, "Extensions"))
+					.LoadExtensions(actionsRepositoryService, log);
+			}
+			catch (Exception e)
+			{
+				log?.Emit(new EventId(), LogLevel.Critical, "Fatal error occured when booting application", e);
+				desktop.Shutdown();
+			}
 		});
 	}
 

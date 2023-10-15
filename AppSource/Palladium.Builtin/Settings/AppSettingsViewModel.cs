@@ -53,9 +53,9 @@ public class AppSettingsViewModel : ReactiveValidationObject, IActivatableViewMo
 
 			// watch commands errors
 			// log exceptions
-			CreateStartupShortcut.ThrownExceptions.LogExceptions(log).DisposeWith(disposables);
-			TryGetStartupShortcut.ThrownExceptions.LogExceptions(log).DisposeWith(disposables);
-			RemoveStartupShortcut.ThrownExceptions.LogExceptions(log).DisposeWith(disposables);
+			CreateStartupShortcut.ThrownExceptions.LoggedCatch(log).DisposeWith(disposables);
+			TryGetStartupShortcut.ThrownExceptions.LoggedCatch(log).DisposeWith(disposables);
+			RemoveStartupShortcut.ThrownExceptions.LoggedCatch(log).DisposeWith(disposables);
 			// display error to use on exception
 			var errorMessages = Observable.Merge(
 				CreateStartupShortcut.ThrownExceptions.Select(_ => "Failed to enable launching the app at startup."),

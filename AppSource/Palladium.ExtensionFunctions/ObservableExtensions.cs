@@ -182,7 +182,7 @@ public static class ObservableExtensions
 		});
 	}
 
-	public static IDisposable LogExceptions(this IObservable<Exception> observable, Log? log, string? message = null)
+	public static IDisposable LoggedCatch(this IObservable<Exception> observable, Log? log, string? message = null)
 	{
 		return observable.Subscribe(e => log?.Emit(new EventId(), LogLevel.Error, message, e));
 	}
