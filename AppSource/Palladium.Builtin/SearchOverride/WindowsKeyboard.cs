@@ -20,6 +20,8 @@ public class WindowsKeyboard
 	internal const int WM_KEYDOWN = 0x0100;
 	internal const int WM_KEYUP = 0x0101;
 
+	private const int INPUT_KEYBOARD = 1;
+	private const uint KEYEVENTF_KEYUP = 0x0002;
 
 	private ShortcutKeyboardState shortcutKeyboardState = new ();
 
@@ -39,6 +41,9 @@ public class WindowsKeyboard
 
 	[DllImport("user32.dll")]
 	private static extern short GetKeyState(int nVirtKey);
+
+	[DllImport("user32.dll", SetLastError = true)]
+	public static extern uint SendInput(uint cInputs, [ MarshalAs(UnmanagedType.LPArray)] [ In] INPUT[] pInputs, int cbSize);
 
 	/// <summary>
 	///     Add a keyboard shortcut listener.
@@ -67,7 +72,19 @@ public class WindowsKeyboard
 	{
 		var data = Marshal.PtrToStructure<KBDLLHOOKSTRUCT>(lParam);
 
-		return ProcessKeyBlocking(keyState, data.vkCode, key, modifier, scheduler, callback);
+		ProcessedKey result = ProcessKeyBlocking(keyState, data.vkCode, key, modifier, scheduler, callback);
+		if (result.SimulateKeypress)
+		{
+			var inputDown = new INPUT();
+			inputDown.type = INPUT_KEYBOARD;
+			inputDown.U.ki.wVk = 0xFF;
+			var inputUp = new INPUT();
+			inputUp.type = INPUT_KEYBOARD;
+			inputUp.U.ki.wVk = 0xFF;
+			inputUp.U.ki.dwFlags = KEYEVENTF_KEYUP;
+			SendInput(2, new [] { inputDown, inputUp }, Marshal.SizeOf(typeof(INPUT)));
+		}
+		return result.PropagateEvent;
 	}
 
 	/// <summary>
@@ -80,11 +97,9 @@ public class WindowsKeyboard
 	/// <param name="modifier">The code of the modifier key to press to trigger the shortcut.</param>
 	/// <param name="scheduler">The scheduler to invoke the callback with.</param>
 	/// <param name="callback">Callback when shortcut is pressed.</param>
-	/// <returns>True to propagate the event to the rest of the chain, false to block.</returns>
-	internal bool ProcessKeyBlocking(int keyState, uint eventKeyCode, uint key, uint modifier, IScheduler scheduler, Action callback)
+	/// <returns>.</returns>
+	internal ProcessedKey ProcessKeyBlocking(int keyState, uint eventKeyCode, uint key, uint modifier, IScheduler scheduler, Action callback)
 	{
-		// Log.Emit(new EventId(), LogLevel.Debug, $"KEY: WM={keyState:X} vk={eventKeyCode:X}");
-
 		if (keyState == WM_KEYDOWN)
 		{
 			if (eventKeyCode == modifier)
@@ -92,7 +107,7 @@ public class WindowsKeyboard
 				// block events when the key is being held down
 				if (shortcutKeyboardState.ModifierIsPressed)
 				{
-					return false;
+					return ProcessedKey.Block;
 				}
 
 				shortcutKeyboardState.ModifierIsPressed = true;
@@ -102,14 +117,14 @@ public class WindowsKeyboard
 				// block events when the key is held down
 				if (shortcutKeyboardState.KeyIsPressed)
 				{
-					return false;
+					return ProcessedKey.Block;
 				}
 
 				if (shortcutKeyboardState.ModifierIsPressed)
 				{
 					shortcutKeyboardState.KeyIsPressed = true;
 					scheduler.Schedule(callback);
-					return false;
+					return ProcessedKey.Block;
 				}
 			}
 		}
@@ -122,17 +137,22 @@ public class WindowsKeyboard
 			else if (eventKeyCode == modifier)
 			{
 				shortcutKeyboardState.ModifierIsPressed = false;
+
+				// send keypress so that modifier is eaten up to block things like windows start menu from appearing
+				// https://www.autohotkey.com/docs/v1/lib/_MenuMaskKey.htm
+				if (shortcutKeyboardState.KeyIsPressed)
+				{
+					return new ProcessedKey
+					{
+						PropagateEvent = true,
+						SimulateKeypress = true
+					};
+				}
 			}
 		}
 
-		// if (eventKeyCode == VK_LWIN)
-		// {
-		// 	string type  = keyState == WM_KEYUP ? "up" : "down";
-		// 	Log.Emit(new EventId(), LogLevel.Debug, $"SENDING WIN KEY {type}");
-		// }
-
 		// For all other cases/key events, propagate to other handlers
-		return true;
+		return ProcessedKey.Propagate;
 	}
 
 	public void SetHook(KeyboardProc? proc)
@@ -156,7 +176,23 @@ public class WindowsKeyboard
 
 	public static bool IsKeyDown(int vKey)
 	{
-		return (GetKeyState((int)vKey) & 0x8000) == 0x8000;
+		return (GetKeyState(vKey) & 0x8000) == 0x8000;
+	}
+
+	public struct ProcessedKey
+	{
+		/// <summary>
+		///     True to propagate the event to the rest of the chain, false to block.
+		/// </summary>
+		public bool PropagateEvent;
+
+		/// <summary>
+		///     True to simulate a reserved/non-assigned key press after processing.
+		/// </summary>
+		public bool SimulateKeypress;
+
+		public static readonly ProcessedKey Propagate = new()  { PropagateEvent = true, SimulateKeypress = false };
+		public static readonly ProcessedKey Block = new()  { PropagateEvent = false, SimulateKeypress = false };
 	}
 
 	private struct ShortcutKeyboardState
@@ -176,5 +212,50 @@ public class WindowsKeyboard
 		public uint flags;
 		public uint time;
 		public IntPtr dwExtraInfo;
+	}
+
+	public struct INPUT
+	{
+		public int type;
+		public InputUnion U;
+	}
+
+	[StructLayout(LayoutKind.Explicit)]
+	public struct InputUnion
+	{
+		[FieldOffset(0)]
+		public MOUSEINPUT mi;
+
+		[FieldOffset(0)]
+		public KEYBDINPUT ki;
+
+		[FieldOffset(0)]
+		public HARDWAREINPUT hi;
+	}
+
+	public struct MOUSEINPUT
+	{
+		public int dx;
+		public int dy;
+		public uint mouseData;
+		public uint dwFlags;
+		public uint time;
+		public IntPtr dwExtraInfo;
+	}
+
+	public struct KEYBDINPUT
+	{
+		public ushort wVk;
+		public ushort wScan;
+		public uint dwFlags;
+		public uint time;
+		public IntPtr dwExtraInfo;
+	}
+
+	public struct HARDWAREINPUT
+	{
+		public uint uMsg;
+		public ushort wParamL;
+		public ushort wParamH;
 	}
 }
