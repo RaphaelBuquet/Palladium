@@ -1,5 +1,4 @@
-﻿using System.Reactive.Subjects;
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using DynamicData;
@@ -13,9 +12,7 @@ public class SearchOverrideAction
 {
 	public static readonly Guid Guid = new ("067fb8e2-fd37-49bc-b15b-6392fe75b550");
 	private SearchOverrideSettingsViewModel? settingsVm;
-	private readonly ReplaySubject<bool> enableOnAppStart = new(1);
-	private Log? log;
-	private SearchOverrideViewModel vm;
+	private SearchOverrideViewModel? vm;
 
 	public ActionDescription Description => new(Guid)
 	{
@@ -29,8 +26,6 @@ public class SearchOverrideAction
 
 	public void Init(ActionsRepositoryService repositoryService, SettingsService settingsService, Log? log)
 	{
-		this.log = log;
-
 		repositoryService.Actions.AddOrUpdate(Description);
 
 		// create view models
