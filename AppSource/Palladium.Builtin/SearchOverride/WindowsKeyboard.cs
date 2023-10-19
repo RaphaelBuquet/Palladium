@@ -12,7 +12,17 @@ public class WindowsKeyboard
 {
 	public delegate IntPtr KeyboardProc(int nCode, int wParam, IntPtr lParam);
 
+	// vk codes of modifiers
 	public const int VK_LWIN = 0x5B;
+	public const int VK_RWIN = 0x5C;
+	public const int VK_LSHIFT = 0xA0;
+	public const int VK_RSHIFT = 0xA1;
+	public const int VK_LCONTROL = 0xA2;
+	public const int VK_RCONTROL = 0xA3;
+	public const int VK_LMENU = 0xA4;
+	public const int VK_RMENU = 0xA5;
+
+	// vk codes of keys
 	public const int VK_S = 0x53;
 
 	private const int WH_KEYBOARD_LL = 13;
@@ -72,7 +82,7 @@ public class WindowsKeyboard
 	{
 		var data = Marshal.PtrToStructure<KBDLLHOOKSTRUCT>(lParam);
 
-		ProcessedKey result = ProcessKeyBlocking(keyState, data.vkCode, key, modifier, scheduler, callback);
+		ProcessedKey result = ProcessKey(keyState, data.vkCode, key, modifier, scheduler, callback);
 		if (result.SimulateKeypress)
 		{
 			var inputDown = new INPUT();
@@ -98,19 +108,53 @@ public class WindowsKeyboard
 	/// <param name="scheduler">The scheduler to invoke the callback with.</param>
 	/// <param name="callback">Callback when shortcut is pressed.</param>
 	/// <returns>.</returns>
-	internal ProcessedKey ProcessKeyBlocking(int keyState, uint eventKeyCode, uint key, uint modifier, IScheduler scheduler, Action callback)
+	internal ProcessedKey ProcessKey(int keyState, uint eventKeyCode, uint key, uint modifier, IScheduler scheduler, Action callback)
+	{
+		ProcessedKey result = DecideAction(keyState, eventKeyCode, key, modifier, scheduler, callback);
+		UpdateState(keyState, eventKeyCode, key, modifier);
+		return result;
+	}
+
+	private void UpdateState(int keyState, uint eventKeyCode, uint key, uint modifier)
+	{
+		if (keyState == WM_KEYDOWN)
+		{
+			if (eventKeyCode == key)
+			{
+				if (shortcutKeyboardState.IsSingleModifierPressed(modifier))
+				{
+					shortcutKeyboardState.KeyIsPressed = true;
+				}
+			}
+			else
+			{
+				shortcutKeyboardState.SetModifierPressed(eventKeyCode);
+			}
+		}
+		else if (keyState == WM_KEYUP)
+		{
+			if (eventKeyCode == key)
+			{
+				shortcutKeyboardState.KeyIsPressed = false;
+			}
+			else
+			{
+				shortcutKeyboardState.SetModifierUnpressed(eventKeyCode);
+			}
+		}
+	}
+
+	private ProcessedKey DecideAction(int keyState, uint eventKeyCode, uint key, uint modifier, IScheduler scheduler, Action callback)
 	{
 		if (keyState == WM_KEYDOWN)
 		{
 			if (eventKeyCode == modifier)
 			{
 				// block events when the key is being held down
-				if (shortcutKeyboardState.ModifierIsPressed)
+				if (shortcutKeyboardState.IsSingleModifierPressed(modifier))
 				{
 					return ProcessedKey.Block;
 				}
-
-				shortcutKeyboardState.ModifierIsPressed = true;
 			}
 			else if (eventKeyCode == key)
 			{
@@ -120,9 +164,8 @@ public class WindowsKeyboard
 					return ProcessedKey.Block;
 				}
 
-				if (shortcutKeyboardState.ModifierIsPressed)
+				if (shortcutKeyboardState.IsSingleModifierPressed(modifier))
 				{
-					shortcutKeyboardState.KeyIsPressed = true;
 					scheduler.Schedule(callback);
 					return ProcessedKey.Block;
 				}
@@ -130,14 +173,8 @@ public class WindowsKeyboard
 		}
 		else if (keyState == WM_KEYUP)
 		{
-			if (eventKeyCode == key)
+			if (eventKeyCode == modifier)
 			{
-				shortcutKeyboardState.KeyIsPressed = false;
-			}
-			else if (eventKeyCode == modifier)
-			{
-				shortcutKeyboardState.ModifierIsPressed = false;
-
 				// send keypress so that modifier is eaten up to block things like windows start menu from appearing
 				// https://www.autohotkey.com/docs/v1/lib/_MenuMaskKey.htm
 				if (shortcutKeyboardState.KeyIsPressed)
@@ -201,7 +238,84 @@ public class WindowsKeyboard
 		{ }
 
 		public bool KeyIsPressed = false;
-		public bool ModifierIsPressed = false;
+		public Modifiers Modifiers = Modifiers.None;
+
+		public bool IsSingleModifierPressed(uint keyCode)
+		{
+			switch (keyCode)
+			{
+				case VK_LWIN:
+				case VK_RWIN:
+					return Modifiers == Modifiers.Windows;
+				case VK_LSHIFT:
+				case VK_RSHIFT:
+					return Modifiers == Modifiers.Shift;
+				case VK_LCONTROL:
+				case VK_RCONTROL:
+					return Modifiers == Modifiers.Control;
+				case VK_LMENU:
+				case VK_RMENU:
+					return Modifiers == Modifiers.Alt;
+				default:
+					return false;
+			}
+		}
+
+		public void SetModifierPressed(uint keyCode)
+		{
+			switch (keyCode)
+			{
+				case VK_LWIN:
+				case VK_RWIN:
+					Modifiers |= Modifiers.Windows;
+					break;
+				case VK_LSHIFT:
+				case VK_RSHIFT:
+					Modifiers |= Modifiers.Shift;
+					break;
+				case VK_LCONTROL:
+				case VK_RCONTROL:
+					Modifiers |= Modifiers.Control;
+					break;
+				case VK_LMENU:
+				case VK_RMENU:
+					Modifiers |= Modifiers.Alt;
+					break;
+			}
+		}
+
+		public void SetModifierUnpressed(uint keyCode)
+		{
+			switch (keyCode)
+			{
+				case VK_LWIN:
+				case VK_RWIN:
+					Modifiers &= ~Modifiers.Windows;
+					break;
+				case VK_LSHIFT:
+				case VK_RSHIFT:
+					Modifiers &= ~Modifiers.Shift;
+					break;
+				case VK_LCONTROL:
+				case VK_RCONTROL:
+					Modifiers &= ~Modifiers.Control;
+					break;
+				case VK_LMENU:
+				case VK_RMENU:
+					Modifiers &= ~Modifiers.Alt;
+					break;
+			}
+		}
+	}
+
+	[Flags]
+	private enum Modifiers : byte
+	{
+		None = 0,
+		Windows = 1 << 0,
+		Shift = 1 << 1,
+		Control = 1 << 2,
+		Alt = 1 << 3
 	}
 
 	[StructLayout(LayoutKind.Sequential)]
