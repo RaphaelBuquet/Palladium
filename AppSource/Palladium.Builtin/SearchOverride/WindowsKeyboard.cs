@@ -1,6 +1,7 @@
 ﻿using System.Reactive.Concurrency;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Microsoft.Win32;
 
 // ReSharper disable IdentifierTypo
 
@@ -196,9 +197,20 @@ public class WindowsKeyboard
 	{
 		// Store the callback delegate instance in a field to prevent it from being garbage collected
 		keyboardCallback = proc;
+		SystemEvents.SessionSwitch += SystemEventsOnSessionSwitch;
 
 		// Set the hook
 		hookHandle = SetWindowsHookEx(WH_KEYBOARD_LL, keyboardCallback, IntPtr.Zero, 0);
+	}
+
+	private void SystemEventsOnSessionSwitch(object sender, SessionSwitchEventArgs e)
+	{
+		// on Windows 10, the key up events are not raised when the user locks their PC.
+		// so on unlock we clear the key downs.
+		if (e.Reason == SessionSwitchReason.SessionUnlock)
+		{
+			shortcutKeyboardState = new ShortcutKeyboardState();
+		}
 	}
 
 	public void UnsetHook()
@@ -207,6 +219,7 @@ public class WindowsKeyboard
 		UnhookWindowsHookEx(hookHandle);
 		hookHandle = IntPtr.Zero;
 		keyboardCallback = null;
+		SystemEvents.SessionSwitch -= SystemEventsOnSessionSwitch;
 
 		shortcutKeyboardState = new ShortcutKeyboardState ();
 	}
