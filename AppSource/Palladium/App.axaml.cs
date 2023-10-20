@@ -16,6 +16,7 @@ using Palladium.ActionsService;
 using Palladium.Builtin.ImmersiveGame;
 using Palladium.Builtin.SearchOverride;
 using Palladium.Builtin.Settings;
+using Palladium.Controls;
 using Palladium.Extensions;
 using Palladium.Logging;
 using Palladium.Settings;
@@ -29,6 +30,7 @@ public  class App : Application
 {
 	private Log? log;
 	private LogViewerControlViewModel? logVm;
+	private Action? createMainWindow;
 
 	public override void Initialize()
 	{
@@ -44,6 +46,7 @@ public  class App : Application
 
 			ParseArgs(desktop, out bool minimised);
 
+			LoadApp(desktop);
 			if (!minimised)
 			{
 				CreateMainWindow(desktop);
@@ -51,6 +54,61 @@ public  class App : Application
 		}
 
 		base.OnFrameworkInitializationCompleted();
+	}
+
+	private void LoadApp(IClassicDesktopStyleApplicationLifetime desktop)
+	{
+		// services
+		string settingsFilePath = Path.Combine(
+			Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+			"Palladium",
+			"Settings.xml");
+		var settingsService = new SettingsService(log, settingsFilePath);
+		var actionsRepositoryService = new ActionsRepositoryService();
+		var tabsService = new TabsService();
+
+		// delay creation of main window
+		createMainWindow = () =>
+		{
+			var mainWindow = new MainWindow();
+			mainWindow.DataContext = new MainWindowViewModel(logVm, mainWindow, actionsRepositoryService, tabsService, settingsService);
+			desktop.MainWindow = mainWindow;
+
+			// home
+			var homeViewModel = new HomeViewModel(actionsRepositoryService, tabsService);
+			// the TabItem cannot be set in XAML because setting items in the XAML and binding to an ItemsSource at the same time is not supported.
+			tabsService.Tabs.Add(new ApplicationTabItem()
+			{
+				Header = "🏠 Home",
+				AllowClose = false,
+				Content = new Home()
+				{
+					DataContext = homeViewModel
+				}
+			});
+		};
+
+		// background load
+		Task.Run(() =>
+		{
+			try
+			{
+				InstallActions(actionsRepositoryService, log, settingsService);
+
+				var appSettingsViewModel = new AppSettingsViewModel(new WindowsShortcutHandler(), log);
+				settingsService.Install(appSettingsViewModel, () => new AppSettingsView { DataContext = appSettingsViewModel }, false);
+
+				LogStartingMode();
+
+				new ExtensionsLoader(Path.Combine(Environment.CurrentDirectory, "Extensions"))
+					.LoadExtensions(actionsRepositoryService, log);
+			}
+			catch (Exception e)
+			{
+				log?.Emit(new EventId(), LogLevel.Critical, "Fatal error occured when booting application", e);
+				desktop.Shutdown();
+			}
+		});
 	}
 
 	private static void ParseArgs(IClassicDesktopStyleApplicationLifetime desktop, out bool startMinimised)
@@ -94,46 +152,11 @@ public  class App : Application
 
 	private void CreateMainWindow(IClassicDesktopStyleApplicationLifetime desktop)
 	{
-		// services
-		string settingsFilePath = Path.Combine(
-			Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-			"Palladium",
-			"Settings.xml");
-		var settingsService = new SettingsService(log, settingsFilePath);
-		var actionsRepositoryService = new ActionsRepositoryService();
-		var tabsService = new TabsService();
-
-		// main window
-		var mainWindow = new MainWindow();
-		mainWindow.DataContext = new MainWindowViewModel(logVm, mainWindow, actionsRepositoryService, tabsService, settingsService);
-		desktop.MainWindow = mainWindow;
-		tabsService.Target = mainWindow.Tabs;
-
-		// home
-		var homeViewModel = new HomeViewModel(actionsRepositoryService, tabsService);
-		mainWindow.Home.DataContext = homeViewModel;
-
-		// background load
-		Task.Run(() =>
+		if (desktop.MainWindow == null && createMainWindow != null)
 		{
-			try
-			{
-				InstallActions(actionsRepositoryService, log, settingsService);
-
-				var appSettingsViewModel = new AppSettingsViewModel(new WindowsShortcutHandler(), log);
-				settingsService.Install(appSettingsViewModel, () => new AppSettingsView { DataContext = appSettingsViewModel }, false);
-
-				LogStartingMode();
-
-				new ExtensionsLoader(Path.Combine(Environment.CurrentDirectory, "Extensions"))
-					.LoadExtensions(actionsRepositoryService, log);
-			}
-			catch (Exception e)
-			{
-				log?.Emit(new EventId(), LogLevel.Critical, "Fatal error occured when booting application", e);
-				desktop.Shutdown();
-			}
-		});
+			createMainWindow?.Invoke();
+			createMainWindow = null;
+		}
 	}
 
 	private void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)

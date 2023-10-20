@@ -1,6 +1,7 @@
-﻿using System.Windows.Input;
+﻿using System.Collections.ObjectModel;
+using System.Reactive.Subjects;
+using System.Windows.Input;
 using Avalonia.Controls;
-using Avalonia.LogicalTree;
 using Palladium.Controls;
 using ReactiveUI;
 
@@ -8,18 +9,19 @@ namespace Palladium.ActionsService;
 
 public class TabsService
 {
-	private readonly Dictionary<Guid, TabItem> registeredActions = new();
+	private readonly Dictionary<Guid, ApplicationTabItem> registeredActions = new();
+	private readonly ReplaySubject<ApplicationTabItem?> currentTab = new (1);
 
-	public TabControl? Target;
+	public ObservableCollection<ApplicationTabItem> Tabs { get; } = new ();
+
+	public IObservable<ApplicationTabItem?> CurrentTab => currentTab;
 
 	public void HandleStartAction(ActionDescription action)
 	{
-		if (Target == null) throw new InvalidOperationException("Target has not been set.");
-
-		if (!action.CanOpenMultiple && registeredActions.TryGetValue(action.Guid, out TabItem? registeredAction))
+		if (!action.CanOpenMultiple && registeredActions.TryGetValue(action.Guid, out ApplicationTabItem? registeredAction))
 		{
 			// change selected tab
-			Target.SelectedItem = registeredAction;
+			currentTab.OnNext(registeredAction);
 		}
 		else
 		{
@@ -31,8 +33,8 @@ public class TabsService
 				Header = $"{action.Emoji} {action.Title}"
 			};
 			newTab.CloseTabCommand = CloseTab(contentControl, newTab, action.Guid);
-			Target.Items.Add(newTab);
-			Target.SelectedItem = newTab;
+			Tabs.Add(newTab);
+			currentTab.OnNext(newTab);
 			if (!action.CanOpenMultiple)
 			{
 				registeredActions.Add(action.Guid, newTab);
@@ -51,7 +53,7 @@ public class TabsService
 			{
 				disposable.Dispose();
 			}
-			Target?.Items.Remove(tab);
+			Tabs.Remove(tab);
 			registeredActions.Remove(actionGuid);
 		});
 	}

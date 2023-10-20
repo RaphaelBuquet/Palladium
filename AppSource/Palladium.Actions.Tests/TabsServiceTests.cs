@@ -1,4 +1,3 @@
-using Avalonia.Controls;
 using NSubstitute;
 using Palladium.ActionsService;
 using Palladium.Controls;
@@ -12,11 +11,7 @@ public class TabsServiceTests
 	{
 		// arrange
 		var mock = Substitute.For<IDisposable>();
-		var tabControl = new TabControl();
-		var tabService = new TabsService
-		{
-			Target = tabControl
-		};
+		var tabService = new TabsService();
 
 		// act
 		tabService.HandleStartAction(new ActionDescription(new Guid("710F4DED-98D5-4044-BA81-C4A687486A7F"))
@@ -26,14 +21,14 @@ public class TabsServiceTests
 		});
 
 		// assert
-		Assert.AreEqual(1, tabControl.Items.Count);
+		Assert.AreEqual(1, tabService.Tabs.Count);
 
 		// act
-		ApplicationTabItem tabItem = tabControl.Items.OfType<ApplicationTabItem>().First();
+		ApplicationTabItem tabItem = tabService.Tabs.First();
 		tabItem.CloseTabCommand!.Execute(null);
 
 		// assert
 		mock.Received().Dispose();
-		Assert.AreEqual(0, tabControl.Items.Count);
+		Assert.AreEqual(0, tabService.Tabs.Count);
 	}
 }

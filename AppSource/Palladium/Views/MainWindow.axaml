@@ -4,7 +4,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:controls="clr-namespace:Palladium.Controls;assembly=Palladium.Controls"
         xmlns:viewModels="clr-namespace:Palladium.ViewModels"
-        xmlns:views="clr-namespace:Palladium.Views"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Palladium.Views.MainWindow"
         Icon="/Assets/v3.ico"
@@ -47,11 +46,15 @@
                 </StackPanel>
             </Grid>
         </Border>
-        <TabControl Grid.Row="1" x:Name="Tabs" Classes="ApplicationTabs">
-            <controls:ApplicationTabItem Header="🏠 Home" AllowClose="False">
-                <views:Home x:Name="Home" />
-                <!-- DataContext is set in App.axaml.cs (as MainWindow should not have a dependency on that DataContext) -->
-            </controls:ApplicationTabItem>
+        <TabControl Grid.Row="1"
+                    x:Name="Tabs"
+                    Classes="ApplicationTabs"
+                    ItemsSource="{Binding Tabs}"
+                    SelectedItem="{Binding CurrentTab^}">
+            <!--
+                Note: adding items here and binding to ItemsSource at the same time is not supported. 
+                Tabs should only be added to Tabs on the VM. 
+            -->
         </TabControl>
     </Grid>
 </Window>

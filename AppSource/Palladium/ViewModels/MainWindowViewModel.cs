@@ -1,9 +1,13 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Reactive;
+using System.Reactive.Linq;
 using Avalonia.Controls;
 using LogViewer.Core.ViewModels;
 using Palladium.ActionsService;
 using Palladium.Builtin.Settings;
+using Palladium.Controls;
 using Palladium.Settings;
 using Palladium.Views;
 using ReactiveUI;
@@ -53,6 +57,9 @@ public class MainWindowViewModel : ReactiveObject, IActivatableViewModel
 
 	/// <inheritdoc />
 	ViewModelActivator IActivatableViewModel.Activator { get; } = new ();
+
+	public ObservableCollection<ApplicationTabItem>? Tabs => tabsService?.Tabs;
+	public IObservable<ApplicationTabItem?> CurrentTab => tabsService?.CurrentTab ?? Observable.Never<ApplicationTabItem?>();
 
 	private void OpenLogs()
 	{
