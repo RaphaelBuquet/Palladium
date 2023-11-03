@@ -1,6 +1,0 @@
-<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Publish PalladiumExtensionTemplate to extensions folder" type="DotNetFolderPublish" factoryName="Publish to folder">
-    <riderPublish configuration="Release" platform="Any CPU" runtime="Portable" target_folder="$PROJECT_DIR$/../Palladium/Extensions/PalladiumExtensionTemplate" target_framework="net7.0" uuid_high="7318029926529781016" uuid_low="-8625032328692303856" />
-    <method v="2" />
-  </configuration>
-</component>

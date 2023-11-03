@@ -1,5 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project>
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
@@ -7,39 +6,32 @@
     <EnableDynamicLoading>true</EnableDynamicLoading>
   </PropertyGroup>
 
-  <!-- Palladium DLLs -->
+  <!-- 
+    Palladium projects
+    <Private>false</Private> is needed to make sure the DLLs aren't unecessarily copied.
+   -->
   <ItemGroup>
-    <Reference Include="Palladium.Actions">
+    <ProjectReference Include="..\..\AppSource\Palladium.Actions\Palladium.Actions.csproj">
       <Private>false</Private>
-      <ExcludeAssets>runtime</ExcludeAssets>
-      <HintPath>..\..\AppBinaries\Palladium.Actions.dll</HintPath>
-    </Reference>
-    <Reference Include="Palladium.Builtin">
+    </ProjectReference>
+    <ProjectReference Include="..\..\AppSource\Palladium.Controls\Palladium.Controls.csproj">
       <Private>false</Private>
-      <ExcludeAssets>runtime</ExcludeAssets>
-      <HintPath>..\..\AppBinaries\Palladium.Builtin.dll</HintPath>
-    </Reference>
-    <Reference Include="Palladium.Controls">
+    </ProjectReference>
+    <ProjectReference Include="..\..\AppSource\Palladium.Converters\Palladium.Converters.csproj">
       <Private>false</Private>
-      <ExcludeAssets>runtime</ExcludeAssets>
-      <HintPath>..\..\AppBinaries\Palladium.Controls.dll</HintPath>
-    </Reference>
-    <Reference Include="Palladium.Extensions">
+    </ProjectReference>
+    <ProjectReference Include="..\..\AppSource\Palladium.ExtensionFunctions\Palladium.ExtensionFunctions.csproj">
       <Private>false</Private>
-      <ExcludeAssets>runtime</ExcludeAssets>
-      <HintPath>..\..\AppBinaries\Palladium.Extensions.dll</HintPath>
-    </Reference>
-    <Reference Include="Palladium.Logging">
+    </ProjectReference>
+    <ProjectReference Include="..\..\AppSource\Palladium.Extensions\Palladium.Extensions.csproj">
       <Private>false</Private>
-      <ExcludeAssets>runtime</ExcludeAssets>
-      <HintPath>..\..\AppBinaries\Palladium.Logging.dll</HintPath>
-    </Reference>
-
-    <Reference Include="Palladium.ExtensionFunctions">
+    </ProjectReference>
+    <ProjectReference Include="..\..\AppSource\Palladium.Logging\Palladium.Logging.csproj">
       <Private>false</Private>
-      <ExcludeAssets>runtime</ExcludeAssets>
-      <HintPath>..\..\AppBinaries\Palladium.ExtensionFunctions.dll</HintPath>
-    </Reference>
+    </ProjectReference>
+    <ProjectReference Include="..\..\AppSource\Palladium.Settings\Palladium.Settings.csproj">
+      <Private>false</Private>
+    </ProjectReference>
   </ItemGroup>
 
   <!--
