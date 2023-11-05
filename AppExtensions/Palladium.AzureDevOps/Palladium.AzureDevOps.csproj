@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\..\AppSource\Palladium.Extensions\PalladiumExtension.props"/>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.TeamFoundationServer.Client" Version="16.205.1"/>
+    <PackageReference Include="ReactiveUI.Fody" Version="19.5.1"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Palladium.AzureDevOps.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AzureDevOpsTools\AzureDevOpsTools.csproj"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Queries\"/>
+  </ItemGroup>
+</Project>
