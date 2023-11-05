@@ -55,6 +55,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Converters", "App
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Converters.Tests", "AppSource\Palladium.Converters.Tests\Palladium.Converters.Tests.csproj", "{CCB9BF0E-70CD-4286-92D1-DB3B0521BE43}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.AzureDevOps", "AppExtensions\Palladium.AzureDevOps\Palladium.AzureDevOps.csproj", "{0BCEC05F-D7B8-4992-8D3D-5C0DA9447048}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.AzureDevOps.Tests", "AppExtensions\Palladium.AzureDevOps.Tests\Palladium.AzureDevOps.Tests.csproj", "{863AEC22-2AE4-41AE-AA0D-E7F394174E5B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureDevOpsTools", "AppExtensions\AzureDevOpsTools\AzureDevOpsTools.csproj", "{34B8E15B-8618-43F2-B117-F1E4C84EFF54}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|x64 = Release|x64
@@ -161,5 +167,17 @@ Global
 		{CCB9BF0E-70CD-4286-92D1-DB3B0521BE43}.Release|x64.Build.0 = Release|Any CPU
 		{CCB9BF0E-70CD-4286-92D1-DB3B0521BE43}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{CCB9BF0E-70CD-4286-92D1-DB3B0521BE43}.Debug|x64.Build.0 = Debug|Any CPU
+		{0BCEC05F-D7B8-4992-8D3D-5C0DA9447048}.Release|x64.ActiveCfg = Release|Any CPU
+		{0BCEC05F-D7B8-4992-8D3D-5C0DA9447048}.Release|x64.Build.0 = Release|Any CPU
+		{0BCEC05F-D7B8-4992-8D3D-5C0DA9447048}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0BCEC05F-D7B8-4992-8D3D-5C0DA9447048}.Debug|x64.Build.0 = Debug|Any CPU
+		{863AEC22-2AE4-41AE-AA0D-E7F394174E5B}.Release|x64.ActiveCfg = Release|Any CPU
+		{863AEC22-2AE4-41AE-AA0D-E7F394174E5B}.Release|x64.Build.0 = Release|Any CPU
+		{863AEC22-2AE4-41AE-AA0D-E7F394174E5B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{863AEC22-2AE4-41AE-AA0D-E7F394174E5B}.Debug|x64.Build.0 = Debug|Any CPU
+		{34B8E15B-8618-43F2-B117-F1E4C84EFF54}.Release|x64.ActiveCfg = Release|Any CPU
+		{34B8E15B-8618-43F2-B117-F1E4C84EFF54}.Release|x64.Build.0 = Release|Any CPU
+		{34B8E15B-8618-43F2-B117-F1E4C84EFF54}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{34B8E15B-8618-43F2-B117-F1E4C84EFF54}.Debug|x64.Build.0 = Debug|Any CPU
 	EndGlobalSection
 EndGlobal

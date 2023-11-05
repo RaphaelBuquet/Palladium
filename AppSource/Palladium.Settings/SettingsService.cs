@@ -46,12 +46,11 @@ public class SettingsService : ISettingsService
 	/// </param>
 	/// <param name="tryReadExistingSettings">
 	///     If true, will try to read any existing settings saved in user preferences. The
-	///     existing settings will be emitted through the observable in
-	///     <see cref="ISettings{T}.ProcessDataObservable" />.
+	///     existing settings will be emitted through the observable <see cref="ISettings{T}.Data" />.
 	/// </param>
 	/// <returns>
 	///     A task for the deserialization of existing settings. This is useful to know if the settings are being deserialized.
-	///     You should implement <see cref="ISettings{T}.ProcessDataObservable" /> to get the deserialized
+	///     You should subscribe to <see cref="ISettings{T}.Data" /> to get the deserialized
 	///     value.
 	/// </returns>
 	public Task Install<T> (ISettings<T> settings, Func<object> createView, bool tryReadExistingSettings)
@@ -71,20 +70,20 @@ public class SettingsService : ISettingsService
 
 	private async Task InstallImplementation<T>(ISettings<T> settings, Func<object> createView, bool tryReadExistingSettings)
 	{
-		var writeFunction = delegate (XElement node) { WriteSerialize(node, settings.GetDataToSerialize()); };
+		var writeFunction = delegate (XElement node) { WriteSerialize(node, settings.Data.Value); };
 		if (!serializers.TryAdd(settings.SettingsGuid, new SettingsSerializer { Type = typeof(T), SerializeFunction = writeFunction }))
 		{
 			log?.Emit(new EventId(), LogLevel.Warning, $"Settings with GUID {settings.SettingsGuid} were already installed, cannot install settings of type {settings.GetType().AssemblyQualifiedName}.");
 			return;
 		}
 
-		var subject = new ReplaySubject<T>(1);
 
 		if (tryReadExistingSettings)
 		{
 			try
 			{
-				await DeserializeAsync(settings.SettingsGuid, subject);
+				_ = settings.DeserializedData.Subscribe(settings.Data);
+				await DeserializeAsync(settings.SettingsGuid, settings.DeserializedData);
 			}
 			catch (Exception e)
 			{
@@ -92,7 +91,6 @@ public class SettingsService : ISettingsService
 				return;
 			}
 		}
-		settings.ProcessDataObservable(subject);
 		SettingsViews.AddOrUpdate(new SettingsEntry
 		{
 			Text = settings.SettingsText,

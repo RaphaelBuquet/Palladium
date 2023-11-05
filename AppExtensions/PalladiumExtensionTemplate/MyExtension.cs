@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls;
+﻿using System.Diagnostics.CodeAnalysis;
+using Avalonia.Controls;
 using DynamicData;
 using Palladium.ActionsService;
 using Palladium.Extensions;
@@ -7,6 +8,7 @@ namespace PalladiumExtensionTemplate;
 
 // This class is instantiated at runtime by Palladium after the extension DLL is loaded.
 // TODO: Rename this.
+[SuppressMessage("ReSharper", "UnusedType.Global")]
 public class MyExtension : ExtensionBase
 {
 	/// <inheritdoc />

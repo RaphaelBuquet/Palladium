@@ -1,10 +1,12 @@
-﻿using Avalonia;
+﻿using System.Reactive.Linq;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using DynamicData;
 using Palladium.ActionsService;
 using Palladium.Logging;
 using Palladium.Settings;
+using ReactiveUI;
 
 namespace Palladium.Builtin.SearchOverride;
 
@@ -37,13 +39,15 @@ public class SearchOverrideAction
 		_ = settingsService.Install(settingsVm, createSettingsView, true);
 
 		// handle background start option
-		settingsVm.LoadedSettingsObservable.Subscribe(settings =>
-		{
-			if (settings.EnableOnAppStart)
+		settingsVm.DeserializedData
+			.ObserveOn(RxApp.MainThreadScheduler)
+			.Subscribe(settings =>
 			{
-				vm.ActivateCommand.Execute().Subscribe();
-			}
-		});
+				if (settings.EnableOnAppStart)
+				{
+					vm.ActivateCommand.Execute().Subscribe();
+				}
+			});
 	}
 
 	private void Start(ContentControl container)

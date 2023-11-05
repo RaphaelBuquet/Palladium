@@ -1,12 +1,12 @@
 ﻿using Avalonia;
 using Avalonia.Headless;
 using Avalonia.ReactiveUI;
+using Palladium.Controls.Tests;
 using Palladium.Headless;
-using Palladium.Tests;
 
 [assembly: AvaloniaTestApplication(typeof(TestAppBuilder))]
 
-namespace Palladium.Tests;
+namespace Palladium.Controls.Tests;
 
 public class TestAppBuilder
 {

@@ -1,4 +1,5 @@
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using Palladium.Logging;
 using TestUtilities;
@@ -16,7 +17,7 @@ public class SettingsServiceTests
 		// arrange
 		string tempFile = Path.GetTempFileName();
 		var service = new SettingsService(log, tempFile);
-		var vm = new MockSettings("1A2AD44E-8623-4799-8545-C8EAD5B6FECD");
+		var vm = new MockSettings("1A2AD44E-8623-4799-8545-C8EAD5B6FECD", default);
 
 		// act
 		await service.Install(vm, () => "View", true);
@@ -32,7 +33,7 @@ public class SettingsServiceTests
 		// arrange
 		string tempFile = Path.GetTempFileName();
 		var service = new SettingsService(log, tempFile);
-		var vm = new MockSettings("1A2AD44E-8623-4799-8545-C8EAD5B6FECD") { Value = 567 };
+		var vm = new MockSettings("1A2AD44E-8623-4799-8545-C8EAD5B6FECD", 567);
 
 		// act
 		_ = service.Install(vm, () => "View", false);
@@ -63,16 +64,18 @@ public class SettingsServiceTests
 		                                       """);
 
 		var service = new SettingsService(log, tempFile);
-		var vm = new MockSettings("1A2AD44E-8623-4799-8545-C8EAD5B6FECD");
+		var vm = new MockSettings("1A2AD44E-8623-4799-8545-C8EAD5B6FECD", default);
+		var deserializedValueResult = vm.DeserializedData.FirstAsync().ToTask();
 
 		// act
 		await service.Install(vm, () => "View", true);
 
 		// assert
-		Assert.IsNotNull(vm.Observable);
-		var task = vm.Observable!.FirstAsync().ToTask();
-		Assert.IsTrue(task.IsCompleted);
-		Assert.AreEqual(567, task.Result);
+		var valueResult = vm.Data.FirstAsync().ToTask();
+		Assert.IsTrue(valueResult.IsCompleted);
+		Assert.IsTrue(deserializedValueResult.IsCompleted);
+		Assert.AreEqual(567, valueResult.Result);
+		Assert.AreEqual(567, deserializedValueResult.Result);
 		Assert.AreEqual(0, log.DataStore.Entries.Count);
 	}
 
@@ -94,11 +97,11 @@ public class SettingsServiceTests
 		                                       </PalladiumSettings>
 		                                       """);
 		var service = new SettingsService(log, tempFile);
-		var vm = new MockSettings("1A2AD44E-8623-4799-8545-C8EAD5B6FECD");
+		var vm = new MockSettings("1A2AD44E-8623-4799-8545-C8EAD5B6FECD", default);
 		await service.Install(vm, () => "View", true);
 
 		// act
-		vm.Value = 10;
+		vm.Data.OnNext(10);
 		await service.WriteCommand.Execute();
 
 		// assert
@@ -153,13 +156,13 @@ public class SettingsServiceTests
 		string tempFile = Path.GetTempFileName();
 		await File.WriteAllTextAsync(tempFile, existingSettings);
 		var service = new SettingsService(log, tempFile);
-		var vm1 = new MockSettings("1A2AD44E-8623-4799-8545-C8EAD5B6FECD");
-		var vm2 = new MockSettings("d5ac6569-d165-4fbb-b688-c4348d59841f");
+		var vm1 = new MockSettings("1A2AD44E-8623-4799-8545-C8EAD5B6FECD", default);
+		var vm2 = new MockSettings("d5ac6569-d165-4fbb-b688-c4348d59841f", default);
 		await service.Install(vm1, () => "View1", true);
 		await service.Install(vm2, () => "View2", true);
 
 		// act
-		vm1.Value = 10;
+		vm1.Data.OnNext(10);
 		await service.WriteCommand.Execute();
 
 		// assert
@@ -176,7 +179,7 @@ public class SettingsServiceTests
 		// arrange
 		string tempFile = Path.GetTempFileName();
 		var service = new SettingsService(log, tempFile);
-		var vm = new MockSettings("1A2AD44E-8623-4799-8545-C8EAD5B6FECD");
+		var vm = new MockSettings("1A2AD44E-8623-4799-8545-C8EAD5B6FECD", default);
 
 		// act
 		await service.Install(vm, () => "View", false);
@@ -200,8 +203,8 @@ public class SettingsServiceTests
 		                                       </PalladiumSettings>
 		                                       """);
 		var service = new SettingsService(log, tempFile);
-		var vm1 = new MockSettings("1A2AD44E-8623-4799-8545-C8EAD5B6FECD");
-		var vm2 = new MockSettings("d5ac6569-d165-4fbb-b688-c4348d59841f");
+		var vm1 = new MockSettings("1A2AD44E-8623-4799-8545-C8EAD5B6FECD", default);
+		var vm2 = new MockSettings("d5ac6569-d165-4fbb-b688-c4348d59841f", default);
 
 		// act
 		Task t1 = service.Install(vm1, () => "View1", true);
@@ -225,11 +228,11 @@ public class SettingsServiceTests
 		                                       </PalladiumSettings>
 		                                       """);
 		var service = new SettingsService(log, tempFile);
-		var vm = new MockSettings("1A2AD44E-8623-4799-8545-C8EAD5B6FECD");
+		var vm = new MockSettings("1A2AD44E-8623-4799-8545-C8EAD5B6FECD", default);
 		await service.Install(vm, () => "View1", true);
 
 		// act
-		vm.Value = 1;
+		vm.Data.OnNext(1);
 		var t1 = service.WriteCommand.Execute().ToTask();
 		var t2 = service.WriteCommand.Execute().ToTask();
 		var t3 = service.WriteCommand.Execute().ToTask();
@@ -253,12 +256,10 @@ public class SettingsServiceTests
 
 	private class MockSettings : ISettings<int>
 	{
-		public IObservable<int>? Observable;
-		public int Value;
-
-		public MockSettings(string settingsGuid)
+		public MockSettings(string settingsGuid, int initialValue)
 		{
 			SettingsGuid = Guid.Parse(settingsGuid);
+			Data = new BehaviorSubject<int>(initialValue);
 		}
 
 		/// <inheritdoc />
@@ -268,15 +269,9 @@ public class SettingsServiceTests
 		public SettingsText SettingsText => new();
 
 		/// <inheritdoc />
-		public void ProcessDataObservable(IObservable<int> observable)
-		{
-			Observable = observable;
-		}
+		public BehaviorSubject<int> Data { get;  }
 
 		/// <inheritdoc />
-		public int GetDataToSerialize()
-		{
-			return Value;
-		}
+		public Subject<int> DeserializedData { get; } = new ();
 	}
 }

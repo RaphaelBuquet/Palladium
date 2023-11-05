@@ -2,7 +2,7 @@
 
 public struct SearchOverrideSettings
 {
-	public string BrowserPath;
-	public string BrowserArguments;
+	public string? BrowserPath;
+	public string? BrowserArguments;
 	public bool EnableOnAppStart;
 }

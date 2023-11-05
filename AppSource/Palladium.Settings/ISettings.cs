@@ -1,4 +1,6 @@
-﻿namespace Palladium.Settings;
+﻿using System.Reactive.Subjects;
+
+namespace Palladium.Settings;
 
 /// <summary>
 ///     Implementations of this will typically be view models, which will be used when displaying an action's settings.
@@ -18,16 +20,30 @@ public interface ISettings<T>
 	SettingsText SettingsText { get; }
 
 	/// <summary>
-	///     Sets the observable that emits data serialized from disk.
-	///     When implementing this interface, you should subscribe to this <paramref name="observable" />.
-	///     That observable will emit, upon subscription or later, the last data serialized from disk (or will never emit if
-	///     there isn't any).
+	///     <para>Observable to get the settings and get notified of changes.</para>
+	///     <para>
+	///         The settings system used this. Firstly, a value is emitted by the settings system when it deserializes
+	///         settings, if an existing entry is found. Secondly, when settings need to be serialized to disk, the current
+	///         value is fetched and serialized.
+	///     </para>
+	///     <para>
+	///         Your view models properties need to have a "two-way" binding with this.
+	///     </para>
 	/// </summary>
-	/// <param name="observable"></param>
-	void ProcessDataObservable(IObservable<T> observable);
+	BehaviorSubject<T> Data { get; }
 
 	/// <summary>
-	///     Called when writing data to disk.
+	///     <para>
+	///         The settings system emits a value on this observable when it deserializes settings, if an existing entry is
+	///         found. This is separate from <see cref="Data" /> as it can be useful to separate data changes performed by
+	///         users and data changes performed when loading the settings.
+	///     </para>
+	///     <para>
+	///         This does not emit when the user changes the values.
+	///     </para>
 	/// </summary>
-	T GetDataToSerialize();
+	/// <remarks>
+	///     The value will be emitted here and then on <see cref="Data" />.
+	/// </remarks>
+	Subject<T> DeserializedData { get; }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Reactive;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using Palladium.ExtensionFunctions;
 using Palladium.Logging;
 using Palladium.Settings;
@@ -13,8 +14,6 @@ namespace Palladium.Builtin.Settings;
 public class AppSettingsViewModel : ReactiveValidationObject, IActivatableViewModel, ISettings<AppSettings>
 {
 	public const string StartMinimisedArgs = "--minimised";
-
-	private IDisposable? dataSubscription;
 
 	private bool launchAtStartup;
 	private bool shortcutIsChanging;
@@ -114,8 +113,6 @@ public class AppSettingsViewModel : ReactiveValidationObject, IActivatableViewMo
 					}
 				}).DisposeWith(disposables);
 
-			Disposable.Create(() => dataSubscription?.Dispose()).DisposeWith(disposables);
-
 			if (!hasBeenActivated)
 			{
 				hasBeenActivated = true;
@@ -171,21 +168,13 @@ public class AppSettingsViewModel : ReactiveValidationObject, IActivatableViewMo
 	public SettingsText SettingsText { get; } = new()  { Title = "Application Settings", SectionTitle = "⚙️ Application Settings" };
 
 	/// <inheritdoc />
+	public BehaviorSubject<AppSettings> Data { get; } = new (new AppSettings());
+
+	/// <inheritdoc />
+	public Subject<AppSettings> DeserializedData { get; } = new ();
+
+	/// <inheritdoc />
 	ViewModelActivator IActivatableViewModel.Activator { get; } = new();
-
-	/// <inheritdoc />
-	public void ProcessDataObservable(IObservable<AppSettings> observable)
-	{
-		dataSubscription?.Dispose();
-		dataSubscription = observable
-			.Subscribe(settings => { });
-	}
-
-	/// <inheritdoc />
-	public AppSettings GetDataToSerialize()
-	{
-		return new AppSettings();
-	}
 
 	private void SetLaunchAtStartupWithoutChangingShortcut(bool newValue)
 	{

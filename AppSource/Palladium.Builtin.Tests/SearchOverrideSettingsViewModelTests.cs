@@ -1,5 +1,4 @@
 ﻿using System.Reactive;
-using System.Reactive.Subjects;
 using Microsoft.Reactive.Testing;
 using NSubstitute;
 using Palladium.Builtin.SearchOverride;
@@ -18,11 +17,10 @@ public class SearchOverrideSettingsViewModelTests
 		// arrange
 		using IDisposable l = TestLog.LogToConsole(out Log log);
 		var vm = new SearchOverrideSettingsViewModel(null, null);
-		var subject = new Subject<SearchOverrideSettings>();
 
 		// act
-		((ISettings<SearchOverrideSettings>)vm).ProcessDataObservable(subject);
-		subject.OnNext(new SearchOverrideSettings
+		vm.Activator.Activate();
+		vm.Data.OnNext(new SearchOverrideSettings
 		{
 			BrowserArguments = "hello",
 			BrowserPath = "myapp",
@@ -33,35 +31,6 @@ public class SearchOverrideSettingsViewModelTests
 		Assert.AreEqual("hello", vm.BrowserArguments);
 		Assert.AreEqual("myapp", vm.BrowserPath);
 		Assert.AreEqual(true, vm.EnableOnAppStart);
-		Assert.AreEqual(0, log.DataStore.Entries.Count);
-	}
-
-	[Test]
-	public void EmitsValuesFromSettings()
-	{
-		// arrange
-		using IDisposable l = TestLog.LogToConsole(out Log log);
-		var vm = new SearchOverrideSettingsViewModel(null, null);
-		var subject = new Subject<SearchOverrideSettings>();
-		var testScheduler = new TestScheduler();
-		var observer = testScheduler.CreateObserver<SearchOverrideSettings>();
-
-		// act
-		vm.LoadedSettingsObservable.Subscribe(observer);
-		((ISettings<SearchOverrideSettings>)vm).ProcessDataObservable(subject);
-		var settingsValue = new SearchOverrideSettings
-		{
-			BrowserArguments = "hello",
-			BrowserPath = "myapp",
-			EnableOnAppStart = true
-		};
-		subject.OnNext(settingsValue);
-
-		// assert
-		ReactiveAssert.AreElementsEqual(new []
-		{
-			ReactiveTest.OnNext(0, settingsValue)
-		}, observer.Messages);
 		Assert.AreEqual(0, log.DataStore.Entries.Count);
 	}
 
@@ -79,7 +48,7 @@ public class SearchOverrideSettingsViewModelTests
 		settingsService.WriteCommand.Subscribe(observer);
 
 		// act
-		((IActivatableViewModel)vm).Activator.Activate();
+		vm.Activator.Activate();
 		vm.BrowserArguments = "hello";
 		testScheduler.AdvanceBy(1);
 
