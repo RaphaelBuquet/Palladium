@@ -13,7 +13,7 @@ namespace Palladium.Builtin.SearchOverride;
 
 public class SearchOverrideViewModel : ReactiveObject, IActivatableViewModel, ILifecycleAwareViewModel
 {
-	private readonly SearchOverrideSettingsViewModel? settings;
+	private readonly SearchOverrideSettingsViewModel? settingsVM;
 	private readonly Log? log;
 	private readonly ReplayFirstValuesSubject<Inline> outputStream = new (2);
 	private readonly WindowsKeyboard windowsKeyboard = new ();
@@ -22,9 +22,9 @@ public class SearchOverrideViewModel : ReactiveObject, IActivatableViewModel, IL
 	{ }
 
 	/// <inheritdoc />
-	public SearchOverrideViewModel(SearchOverrideSettingsViewModel? settings, Log? log)
+	public SearchOverrideViewModel(SearchOverrideSettingsViewModel? settingsVm, Log? log)
 	{
-		this.settings = settings;
+		settingsVM = settingsVm;
 		this.log = log;
 		ActivateCommand = ReactiveCommand.Create(Activate);
 		DeactivateCommand = ReactiveCommand.Create(Deactivate);
@@ -65,22 +65,23 @@ public class SearchOverrideViewModel : ReactiveObject, IActivatableViewModel, IL
 		windowsKeyboard.InstallKeyboardShortcut(() =>
 		{
 			outputStream.OnNext(new Run($"{DateTime.Now:HH:mm:ss.ffff} Shortcut pressed"));
-			if (!string.IsNullOrWhiteSpace(settings?.BrowserPath) && File.Exists(settings.BrowserPath))
+			var currentSettings = settingsVM?.Data.Value;
+			if (currentSettings != null && !string.IsNullOrWhiteSpace(currentSettings.Value.BrowserPath) && File.Exists(currentSettings.Value.BrowserPath))
 			{
 				try
 				{
 					var psi = new ProcessStartInfo
 					{
-						FileName = settings.BrowserPath,
-						Arguments = settings.BrowserArguments
+						FileName = currentSettings.Value.BrowserPath,
+						Arguments = currentSettings.Value.BrowserArguments
 					};
 					Process.Start(psi);
-					outputStream.OnNext(new Run($", starting \"{Path.GetFileName(settings.BrowserPath)}\"."));
+					outputStream.OnNext(new Run($", starting \"{Path.GetFileName(currentSettings.Value.BrowserPath)}\"."));
 				}
 				catch (Exception e)
 				{
-					log?.Emit(new EventId(), LogLevel.Error, $"Failed to start \"{settings.BrowserPath}\".", e);
-					outputStream.OnNext(new Run($", failed to start \"{Path.GetFileName(settings.BrowserPath)}\"."));
+					log?.Emit(new EventId(), LogLevel.Error, $"Failed to start \"{currentSettings.Value.BrowserPath}\".", e);
+					outputStream.OnNext(new Run($", failed to start \"{Path.GetFileName(currentSettings.Value.BrowserPath)}\"."));
 				}
 			}
 			outputStream.OnNext(SmartLineBreak.Instance);
