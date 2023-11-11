@@ -5,6 +5,7 @@ using Microsoft.TeamFoundation.WorkItemTracking.Process.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.Process.WebApi.Models;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
+using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
 using Newtonsoft.Json.Linq;
 
@@ -12,6 +13,14 @@ namespace AzureDevOpsTools;
 
 public static class AzureQueries
 {
+	public static async Task<VssConnection> ConnectWithToken(string projectUrl, string token)
+	{
+		var credentials = new VssBasicCredential("", token);
+		var connection = new VssConnection(new Uri(projectUrl), credentials);
+		await connection.ConnectAsync();
+		return connection;
+	}
+	
 	public static async Task<List<string>> GetAutomaticRoadmapTypes(VssConnection connection, string projectId)
 	{
 		var result = new List<string>();

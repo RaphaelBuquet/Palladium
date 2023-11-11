@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Palladium.ActionsService;
 using Palladium.Logging;
+using Palladium.Settings;
 
 namespace Palladium.Extensions;
 
@@ -14,7 +15,7 @@ public class ExtensionsLoader
 		this.extensionsDirectory = extensionsDirectory;
 	}
 
-	public void LoadExtensions(ActionsRepositoryService actionsRepositoryService, Log? log)
+	public void LoadExtensions(ActionsRepositoryService actionsRepositoryService, Log? log, SettingsService? settingsService)
 	{
 		var extensionsToInvoke = new List<Type>();
 
@@ -57,7 +58,7 @@ public class ExtensionsLoader
 			{
 				if (Activator.CreateInstance(extensionType) is ExtensionBase loadedExtension)
 				{
-					loadedExtension.ActionsRepositoryService = actionsRepositoryService;
+					loadedExtension.InstallDependencies(actionsRepositoryService, log, settingsService);
 					loadedExtension.Init();
 					log?.Emit(new EventId(), LogLevel.Information, $"Loaded extension \"{extensionType.Assembly.FullName}\".");
 				}

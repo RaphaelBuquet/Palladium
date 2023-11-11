@@ -26,9 +26,8 @@
             <TextBlock Grid.Row="0" Grid.Column="0" VerticalAlignment="Center" Text="Organisation URL:" />
             <TextBox Grid.Row="0" Grid.Column="2" VerticalAlignment="Center" Name="OrganisationUrl" />
 
-            <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Text="Browser Arguments:" />
-            <TextBox Grid.Row="2" Grid.Column="2" VerticalAlignment="Center"
-                     Text="{Binding BrowserArguments, Mode=TwoWay}" />
+            <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Text="Connection Token:" />
+            <TextBox Grid.Row="2" Grid.Column="2" VerticalAlignment="Center" Name="ConnectionToken" PasswordChar="*"/>
         </Grid>
     </StackPanel>
 </UserControl>

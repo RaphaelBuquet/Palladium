@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using Avalonia.Controls;
 using DynamicData;
+using Microsoft.Extensions.Logging;
 using Palladium.ActionsService;
 using Palladium.Extensions;
 
@@ -10,6 +11,8 @@ namespace Palladium.AzureDevOps;
 [SuppressMessage("ReSharper", "UnusedType.Global")]
 public class AzureDevOpsExtension : ExtensionBase
 {
+	private RoadmapSettingsViewModel? settingsVM;
+
 	/// <inheritdoc />
 	public override void Init()
 	{
@@ -27,13 +30,14 @@ public class AzureDevOpsExtension : ExtensionBase
 				OnStart = StartAction
 			}
 		);
-
-		// SettingsService.Install() TODO
+		
+		settingsVM = new RoadmapSettingsViewModel(SettingsService);
+		SettingsService?.Install(settingsVM, () => new RoadmapSettingsView() { DataContext = settingsVM }, true);
 	}
 
 	private void StartAction(ContentControl container)
 	{
-		var viewModel = new RoadmapViewModel();
+		var viewModel = new RoadmapViewModel(settingsVM, ApplicationLog);
 
 		container.Content = new RoadmapView()
 		{

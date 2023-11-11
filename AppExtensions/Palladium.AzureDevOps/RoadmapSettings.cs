@@ -1,6 +1,7 @@
 ﻿namespace Palladium.AzureDevOps;
 
-public struct RoadmapSettings
+public record RoadmapSettings
 {
-	public string? OrganisationUrl;
+	public string? OrganisationUrl { get; init; }
+	public string? ConnectionTokenEncrypted { get; init; }
 }

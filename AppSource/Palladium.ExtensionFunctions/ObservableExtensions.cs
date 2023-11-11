@@ -1,4 +1,5 @@
 ﻿using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Microsoft.Extensions.Logging;
@@ -128,6 +129,8 @@ public static class ObservableExtensions
 		});
 	}
 
+
+#nullable disable
 	/// <summary>
 	///     When a task is emitted, this observable will also emit it. The difference is that once the task completes, it will
 	///     be emitted again.
@@ -137,50 +140,58 @@ public static class ObservableExtensions
 	/// </summary>
 	/// <param name="tasksObservable"></param>
 	/// <typeparam name="T"></typeparam>
-	/// <returns></returns>
+	/// <returns>
+	///     An observable of tasks. If <paramref name="tasksObservable" /> emits null values then it will emit null values
+	///     too.
+	/// </returns>
 	public static IObservable<Task<T>> AddTaskCompletion<T>(this IObservable<Task<T>> tasksObservable)
 	{
+		if (tasksObservable is null) throw new ArgumentNullException(nameof(tasksObservable));
 		return Observable.Create<Task<T>>(observer =>
 		{
 			var composite = new CompositeDisposable();
 			var locker = new ReaderWriterLockSlim();
-			Task? currentTask;
+			Task currentTask;
 
-			tasksObservable.Subscribe(task =>
-			{
-				// using this to prevent previously watched task from broadcasting OnNext.
-				locker.EnterWriteLock();
-				currentTask = task;
-				locker.ExitWriteLock();
+			tasksObservable.Subscribe(
+				task =>
+				{
+					// using this to prevent previously watched task from broadcasting OnNext.
+					locker.EnterWriteLock();
+					currentTask = task;
+					locker.ExitWriteLock();
 
-				if (task.IsCompleted)
-				{
-					observer.OnNext(task);
-				}
-				else
-				{
-					observer.OnNext(task);
-					task.ContinueWith(task1 =>
+					if (task == null || task.IsCompleted)
 					{
-						try
+						observer.OnNext(task);
+					}
+					else
+					{
+						observer.OnNext(task);
+						task.ContinueWith(task1 =>
 						{
-							locker.EnterReadLock();
-							if (task1 == currentTask)
+							try
 							{
-								observer.OnNext(task1);
+								locker.EnterReadLock();
+								if (task1 == currentTask)
+								{
+									observer.OnNext(task1);
+								}
 							}
-						}
-						finally
-						{
-							locker.ExitReadLock();
-						}
-					}, TaskContinuationOptions.ExecuteSynchronously);
-				}
-			}).DisposeWith(composite);
+							finally
+							{
+								locker.ExitReadLock();
+							}
+						}, TaskContinuationOptions.ExecuteSynchronously);
+					}
+				},
+				observer.OnError,
+				observer.OnCompleted).DisposeWith(composite);
 
 			return composite;
 		});
 	}
+#nullable restore
 
 	public static IDisposable LoggedCatch(this IObservable<Exception> observable, Log? log, string? message = null)
 	{

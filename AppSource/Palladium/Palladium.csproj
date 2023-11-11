@@ -29,6 +29,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Plugin projects can be referenced here so that the Avalonia XAML preview in the IDE works. -->
+    <ProjectReference Include="..\..\AppExtensions\Palladium.AzureDevOps\Palladium.AzureDevOps.csproj">
+      <Private>false</Private>
+      <ExcludeAssets>runtime</ExcludeAssets>
+    </ProjectReference>
     <ProjectReference Include="..\LogViewerControl\CSharp\Background Services\RandomLogging.Service\RandomLogging.Service.csproj"/>
     <ProjectReference Include="..\LogViewerControl\CSharp\Controls\LogViewer.Avalonia\LogViewer.Avalonia.csproj"/>
     <ProjectReference Include="..\LogViewerControl\CSharp\Core\MsLogger.Core\MsLogger.Core.csproj"/>

@@ -22,5 +22,9 @@
     <ProjectReference Include="..\..\AppSource\Palladium.Headless\Palladium.Headless.csproj"/>
     <ProjectReference Include="..\Palladium.AzureDevOps\Palladium.AzureDevOps.csproj"/>
   </ItemGroup>
+  
+  <PropertyGroup>
+    <NoWarn>NUnit2005</NoWarn>
+  </PropertyGroup>
 
 </Project>

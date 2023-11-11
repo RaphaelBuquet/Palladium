@@ -19,12 +19,11 @@ public interface ISettingsService
 	/// </param>
 	/// <param name="tryReadExistingSettings">
 	///     If true, will try to read any existing settings saved in user preferences. The
-	///     existing settings will be emitted through the observable in
-	///     <see cref="ISettings{T}.ProcessDataObservable" />.
+	///     existing settings will be emitted through the observable <see cref="ISettings{T}.Data" />.
 	/// </param>
 	/// <returns>
 	///     A task for the deserialization of existing settings. This is useful to know if the settings are being deserialized.
-	///     You should implement <see cref="ISettings{T}.ProcessDataObservable" /> to get the deserialized
+	///     You should subscribe to <see cref="ISettings{T}.Data" /> to get the deserialized
 	///     value.
 	/// </returns>
 	Task Install<T> (ISettings<T> settings, Func<object> createView, bool tryReadExistingSettings);

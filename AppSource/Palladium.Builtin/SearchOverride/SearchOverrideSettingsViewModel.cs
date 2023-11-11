@@ -24,18 +24,17 @@ public class SearchOverrideSettingsViewModel : ReactiveObject, IActivatableViewM
 		SettingsText = SettingsText.FromActionDescription(actionDescription);
 		this.WhenActivated(disposables =>
 		{
-			var combinedObservable = this.WhenAnyValue(
-					x => x.BrowserArguments,
-					x => x.BrowserPath,
-					x => x.EnableOnAppStart)
-				.Skip(1); // skip initial value to only get user-driven changes
-
-			combinedObservable
+			Data.Skip(1)
+				.DistinctUntilChanged()
 				.ObserveOn(writeToSettingsScheduler)
 				.Subscribe(_ => { settingsService?.WriteCommand.Execute().Subscribe(); })
 				.DisposeWith(disposables);
 
-			combinedObservable
+			this.WhenAnyValue(
+					x => x.BrowserArguments,
+					x => x.BrowserPath,
+					x => x.EnableOnAppStart)
+				.Skip(1)
 				.Subscribe(_ =>
 				{
 					Data.OnNext(new SearchOverrideSettings

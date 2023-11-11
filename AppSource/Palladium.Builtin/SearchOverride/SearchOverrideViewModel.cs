@@ -66,22 +66,22 @@ public class SearchOverrideViewModel : ReactiveObject, IActivatableViewModel, IL
 		{
 			outputStream.OnNext(new Run($"{DateTime.Now:HH:mm:ss.ffff} Shortcut pressed"));
 			var currentSettings = settingsVM?.Data.Value;
-			if (currentSettings != null && !string.IsNullOrWhiteSpace(currentSettings.Value.BrowserPath) && File.Exists(currentSettings.Value.BrowserPath))
+			if (currentSettings != null && !string.IsNullOrWhiteSpace(currentSettings.BrowserPath) && File.Exists(currentSettings.BrowserPath))
 			{
 				try
 				{
 					var psi = new ProcessStartInfo
 					{
-						FileName = currentSettings.Value.BrowserPath,
-						Arguments = currentSettings.Value.BrowserArguments
+						FileName = currentSettings.BrowserPath,
+						Arguments = currentSettings.BrowserArguments
 					};
 					Process.Start(psi);
-					outputStream.OnNext(new Run($", starting \"{Path.GetFileName(currentSettings.Value.BrowserPath)}\"."));
+					outputStream.OnNext(new Run($", starting \"{Path.GetFileName(currentSettings.BrowserPath)}\"."));
 				}
 				catch (Exception e)
 				{
-					log?.Emit(new EventId(), LogLevel.Error, $"Failed to start \"{currentSettings.Value.BrowserPath}\".", e);
-					outputStream.OnNext(new Run($", failed to start \"{Path.GetFileName(currentSettings.Value.BrowserPath)}\"."));
+					log?.Emit(new EventId(), LogLevel.Error, $"Failed to start \"{currentSettings.BrowserPath}\".", e);
+					outputStream.OnNext(new Run($", failed to start \"{Path.GetFileName(currentSettings.BrowserPath)}\"."));
 				}
 			}
 			outputStream.OnNext(SmartLineBreak.Instance);

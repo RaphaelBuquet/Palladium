@@ -101,10 +101,10 @@ public  class App : Application
 				LogStartingMode();
 
 				new ExtensionsLoader(Path.Combine(Environment.CurrentDirectory, "Extensions"))
-					.LoadExtensions(actionsRepositoryService, log);
+					.LoadExtensions(actionsRepositoryService, log, settingsService);
 			}
 			catch (Exception e)
-			{
+			{ 
 				log?.Emit(new EventId(), LogLevel.Critical, "Fatal error occured when booting application", e);
 				desktop.Shutdown();
 			}

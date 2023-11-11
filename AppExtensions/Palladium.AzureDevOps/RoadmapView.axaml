@@ -2,7 +2,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:azureDevOps="clr-namespace:Palladium.AzureDevOps"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Palladium.AzureDevOps.RoadmapView">
-    Welcome to Avalonia!
+    <Design.DataContext>
+        <azureDevOps:RoadmapViewModel />
+    </Design.DataContext>
+    <StackPanel Orientation="Horizontal">
+        <TextBlock Text="{Binding ConnectionStatus}" />
+    </StackPanel>
 </UserControl>

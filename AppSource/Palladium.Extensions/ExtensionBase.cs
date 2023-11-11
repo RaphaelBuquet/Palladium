@@ -16,6 +16,13 @@ public abstract class ExtensionBase
 	public Log? ApplicationLog;
 	public SettingsService? SettingsService;
 
+	internal void InstallDependencies(ActionsRepositoryService? actionsRepositoryService, Log? log, SettingsService? settingsService)
+	{
+		ActionsRepositoryService = actionsRepositoryService;
+		ApplicationLog = log;
+		SettingsService = settingsService;
+	}
+	
 	/// <summary>
 	///     Called by Palladium after the extension's DLL has been loaded. This is called from a background thread.
 	/// </summary>

@@ -15,6 +15,10 @@ public partial class RoadmapSettingsView : ReactiveUserControl<RoadmapSettingsVi
 					viewModel => viewModel.OrganisationUrl,
 					view => view.OrganisationUrl.Text)
 				.DisposeWith(disposables);
+			this.Bind(ViewModel,
+					viewModel => viewModel.ConnectionToken,
+					view => view.ConnectionToken.Text)
+				.DisposeWith(disposables);
 		});
 	}
 }

@@ -1,8 +1,8 @@
 ﻿namespace Palladium.Builtin.SearchOverride;
 
-public struct SearchOverrideSettings
+public record SearchOverrideSettings
 {
-	public string? BrowserPath;
-	public string? BrowserArguments;
-	public bool EnableOnAppStart;
+	public string? BrowserPath { get; init; }
+	public string? BrowserArguments { get; init; }
+	public bool EnableOnAppStart { get; init; }
 }

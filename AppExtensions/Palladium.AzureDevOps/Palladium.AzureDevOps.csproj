@@ -3,6 +3,8 @@
   <Import Project="..\..\AppSource\Palladium.Extensions\PalladiumExtension.props"/>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="7.0.13" />
+    <PackageReference Include="Microsoft.AspNetCore.DataProtection.Extensions" Version="7.0.13" />
     <PackageReference Include="Microsoft.TeamFoundationServer.Client" Version="16.205.1"/>
     <PackageReference Include="ReactiveUI.Fody" Version="19.5.1"/>
   </ItemGroup>
@@ -15,9 +17,5 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AzureDevOpsTools\AzureDevOpsTools.csproj"/>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Queries\"/>
   </ItemGroup>
 </Project>

@@ -36,23 +36,7 @@ public class SettingsService : ISettingsService
 
 	public SourceCache<SettingsEntry, Guid> SettingsViews { get; } = new (pair => pair.Guid);
 
-	/// <summary>
-	///     Install a view and a view model for an action's settings.
-	/// </summary>
-	/// <param name="settings">The view model for the settings page.</param>
-	/// <param name="createView">
-	///     A callback that creates the view for the settings page. The invocation of this callback is
-	///     delayed for performance reasons.
-	/// </param>
-	/// <param name="tryReadExistingSettings">
-	///     If true, will try to read any existing settings saved in user preferences. The
-	///     existing settings will be emitted through the observable <see cref="ISettings{T}.Data" />.
-	/// </param>
-	/// <returns>
-	///     A task for the deserialization of existing settings. This is useful to know if the settings are being deserialized.
-	///     You should subscribe to <see cref="ISettings{T}.Data" /> to get the deserialized
-	///     value.
-	/// </returns>
+	/// <inheritdoc />
 	public Task Install<T> (ISettings<T> settings, Func<object> createView, bool tryReadExistingSettings)
 	{
 		return Task.Run(async () =>

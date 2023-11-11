@@ -1,5 +1,5 @@
 ﻿<component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Palladium with extensions (debug)" type="RunExe" factoryName=".NET Executable">
+  <configuration default="false" name="Run Palladium binaries" type="RunExe" factoryName=".NET Executable">
     <option name="EXE_PATH" value="$PROJECT_DIR$/AppBinaries/Palladium.exe" />
     <option name="PROGRAM_PARAMETERS" value="" />
     <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/AppBinaries" />
@@ -7,9 +7,6 @@
     <option name="USE_EXTERNAL_CONSOLE" value="0" />
     <option name="USE_MONO" value="0" />
     <option name="RUNTIME_ARGUMENTS" value="" />
-    <method v="2">
-      <option name="RunConfigurationTask" enabled="true" run_configuration_name="Publish app (debug)" run_configuration_type="DotNetFolderPublish" />
-      <option name="RunConfigurationTask" enabled="true" run_configuration_name="Publish AzureDevOps extension (debug)" run_configuration_type="DotNetFolderPublish" />
-    </method>
+    <method v="2" />
   </configuration>
 </component>

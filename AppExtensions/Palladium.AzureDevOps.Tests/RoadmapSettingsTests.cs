@@ -11,7 +11,7 @@ public class RoadmapSettingsTests
 	{
 		// arrange
 		var window = new Window();
-		var vm = new RoadmapSettingsViewModel();
+		var vm = new RoadmapSettingsViewModel(null);
 		var view = new RoadmapSettingsView
 		{
 			DataContext = vm
