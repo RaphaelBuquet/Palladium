@@ -2,21 +2,21 @@
 using Palladium.Logging;
 using Palladium.Settings;
 
-namespace Palladium.Extensions;
+namespace Palladium.Plugins;
 
 /// <summary>
 ///     Create a class that inherits from this. Palladium will set the fields and then call <see cref="Init" />.
 /// </summary>
 /// <remarks>
-///     Fields are used instead of function parameters to simplify porting your extensions to newer versions of Palladium.
+///     Fields are used instead of function parameters to simplify porting your plugins to newer versions of Palladium.
 /// </remarks>
-public abstract class ExtensionBase
+public abstract class PluginBase
 {
 	public ActionsRepositoryService? ActionsRepositoryService;
 	public Log? ApplicationLog;
 	public SettingsService? SettingsService;
 
-	internal void InstallDependencies(ActionsRepositoryService? actionsRepositoryService, Log? log, SettingsService? settingsService)
+	public void InstallDependencies(ActionsRepositoryService? actionsRepositoryService, Log? log, SettingsService? settingsService)
 	{
 		ActionsRepositoryService = actionsRepositoryService;
 		ApplicationLog = log;

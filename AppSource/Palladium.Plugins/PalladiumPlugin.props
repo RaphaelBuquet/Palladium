@@ -1,0 +1,33 @@
+﻿<Project>
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <!-- 
+    Palladium projects that are likely to be needed by plugins.
+   -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\AppSource\Palladium.Actions\Palladium.Actions.csproj" />
+    <ProjectReference Include="..\..\AppSource\Palladium.Controls\Palladium.Controls.csproj" />
+    <ProjectReference Include="..\..\AppSource\Palladium.Converters\Palladium.Converters.csproj" />
+    <ProjectReference Include="..\..\AppSource\Palladium.ExtensionFunctions\Palladium.ExtensionFunctions.csproj" />
+    <ProjectReference Include="..\..\AppSource\Palladium.Plugins\Palladium.Plugins.csproj" />
+    <ProjectReference Include="..\..\AppSource\Palladium.Logging\Palladium.Logging.csproj" />
+    <ProjectReference Include="..\..\AppSource\Palladium.Settings\Palladium.Settings.csproj" />
+  </ItemGroup>
+
+  <!--
+   Nuget packages used by Palladium that are likely to be needed by plugins. 
+   -->
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="11.0.5"/>
+    <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.5"/>
+    <PackageReference Include="DynamicData" Version="8.1.1"/>
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1"/>
+    <PackageReference Include="ReactiveUI" Version="19.5.1"/>
+    <PackageReference Include="ReactiveUI.Validation" Version="3.1.7"/>
+    <PackageReference Include="System.Reactive" Version="6.0.0"/>
+  </ItemGroup>
+</Project>

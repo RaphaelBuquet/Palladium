@@ -17,7 +17,7 @@ using Palladium.Builtin.ImmersiveGame;
 using Palladium.Builtin.SearchOverride;
 using Palladium.Builtin.Settings;
 using Palladium.Controls;
-using Palladium.Extensions;
+using Palladium.Plugins;
 using Palladium.Logging;
 using Palladium.Settings;
 using Palladium.ViewModels;
@@ -100,8 +100,7 @@ public  class App : Application
 
 				LogStartingMode();
 
-				new ExtensionsLoader(Path.Combine(Environment.CurrentDirectory, "Extensions"))
-					.LoadExtensions(actionsRepositoryService, log, settingsService);
+				PluginsLoader.LoadAll(actionsRepositoryService, log, settingsService);
 			}
 			catch (Exception e)
 			{ 

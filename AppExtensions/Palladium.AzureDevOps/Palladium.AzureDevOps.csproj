@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\..\AppSource\Palladium.Extensions\PalladiumExtension.props"/>
+  <Import Project="..\..\AppSource\Palladium.Plugins\PalladiumPlugin.props"/>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.DataProtection" Version="7.0.13" />
