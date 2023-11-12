@@ -2,6 +2,7 @@
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.DataProtection;
 using Palladium.Settings;
 using ReactiveUI;
@@ -16,6 +17,12 @@ public class RoadmapSettingsViewModel :  ReactiveObject, IActivatableViewModel, 
 
 	[Reactive]
 	public string? ConnectionToken { get ; set ; }
+	
+	[Reactive]
+	public string? ProjectId { get; set; }
+
+	[Reactive]
+	public string? PlanId { get; set; }
 
 	/// <inheritdoc />
 	public Guid SettingsGuid => new ("863E717F-C1ED-43CD-A54D-823F0A10BD5B");
@@ -26,7 +33,10 @@ public class RoadmapSettingsViewModel :  ReactiveObject, IActivatableViewModel, 
 		Title = "Azure DevOps Roadmap Settings",
 		SectionTitle = "🗓️ Azure DevOps Roadmap Settings"
 	};
-
+	
+	public RoadmapSettingsViewModel() : this(null)
+	{ }
+	
 	/// <param name="settingsService"></param>
 	/// <inheritdoc />
 	public RoadmapSettingsViewModel(ISettingsService? settingsService)
@@ -37,16 +47,24 @@ public class RoadmapSettingsViewModel :  ReactiveObject, IActivatableViewModel, 
 			{
 				OrganisationUrl = x.OrganisationUrl;
 				ConnectionToken = Decrypt(x.ConnectionTokenEncrypted);
+				ProjectId = x.ProjectId;
+				PlanId = x.PlanId;
 			});
 
-			this.WhenAnyValue(x => x.OrganisationUrl, x => x.ConnectionToken)
+			this.WhenAnyValue(
+					x => x.OrganisationUrl, 
+					x => x.ConnectionToken,
+					x => x.ProjectId,
+					x => x.PlanId)
 				.Skip(1)
 				.Subscribe(_ =>
 				{
 					Data.OnNext(new RoadmapSettings()
 					{
 						OrganisationUrl = OrganisationUrl,
-						ConnectionTokenEncrypted = Encrypt(ConnectionToken)
+						ConnectionTokenEncrypted = Encrypt(ConnectionToken),
+						ProjectId = ProjectId,
+						PlanId = PlanId
 					});
 				})
 				.DisposeWith(disposables);

@@ -18,9 +18,14 @@ public static class AzureQueries
 		var credentials = new VssBasicCredential("", token);
 		var connection = new VssConnection(new Uri(projectUrl), credentials);
 		await connection.ConnectAsync();
+
+		// try accessing projects to verify the token
+		var projectHttpClient = await connection.GetClientAsync<ProjectHttpClient>();
+		await projectHttpClient.GetProjects();
+
 		return connection;
 	}
-	
+
 	public static async Task<List<string>> GetAutomaticRoadmapTypes(VssConnection connection, string projectId)
 	{
 		var result = new List<string>();
@@ -50,8 +55,9 @@ public static class AzureQueries
 	{
 		var workItemTrackingProcessClient = connection.GetClient<WorkItemTrackingProcessHttpClient>();
 		string? processId = null;
-		TeamProject project = await GetProject(connection, projectId);
-		project.Capabilities.TryGetValue("processTemplate", out var processTemplate);
+		TeamProject? project = await GetProject(connection, projectId);
+		Dictionary<string, string>? processTemplate = null;
+		project?.Capabilities.TryGetValue("processTemplate", out processTemplate);
 		processTemplate?.TryGetValue("templateTypeId", out processId);
 		if (processId == null)
 		{
@@ -60,10 +66,16 @@ public static class AzureQueries
 		return await workItemTrackingProcessClient.GetWorkItemTypesAsync(new Guid(processId));
 	}
 
-	public static Task<TeamProject> GetProject(VssConnection connection, string projectId)
+	public static Task<TeamProject?> GetProject(VssConnection connection, string projectId)
 	{
 		var workClient = connection.GetClient<ProjectHttpClient>();
 		return workClient.GetProject(projectId, true);
+	}
+
+	public static Task<Plan?> GetPlan(VssConnection connection, string projectId, string planId)
+	{
+		var workClient = connection.GetClient<WorkHttpClient>();
+		return workClient.GetPlanAsync(projectId, planId);
 	}
 
 	public static async Task<RoadmapDefinition> GetRoadmapDefinition(VssConnection connection, string projectId, string planId)
@@ -149,17 +161,17 @@ public static class AzureQueries
 			State = x.Fields.TryGetWithDefault("System.State", "UNKNOWN"),
 			Type = x.Fields.TryGetWithDefault("System.WorkItemType", "UNKNOWN"),
 			AssignedTo = x.Fields.TryGetWithDefault<string, IdentityRef?>("System.AssignedTo", null)?.DisplayName ?? "",
-			Column = FindColumnForWorkItem(x, columns)
+			Iteration = FindColumnForWorkItem(x, columns)
 		}).ToList();
 
 		return new RoadmapEntries()
 		{
-			Columns = columns,
+			Iterations = columns,
 			RoadmapWorkItems = roadmapWorkItems
 		};
 	}
 
-	private static Column FindColumnForWorkItem(WorkItem workItem, List<Column> columns)
+	private static Iteration FindColumnForWorkItem(WorkItem workItem, List<Iteration> columns)
 	{
 		string? iterationPath = workItem.Fields.TryGetWithDefault<string, string?>("System.IterationPath", null);
 		if (iterationPath == null)
@@ -167,10 +179,10 @@ public static class AzureQueries
 			return columns.First();
 		}
 
-		Column? bestCandidate = null;
-		foreach (Column column in columns)
+		Iteration? bestCandidate = null;
+		foreach (Iteration column in columns)
 		{
-			if (iterationPath.StartsWith(column.Iteration) && (bestCandidate == null || bestCandidate.Iteration.Length < column.Iteration.Length))
+			if (iterationPath.StartsWith(column.IterationPath) && (bestCandidate == null || bestCandidate.IterationPath.Length < column.IterationPath.Length))
 			{
 				bestCandidate = column;
 			}
@@ -179,86 +191,18 @@ public static class AzureQueries
 		return bestCandidate ?? columns.First();
 	}
 
-	private static List<Column> CalculateColumns(List<TeamSettingsIteration> iterations)
+	private static List<Iteration> CalculateColumns(List<TeamSettingsIteration> iterations)
 	{
-		DateTime startDate = iterations.Where(x => x.Attributes.StartDate != null)
-			.Min(x => x.Attributes.StartDate!.Value);
-		DateTime endDate = iterations.Where(x => x.Attributes.StartDate != null)
-			.Min(x => x.Attributes.FinishDate!.Value);
-
 		return
 			iterations.Where(x => x.Attributes.StartDate != null && x.Attributes.FinishDate != null)
-				.Select(x => new Column()
+				.Select(x => new Iteration()
 				{
 					StartDate = x.Attributes.StartDate!.Value,
 					EndDate = x.Attributes.FinishDate!.Value,
-					Iteration = x.Path,
+					IterationPath = x.Path,
 					DisplayName = x.Name,
-					RelativeStart = InverseLerp(startDate.Ticks, endDate.Ticks, x.Attributes.StartDate!.Value.Ticks),
-					RelativeEnd = InverseLerp(startDate.Ticks, endDate.Ticks, x.Attributes.FinishDate!.Value.Ticks)
 				})
 				.ToList();
 	}
 
-	public static double InverseLerp(long a, long b, long value)
-	{
-		if (a != b)
-			return (double)(value - a) / (b - a);
-		else
-			return 0.0;
-	}	// public static Task<List<WebApiTeam>> GetAllTeams(VssConnection connection, Guid projectId)
-	// {
-	// 	// Create a team client
-	// 	var teamHttpClient = connection.GetClient<TeamHttpClient>();
-	//
-	// 	// Get Teams for the project
-	// 	return teamHttpClient.GetTeamsAsync(projectId.ToString());
-	// }
-	//
-	//    public static async Task<List<TeamSettingsIteration>> GetTeamSprints(VssConnection connection, Guid projectId, Guid teamId)
-	//    {
-	//     // Create a client to interact with work items and iterations
-	//     var workClient = connection.GetClient<WorkHttpClient>();
-	//
-	//     // Define a team context with the project id and team id
-	//     TeamContext teamContext = new TeamContext(projectId, teamId);
-	//
-	//     // Retrieve all the team's iterations.
-	//     List<TeamSettingsIteration> teamIterations = await workClient.GetTeamIterationsAsync(teamContext);
-	//
-	//     return teamIterations;
-	//    }
-	//     public static async Task<List<string>> GetTeamAreaPaths(VssConnection connection, Guid projectId, string teamId)
-	//    {
-	//        // Create a client to interact with work items and iterations
-	//        var workClient = connection.GetClient<WorkHttpClient>();
-	//
-	//        // Define a team context with the project id and team id
-	//        TeamContext teamContext = new TeamContext(projectId, teamId);
-	//
-	//        // Retrieve all the area paths.
-	//        var areaPaths = await workClient.Get(teamContext);
-	//
-	//        // Return all paths
-	//        return areaPaths.Select(ap => ap.Name).ToList();
-	//    }
-	// public static async Task<List<string>> GetTeamAreaPaths(VssConnection connection, Guid projectId, Guid teamId)
-	//    {
-	//        // Create a client to interact with work items and iterations
-	//        var workClient = connection.GetClient<WorkHttpClient>();
-	//
-	//        // Define a team context with the project id and team id
-	//        TeamContext teamContext = new TeamContext(projectId, teamId);
-	//
-	//        // Retrieve backlog configuration which includes team field settings
-	//        var backlogConfiguration = await workClient.GetBacklogConfigurationsAsync(teamContext);
-	//
-	//        // Retrieve area paths by finding "System.AreaPath" in team fields and select their default value
-	//        var areaPaths = backlogConfiguration.TeamFields
-	//            .Where(tf => tf.Name.Equals("System.AreaPath"))
-	//            .Select(tf => tf.DefaultValue)
-	//            .ToList();
-	//
-	//        return areaPaths;
-	//    }
 }

@@ -15,6 +15,10 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="6" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="6" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="6" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
@@ -28,6 +32,12 @@
 
             <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Text="Connection Token:" />
             <TextBox Grid.Row="2" Grid.Column="2" VerticalAlignment="Center" Name="ConnectionToken" PasswordChar="*"/>
+            
+            <TextBlock Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Text="Project ID:" />
+            <TextBox Grid.Row="4" Grid.Column="2" VerticalAlignment="Center" Name="Project" />
+            
+            <TextBlock Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" Text="Plan ID:" />
+            <TextBox Grid.Row="6" Grid.Column="2" VerticalAlignment="Center" Name="Plan" />
         </Grid>
     </StackPanel>
 </UserControl>

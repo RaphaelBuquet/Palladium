@@ -8,7 +8,37 @@
     <Design.DataContext>
         <azureDevOps:RoadmapViewModel />
     </Design.DataContext>
-    <StackPanel Orientation="Horizontal">
+
+    <UserControl.Resources>
+        <DataTemplate x:Key="{x:Type azureDevOps:IterationViewModel}"
+                      DataType="{x:Type azureDevOps:IterationViewModel}">
+            <!-- ReSharper disable Xaml.RedundantAttachedProperty -->
+            <Border
+                Background="{StaticResource Tone2}"
+                Grid.Column="{Binding StartColumnIndex}"
+                Grid.ColumnSpan="{Binding ColumnSpan}"
+                Grid.Row="{Binding ColumnSpan}"
+                CornerRadius="2"
+                Height="32">
+                <!-- ReSharper restore Xaml.RedundantAttachedProperty -->
+                <TextBlock
+                    Foreground="{StaticResource Tone1}"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Text="{Binding IterationName, Mode=OneTime}" 
+                    FontWeight="Medium"/>
+            </Border>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <StackPanel Orientation="Vertical">
         <TextBlock Text="{Binding ConnectionStatus}" />
+        <TextBlock Text="{Binding ProjectValidation}" />
+        <TextBlock Text="{Binding PlanValidation}" />
+        <ScrollViewer>
+            <StackPanel Orientation="Vertical">
+                <Grid Name="Grid" />
+            </StackPanel>
+        </ScrollViewer>
     </StackPanel>
 </UserControl>
