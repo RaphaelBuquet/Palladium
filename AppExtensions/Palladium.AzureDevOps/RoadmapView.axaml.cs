@@ -35,14 +35,19 @@ public partial class RoadmapView : ReactiveUserControl<RoadmapViewModel>, IDispo
 					{
 						Grid.RowDefinitions = rowDefinitions;
 						Grid.ColumnDefinitions = columnDefinitions;
-						
+
 						Grid.Children.Clear();
-						
+
 						PopulateIterations(roadmapGridViewModel);
 						PopulateWorkItems(roadmapGridViewModel);
 					}
 				})
 				.DisposeWith(disposables);
+
+			Disposable.Create(() =>
+			{
+				if (Grid is not null) Grid.Children.Clear();
+			}).DisposeWith(disposables);
 		});
 	}
 
@@ -79,7 +84,7 @@ public partial class RoadmapView : ReactiveUserControl<RoadmapViewModel>, IDispo
 			Grid.Children.AddRange(workItemControls!);
 		}
 	}
-	
+
 	/// <inheritdoc />
 	public void Dispose()
 	{
