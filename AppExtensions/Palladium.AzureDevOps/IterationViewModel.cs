@@ -4,15 +4,17 @@ namespace Palladium.AzureDevOps;
 
 public class IterationViewModel
 {
-	public IterationViewModel(Iteration columnChangeIteration)
+	public IterationViewModel(Iteration iteration)
 	{
-		IterationName = columnChangeIteration.DisplayName;
+		Iteration = iteration;
 	}
+	
+	public Iteration Iteration { get; }
 
-	public string IterationName { get; }
+	public string IterationName => Iteration.DisplayName;
 
-	public int StartColumnIndex { get; init; }
-	public int RowIndex { get; init; }
+	public int StartColumnIndex { get; set; }
+	public int RowIndex { get; set; }
 	public int EndColumnIndexExclusive { get; set; }
 	public int ColumnSpan => EndColumnIndexExclusive - StartColumnIndex;
 }

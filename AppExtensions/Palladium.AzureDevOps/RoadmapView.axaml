@@ -15,9 +15,9 @@
             <!-- ReSharper disable Xaml.RedundantAttachedProperty -->
             <Border
                 Background="{StaticResource Tone2}"
-                Grid.Column="{Binding StartColumnIndex}"
-                Grid.ColumnSpan="{Binding ColumnSpan}"
-                Grid.Row="{Binding ColumnSpan}"
+                Grid.Column="{Binding StartColumnIndex, Mode=OneTime}"
+                Grid.ColumnSpan="{Binding ColumnSpan, Mode=OneTime}"
+                Grid.Row="{Binding RowIndex, Mode=OneTime}"
                 CornerRadius="2"
                 Height="32">
                 <!-- ReSharper restore Xaml.RedundantAttachedProperty -->
@@ -27,6 +27,23 @@
                     VerticalAlignment="Center"
                     Text="{Binding IterationName, Mode=OneTime}" 
                     FontWeight="Medium"/>
+            </Border>
+        </DataTemplate>
+        <DataTemplate x:Key="{x:Type azureDevOps:WorkItemViewModel}"
+                      DataType="{x:Type azureDevOps:WorkItemViewModel}">
+            <!-- ReSharper disable Xaml.RedundantAttachedProperty -->
+            <Border
+                Background="{StaticResource Tone2}"
+                Grid.Column="{Binding StartColumnIndex, Mode=OneTime}"
+                Grid.ColumnSpan="{Binding ColumnSpan, Mode=OneTime}"
+                Grid.Row="{Binding RowIndex, Mode=OneTime}"
+                CornerRadius="2"
+                Height="32">
+                <!-- ReSharper restore Xaml.RedundantAttachedProperty -->
+                <TextBlock
+                    Foreground="{StaticResource Tone1}"
+                    Text="{Binding Title, Mode=OneTime}" 
+                    />
             </Border>
         </DataTemplate>
     </UserControl.Resources>

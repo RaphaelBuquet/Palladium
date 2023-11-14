@@ -214,12 +214,17 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 					{
 						return RoadmapGridViewModel.Empty();
 					}
-					RoadmapGridAlgorithms.IterationsGrid iterationsGrid = RoadmapGridAlgorithms.CreateIterationsGrid(x.Value.Iterations);
+					RoadmapGridAlgorithms.IterationsGrid iterationsGrid =
+						RoadmapGridAlgorithms.CreateIterationsGrid(x.Value.Iterations);
+					RoadmapGridAlgorithms.WorkItemGrid workItemsGrid =
+						RoadmapGridAlgorithms.CreateWorkItemsGrid(iterationsGrid.Rows.Count, iterationsGrid.IterationViewModels, x.Value.RoadmapWorkItems);
+
 					return new RoadmapGridViewModel()
 					{
 						Columns = iterationsGrid.Columns,
-						Rows = iterationsGrid.Rows,
-						IterationViewModels = iterationsGrid.IterationViewModels
+						Rows = iterationsGrid.Rows.Concat(workItemsGrid.Rows).ToList(),
+						IterationViewModels = iterationsGrid.IterationViewModels,
+						WorkItemViewModels = workItemsGrid.WorkItemViewModels
 					};
 				}).ToProperty(this, x => x.RoadmapGridViewModel)
 				.DisposeWith(disposables);
@@ -228,35 +233,52 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 
 	private void HandleDesignMode()
 	{
+		var m1 = new Iteration
+		{
+			DisplayName = "M1",
+			StartDate = new DateTime(2023, 11, 1),
+			EndDate = new DateTime(2023, 11, 30),
+			IterationPath = "Palladium\\M1"
+		};
+		var m2 = new Iteration
+		{
+			DisplayName = "M2",
+			StartDate = new DateTime(2023, 12, 1),
+			EndDate = new DateTime(2023, 12, 31),
+			IterationPath = "Palladium\\M2"
+		};
+		
 		roadmapGridViewModel = Observable.Return(new RoadmapGridViewModel()
 			{
 				IterationViewModels = new List<IterationViewModel>()
 				{
-					new (new Iteration
-						{
-							DisplayName = "M1",
-							StartDate = new DateTime(2023, 11, 1),
-							EndDate = new DateTime(2023, 11, 30),
-							IterationPath = "Palladium\\M1"
-						}
-					)
+					new (m1)
 					{
 						StartColumnIndex = 0,
 						RowIndex = 0,
 						EndColumnIndexExclusive = 1
 					},
-					new (new Iteration
-						{
-							DisplayName = "M2",
-							StartDate = new DateTime(2023, 12, 1),
-							EndDate = new DateTime(2023, 12, 31),
-							IterationPath = "Palladium\\M2"
-						}
-					)
+					new (m2)
 					{
 						StartColumnIndex = 2,
 						RowIndex = 0,
 						EndColumnIndexExclusive = 3
+					}
+				},
+				WorkItemViewModels = new List<WorkItemViewModel>()
+				{
+					new WorkItemViewModel(new RoadmapWorkItem()
+					{
+						AssignedTo = "John Smith",
+						Iteration = m1,
+						State = "In progress",
+						Title = "Example bug",
+						Type = "Bug"
+					})
+					{
+						StartColumnIndex = 0,
+						RowIndex = 1,
+						EndColumnIndexExclusive = 1
 					}
 				},
 				Columns = new List<GridLength>()
@@ -294,23 +316,4 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 		public required string? Validation;
 		public bool IsValid => Value != null && Validation == null;
 	}
-}
-
-public class RoadmapGridViewModel
-{
-	public static RoadmapGridViewModel Empty()
-	{
-		return new RoadmapGridViewModel()
-		{
-			IterationViewModels = new List<IterationViewModel>(),
-			Columns = new List<GridLength>(),
-			Rows = new List<GridLength>()
-		};
-	}
-
-	public required List<GridLength> Columns { get; init; }
-
-	public required List<GridLength> Rows { get; init; }
-
-	public required List<IterationViewModel> IterationViewModels { get; init; }
 }

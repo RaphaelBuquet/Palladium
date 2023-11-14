@@ -38,25 +38,48 @@ public partial class RoadmapView : ReactiveUserControl<RoadmapViewModel>, IDispo
 						
 						Grid.Children.Clear();
 						
-						Resources.TryGetValue(typeof(IterationViewModel), out object? iterationDataTemplateResource);
-						if (iterationDataTemplateResource is DataTemplate iterationDataTemplate)
-						{
-							var controls = roadmapGridViewModel.IterationViewModels
-								.Select(iterationViewModel =>
-								{
-									Control? control = iterationDataTemplate.Build(null);
-									if (control is not null) control.DataContext = iterationViewModel;
-									return control;
-								})
-								.Where(x => x != null);
-							Grid.Children.AddRange(controls!);
-						}
+						PopulateIterations(roadmapGridViewModel);
+						PopulateWorkItems(roadmapGridViewModel);
 					}
 				})
 				.DisposeWith(disposables);
 		});
 	}
 
+	private void PopulateIterations(RoadmapGridViewModel roadmapGridViewModel)
+	{
+		Resources.TryGetValue(typeof(IterationViewModel), out object? iterationDataTemplateResource);
+		if (iterationDataTemplateResource is DataTemplate dataTemplate)
+		{
+			var iterationControls = roadmapGridViewModel.IterationViewModels
+				.Select(vm =>
+				{
+					Control? control = dataTemplate.Build(null);
+					if (control is not null) control.DataContext = vm;
+					return control;
+				})
+				.Where(x => x != null);
+			Grid.Children.AddRange(iterationControls!);
+		}
+	}
+
+	private void PopulateWorkItems(RoadmapGridViewModel roadmapGridViewModel)
+	{
+		Resources.TryGetValue(typeof(WorkItemViewModel), out object? workItemDataTemplateResource);
+		if (workItemDataTemplateResource is DataTemplate dataTemplate)
+		{
+			var workItemControls = roadmapGridViewModel.WorkItemViewModels
+				.Select(vm =>
+				{
+					Control? control = dataTemplate.Build(null);
+					if (control is not null) control.DataContext = vm;
+					return control;
+				})
+				.Where(x => x != null);
+			Grid.Children.AddRange(workItemControls!);
+		}
+	}
+	
 	/// <inheritdoc />
 	public void Dispose()
 	{
