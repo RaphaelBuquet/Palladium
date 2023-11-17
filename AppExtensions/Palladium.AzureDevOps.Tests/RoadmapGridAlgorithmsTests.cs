@@ -66,6 +66,7 @@ public class RoadmapGridAlgorithmsTests
 		Assert.AreEqual(2, result.IterationViewModels.Count);
 		Assert.AreEqual(3, result.Columns.Count);
 		Assert.AreEqual(1, result.Rows.Count);
+		Assert.IsTrue(RoadmapGridAlgorithms.HasNoOverlaps(result.IterationViewModels));
 
 		Assert.AreEqual("M1", result.IterationViewModels[0].IterationName);
 		Assert.AreEqual(RoadmapGridAlgorithms.IterationRowOffset, result.IterationViewModels[0].RowIndex);
@@ -91,11 +92,6 @@ public class RoadmapGridAlgorithmsTests
         		EndDate = new DateTime(2023, 11, 30),
         		IterationPath = "Palladium\\Milestone\\Sprint"
         	},
-        	// {
-        	// 	StartColumnIndex = 1,
-        	// 	EndColumnIndexExclusive = 2,
-        	// 	RowIndex = 0
-        	// },
         	new Iteration
         	{
         		DisplayName = "Milestone",
@@ -103,16 +99,12 @@ public class RoadmapGridAlgorithmsTests
         		EndDate = new DateTime(2023, 12, 31),
         		IterationPath = "Palladium\\Milestone"
         	},
-        	// {
-        	// 	StartColumnIndex = 0,
-        	// 	EndColumnIndexExclusive = 3,
-        	// 	RowIndex = 0
-        	// }
         };
         RoadmapGridAlgorithms.IterationsGrid result = RoadmapGridAlgorithms.CreateIterationsGrid(iterations);
         Assert.AreEqual(2, result.IterationViewModels.Count);
         Assert.AreEqual(3, result.Columns.Count);
         Assert.AreEqual(2, result.Rows.Count);
+        Assert.IsTrue(RoadmapGridAlgorithms.HasNoOverlaps(result.IterationViewModels));
 
         var sprintIteration = result.IterationViewModels.Single(x => x.IterationName == "Sprint");
         Assert.AreEqual(RoadmapGridAlgorithms.IterationRowOffset + 1, sprintIteration.RowIndex); // lower iteration is pushed down
@@ -123,6 +115,44 @@ public class RoadmapGridAlgorithmsTests
         Assert.AreEqual(RoadmapGridAlgorithms.IterationRowOffset, milestoneIteration.RowIndex);
         Assert.AreEqual(RoadmapGridAlgorithms.IterationColumnOffset, milestoneIteration.StartColumnIndex);
         Assert.AreEqual(RoadmapGridAlgorithms.IterationColumnOffset + 3, milestoneIteration.EndColumnIndexExclusive);
+	}
+	
+	[Test]
+	public void CreateIterationsGrid_OverlappingIterations_WithSameIterationHierarchicalLevel()
+	{
+		// arrange
+        var iterations = new List<Iteration>()
+        {
+        	new Iteration
+        	{
+        		DisplayName = "Example1",
+        		StartDate = new DateTime(2023, 11, 1),
+        		EndDate = new DateTime(2023, 11, 30),
+        		IterationPath = "Palladium\\Example1"
+        	},
+        	new Iteration
+        	{
+        		DisplayName = "Example2",
+        		StartDate = new DateTime(2023, 11, 15),
+        		EndDate = new DateTime(2023, 12, 15),
+        		IterationPath = "Palladium\\Example2"
+        	},
+        };
+        RoadmapGridAlgorithms.IterationsGrid result = RoadmapGridAlgorithms.CreateIterationsGrid(iterations);
+        Assert.AreEqual(2, result.IterationViewModels.Count);
+        Assert.AreEqual(3, result.Columns.Count);
+        Assert.AreEqual(2, result.Rows.Count);
+        Assert.IsTrue(RoadmapGridAlgorithms.HasNoOverlaps(result.IterationViewModels));
+
+        var iteration1 = result.IterationViewModels.Single(x => x.IterationName == "Example1");
+        Assert.AreEqual(RoadmapGridAlgorithms.IterationRowOffset, iteration1.RowIndex);
+        Assert.AreEqual(RoadmapGridAlgorithms.IterationColumnOffset, iteration1.StartColumnIndex); 
+        Assert.AreEqual(RoadmapGridAlgorithms.IterationColumnOffset + 2, iteration1.EndColumnIndexExclusive);
+
+        var iteration2 = result.IterationViewModels.Single(x => x.IterationName == "Example2");
+        Assert.AreEqual(RoadmapGridAlgorithms.IterationRowOffset + 1, iteration2.RowIndex);
+        Assert.AreEqual(RoadmapGridAlgorithms.IterationColumnOffset + 1, iteration2.StartColumnIndex);
+        Assert.AreEqual(RoadmapGridAlgorithms.IterationColumnOffset + 3, iteration2.EndColumnIndexExclusive);
 	}
 
 	[Test]
