@@ -94,7 +94,7 @@ public static class AzureQueries
 			return new RoadmapDefinition();
 		}
 
-		var teamsContexts = Enumerable.Select<JsonTypes.TeamBacklogMapping, string>(settings.TeamBacklogMappings, x =>  x.TeamId)
+		var teamsContexts = settings.TeamBacklogMappings.Select(x =>  x.TeamId)
 			.Distinct()
 			.Select(x => new TeamContext(projectId, x))
 			.ToList();
@@ -191,6 +191,33 @@ public static class AzureQueries
 		return bestCandidate ?? columns.First();
 	}
 
+	public static async Task<Dictionary<WorkItemState, WorkItemStateColor>> GetStateColors(VssConnection connection, List<WorkItemTypeModel> workItemTypes, string projectId)
+	{
+		var workItemTrackingHttpClient = connection.GetClient<WorkItemTrackingHttpClient>();
+		var tasks = new List<Task<List<WorkItemStateColor>>>();
+		foreach (WorkItemTypeModel workItemType in workItemTypes)
+		{
+			tasks.Add(workItemTrackingHttpClient.GetWorkItemTypeStatesAsync(projectId, workItemType.Name));
+		}
+		await Task.WhenAll(tasks);
+
+		var result = new Dictionary<WorkItemState, WorkItemStateColor>();
+		for (var index = 0; index < tasks.Count; index++)
+		{
+			var task = tasks[index];
+			WorkItemTypeModel workItemType = workItemTypes[index];
+			foreach (WorkItemStateColor workItemStateColor in task.Result)
+			{
+				result[new WorkItemState()
+				{
+					State = workItemStateColor.Name,
+					WorkItemType = workItemType.Name
+				}] = workItemStateColor;
+			}
+		}
+		return result;
+	}
+
 	private static List<Iteration> CalculateColumns(List<TeamSettingsIteration> iterations)
 	{
 		return
@@ -200,9 +227,8 @@ public static class AzureQueries
 					StartDate = x.Attributes.StartDate!.Value,
 					EndDate = x.Attributes.FinishDate!.Value,
 					IterationPath = x.Path,
-					DisplayName = x.Name,
+					DisplayName = x.Name
 				})
 				.ToList();
 	}
-
 }

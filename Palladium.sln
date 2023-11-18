@@ -61,6 +61,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.AzureDevOps.Tests
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AzureDevOpsTools", "AppExtensions\AzureDevOpsTools\AzureDevOpsTools.csproj", "{34B8E15B-8618-43F2-B117-F1E4C84EFF54}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Palladium.Dev", "AppSource\Palladium.Dev\Palladium.Dev.csproj", "{C4D1EA5E-4973-46BE-A3EB-E2D15B11BEEC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Release|x64 = Release|x64
@@ -179,5 +181,9 @@ Global
 		{34B8E15B-8618-43F2-B117-F1E4C84EFF54}.Release|x64.Build.0 = Release|Any CPU
 		{34B8E15B-8618-43F2-B117-F1E4C84EFF54}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{34B8E15B-8618-43F2-B117-F1E4C84EFF54}.Debug|x64.Build.0 = Debug|Any CPU
+		{C4D1EA5E-4973-46BE-A3EB-E2D15B11BEEC}.Release|x64.ActiveCfg = Release|Any CPU
+		{C4D1EA5E-4973-46BE-A3EB-E2D15B11BEEC}.Release|x64.Build.0 = Release|Any CPU
+		{C4D1EA5E-4973-46BE-A3EB-E2D15B11BEEC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{C4D1EA5E-4973-46BE-A3EB-E2D15B11BEEC}.Debug|x64.Build.0 = Debug|Any CPU
 	EndGlobalSection
 EndGlobal

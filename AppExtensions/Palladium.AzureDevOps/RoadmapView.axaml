@@ -3,6 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:azureDevOps="clr-namespace:Palladium.AzureDevOps"
+             xmlns:converters="clr-namespace:Palladium.Converters;assembly=Palladium.Converters"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Palladium.AzureDevOps.RoadmapView">
     <Design.DataContext>
@@ -25,25 +26,48 @@
                     Foreground="{StaticResource Tone1}"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
-                    Text="{Binding IterationName, Mode=OneTime}" 
-                    FontWeight="Medium"/>
+                    Text="{Binding IterationName, Mode=OneTime}"
+                    FontWeight="Medium" />
             </Border>
         </DataTemplate>
         <DataTemplate x:Key="{x:Type azureDevOps:WorkItemViewModel}"
                       DataType="{x:Type azureDevOps:WorkItemViewModel}">
             <!-- ReSharper disable Xaml.RedundantAttachedProperty -->
             <Border
-                Background="{StaticResource Tone2}"
                 Grid.Column="{Binding StartColumnIndex, Mode=OneTime}"
                 Grid.ColumnSpan="{Binding ColumnSpan, Mode=OneTime}"
                 Grid.Row="{Binding RowIndex, Mode=OneTime}"
                 CornerRadius="2"
-                Height="32">
+                BorderThickness="4 0 0 0"
+                BorderBrush="{Binding 
+                    TypeColour, 
+                    Mode=OneTime,
+                    Converter={x:Static converters:ColorToSolidColorBrushConverter.Instance}}">
                 <!-- ReSharper restore Xaml.RedundantAttachedProperty -->
-                <TextBlock
-                    Foreground="{StaticResource Tone1}"
-                    Text="{Binding Title, Mode=OneTime}" 
-                    />
+                <Border
+                    BorderThickness="0 1 1 1"
+                    BorderBrush="{StaticResource Tone1-25}"
+                    Padding="4">
+                    <StackPanel Orientation="Vertical" Spacing="4">
+                        <TextBlock Foreground="{StaticResource Tone1}"
+                                   Text="{Binding WorkItem.Title, Mode=OneTime}" />
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                            <Ellipse Width="6"
+                                     Height="6"
+                                     Fill="{Binding 
+                                    StateColour, 
+                                    Mode=OneTime,
+                                    Converter={x:Static converters:ColorToSolidColorBrushConverter.Instance}}" />
+                            <TextBlock Foreground="{StaticResource Tone1}"
+                                       Text="{Binding WorkItem.State, Mode=OneTime}"
+                                       FontSize="12" />
+                        </StackPanel>
+                        <TextBlock Foreground="{StaticResource Tone1}"
+                                   Text="{Binding WorkItem.AssignedTo, Mode=OneTime}"
+                                   FontSize="12"
+                                   IsVisible="{Binding WorkItem.AssignedTo, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                    </StackPanel>
+                </Border>
             </Border>
         </DataTemplate>
     </UserControl.Resources>

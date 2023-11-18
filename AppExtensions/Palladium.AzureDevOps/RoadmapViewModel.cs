@@ -1,6 +1,7 @@
 ﻿using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Avalonia.Controls;
+using Avalonia.Media;
 using AzureDevOpsTools;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.Core.WebApi;
@@ -19,7 +20,13 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 	private readonly RoadmapSettingsViewModel? settings;
 	private ObservableAsPropertyHelper<string>? connectionStatus;
 
-	public string ConnectionStatus => connectionStatus?.Value ?? string.Empty;
+	private ObservableAsPropertyHelper<RoadmapGridViewModel>? roadmapGridViewModel;
+
+	private ObservableAsPropertyHelper<string?>? planValidation;
+
+	private ObservableAsPropertyHelper<string?>? projectValidation;
+
+	private ObservableAsPropertyHelper<string?>? workItemStylesValidation;
 
 	public RoadmapViewModel() : this(null, null)
 	{ }
@@ -91,11 +98,11 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 				{
 					if (tuple.connection == null)
 					{
-						return new ValidatedField { Value = null, Validation = null };
+						return new ValidatedField<string> { Value = null, Validation = null };
 					}
 					if (string.IsNullOrWhiteSpace(tuple.projectId))
 					{
-						return new ValidatedField
+						return new ValidatedField<string>
 						{
 							Value = null,
 							Validation = "Add project ID in application settings to display a roadmap."
@@ -106,13 +113,13 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 						TeamProject? project = await AzureQueries.GetProject(tuple.connection, tuple.projectId);
 						if (project == null)
 						{
-							return new ValidatedField()
+							return new ValidatedField<string>()
 							{
 								Value = null,
 								Validation = "Project could not be found."
 							};
 						}
-						return new ValidatedField
+						return new ValidatedField<string>
 						{
 							Value = tuple.projectId,
 							Validation = null
@@ -121,7 +128,7 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 					catch (Exception e)
 					{
 						log?.Emit(new EventId(), LogLevel.Information, "Failed to get project.", e);
-						return new ValidatedField
+						return new ValidatedField<string>
 						{
 							Value = null,
 							Validation = "Failed to get project."
@@ -143,11 +150,11 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 				{
 					if (tuple.connection == null || !tuple.project.IsValid)
 					{
-						return new ValidatedField { Value = null, Validation = null };
+						return new ValidatedField<string> { Value = null, Validation = null };
 					}
 					if (string.IsNullOrWhiteSpace(tuple.planId))
 					{
-						return new ValidatedField
+						return new ValidatedField<string>
 						{
 							Value = null,
 							Validation = "Add plan ID in application settings to display a roadmap."
@@ -158,13 +165,13 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 						Plan? plan = await AzureQueries.GetPlan(tuple.connection, tuple.project.Value!, tuple.planId);
 						if (plan == null)
 						{
-							return new ValidatedField()
+							return new ValidatedField<string>()
 							{
 								Value = null,
 								Validation = "Plan could not be found."
 							};
 						}
-						return new ValidatedField
+						return new ValidatedField<string>
 						{
 							Value = tuple.planId,
 							Validation = null
@@ -173,7 +180,7 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 					catch (Exception e)
 					{
 						log?.Emit(new EventId(), LogLevel.Information, "Failed to get plan.", e);
-						return new ValidatedField
+						return new ValidatedField<string>
 						{
 							Value = null,
 							Validation = "Failed to get plan."
@@ -187,8 +194,55 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 				.ToProperty(this, x => x.PlanValidation)
 				.DisposeWith(disposables);
 
-			var roadmapEntries = connectionObservable.CombineLatest(projectObservable).CombineLatest(planObservable)
-				.Select(x => (connection: x.First.First, project: x.First.Second, plan: x.Second))
+			var workItemStylesObservable = connectionObservable
+				.CombineLatest(projectObservable)
+				.Select(x => (connection: x.First, project: x.Second))
+				.SelectMany(async tuple =>
+				{
+					if (tuple.connection == null || !tuple.project.IsValid)
+					{
+						return new ValidatedField<WorkItemStyles> { Value = null, Validation = null };
+					}
+					try
+					{
+						var workItemTypes = await AzureQueries.GetWorkItemTypes(tuple.connection, tuple.project.Value!);
+						var stateColorsTask = await AzureQueries.GetStateColors(tuple.connection, workItemTypes, tuple.project.Value!);
+
+						var styles = new WorkItemStyles()
+						{
+							StateToColour = WorkItemStyles.BuildStateColourLookup(stateColorsTask),
+							TypeToColour = WorkItemStyles.BuildTypeColourLookup(workItemTypes)
+						};
+
+						return new ValidatedField<WorkItemStyles>
+						{
+							Value = styles,
+							Validation = null
+						};
+					}
+					catch (Exception e)
+					{
+						log?.Emit(new EventId(), LogLevel.Information, "Failed to get plan.", e);
+						return new ValidatedField<WorkItemStyles>
+						{
+							Value = null,
+							Validation = "Failed to get plan."
+						};
+					}
+				}).Replay(1);
+			workItemStylesObservable.Connect().DisposeWith(disposables);
+
+			workItemStylesValidation = workItemStylesObservable
+				.Select(x => x.Validation)
+				.ToProperty(this, x => x.WorkItemStylesValidation)
+				.DisposeWith(disposables);
+
+			var roadmapEntriesObservable = connectionObservable
+				.CombineLatest(
+					projectObservable,
+					planObservable,
+					(connection, project, plan)
+						=> (connection, project, plan))
 				.SelectMany(async tuple =>
 				{
 					if (tuple.connection == null || !tuple.project.IsValid || !tuple.plan.IsValid)
@@ -208,16 +262,25 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 					}
 				});
 
-			roadmapGridViewModel = roadmapEntries.Select(x =>
+			roadmapGridViewModel = roadmapEntriesObservable
+				.CombineLatest(workItemStylesObservable,
+					(roadmapEntries, workItemStyles)
+						=> (roadmapEntries, workItemStyles))
+				.Select(tuple =>
 				{
-					if (x == null)
+					if (tuple.roadmapEntries == null || !tuple.workItemStyles.IsValid)
 					{
 						return RoadmapGridViewModel.Empty();
 					}
 					RoadmapGridAlgorithms.IterationsGrid iterationsGrid =
-						RoadmapGridAlgorithms.CreateIterationsGrid(x.Value.Iterations);
+						RoadmapGridAlgorithms.CreateIterationsGrid(tuple.roadmapEntries.Value.Iterations);
 					RoadmapGridAlgorithms.WorkItemGrid workItemsGrid =
-						RoadmapGridAlgorithms.CreateWorkItemsGrid(iterationsGrid.Rows.Count, iterationsGrid.IterationViewModels, x.Value.RoadmapWorkItems);
+						RoadmapGridAlgorithms.CreateWorkItemsGrid(iterationsGrid.Rows.Count, iterationsGrid.IterationViewModels, tuple.roadmapEntries.Value.RoadmapWorkItems);
+
+					foreach (WorkItemViewModel workItemViewModel in workItemsGrid.WorkItemViewModels)
+					{
+						workItemViewModel.WorkItemStyles = tuple.workItemStyles.Value;
+					}
 
 					return new RoadmapGridViewModel()
 					{
@@ -230,6 +293,22 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 				.DisposeWith(disposables);
 		});
 	}
+
+	public string ConnectionStatus => connectionStatus?.Value ?? string.Empty;
+
+	/// <inheritdoc />
+	public ViewModelActivator Activator { get; } = new ();
+
+	public string? PlanValidation => planValidation?.Value;
+
+	public RoadmapGridViewModel RoadmapGridViewModel => roadmapGridViewModel?.Value ?? RoadmapGridViewModel.Empty();
+
+	public string? WorkItemStylesValidation => workItemStylesValidation?.Value;
+
+	public string? ProjectValidation => projectValidation?.Value;
+
+	/// <inheritdoc />
+	LifecycleActivator ILifecycleAwareViewModel.Activator { get; } = new ();
 
 	private void HandleDesignMode()
 	{
@@ -247,7 +326,19 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 			EndDate = new DateTime(2023, 12, 31),
 			IterationPath = "Palladium\\M2"
 		};
-		
+
+		var styles = new WorkItemStyles()
+		{
+			StateToColour = new Dictionary<WorkItemState, Color>
+			{
+				{ new WorkItemState() { State = "In progress", WorkItemType = "Bug" }, Colors.CornflowerBlue }
+			},
+			TypeToColour = new Dictionary<string, Color>()
+			{
+				{ "Bug", Colors.OrangeRed }
+			}
+		};
+
 		roadmapGridViewModel = Observable.Return(new RoadmapGridViewModel()
 			{
 				IterationViewModels = new List<IterationViewModel>()
@@ -278,7 +369,8 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 					{
 						StartColumnIndex = 0,
 						RowIndex = 1,
-						EndColumnIndexExclusive = 1
+						EndColumnIndexExclusive = 1,
+						WorkItemStyles = styles
 					}
 				},
 				Columns = new List<GridLength>()
@@ -287,32 +379,14 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 					new (1, GridUnitType.Star),
 					new (30, GridUnitType.Star)
 				},
-				Rows = new List<GridLength>() { GridLength.Auto }
+				Rows = new List<GridLength>() { GridLength.Auto, GridLength.Auto }
 			})
 			.ToProperty(this, x => x.RoadmapGridViewModel);
 	}
 
-	/// <inheritdoc />
-	public ViewModelActivator Activator { get; } = new ();
-
-	private ObservableAsPropertyHelper<RoadmapGridViewModel>? roadmapGridViewModel;
-
-	private ObservableAsPropertyHelper<string?>? planValidation;
-
-	public string? PlanValidation => planValidation?.Value;
-
-	public RoadmapGridViewModel RoadmapGridViewModel => roadmapGridViewModel?.Value ?? RoadmapGridViewModel.Empty();
-
-	private ObservableAsPropertyHelper<string?>? projectValidation;
-
-	public string? ProjectValidation => projectValidation?.Value;
-
-	/// <inheritdoc />
-	LifecycleActivator ILifecycleAwareViewModel.Activator { get; } = new ();
-
-	private struct ValidatedField
+	private struct ValidatedField<T>
 	{
-		public required string? Value;
+		public required T? Value;
 		public required string? Validation;
 		public bool IsValid => Value != null && Validation == null;
 	}
