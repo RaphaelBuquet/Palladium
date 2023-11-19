@@ -11,6 +11,25 @@
     </Design.DataContext>
 
     <UserControl.Resources>
+        <ControlTheme TargetType="Button" x:Key="WorkItemButtonTheme">
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <ContentPresenter x:Name="PART_ContentPresenter"
+                                      Foreground="{TemplateBinding Foreground}"
+                                      Background="{TemplateBinding Background}"
+                                      BorderBrush="{TemplateBinding BorderBrush}"
+                                      BorderThickness="{TemplateBinding BorderThickness}"
+                                      CornerRadius="{TemplateBinding CornerRadius}"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      Padding="{TemplateBinding Padding}"
+                                      RecognizesAccessKey="True"
+                                      HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                      VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                      Height="{TemplateBinding Height}" />
+                </ControlTemplate>
+            </Setter>
+        </ControlTheme>
         <DataTemplate x:Key="{x:Type azureDevOps:IterationViewModel}"
                       DataType="{x:Type azureDevOps:IterationViewModel}">
             <!-- ReSharper disable Xaml.RedundantAttachedProperty -->
@@ -20,7 +39,8 @@
                 Grid.ColumnSpan="{Binding ColumnSpan, Mode=OneTime}"
                 Grid.Row="{Binding RowIndex, Mode=OneTime}"
                 CornerRadius="2"
-                Height="32">
+                Height="32"
+                Margin="1 0 1 4">
                 <!-- ReSharper restore Xaml.RedundantAttachedProperty -->
                 <TextBlock
                     Foreground="{StaticResource Tone1}"
@@ -33,53 +53,72 @@
         <DataTemplate x:Key="{x:Type azureDevOps:WorkItemViewModel}"
                       DataType="{x:Type azureDevOps:WorkItemViewModel}">
             <!-- ReSharper disable Xaml.RedundantAttachedProperty -->
-            <Border
+            <Button
+                Theme="{StaticResource WorkItemButtonTheme}"
                 Grid.Column="{Binding StartColumnIndex, Mode=OneTime}"
                 Grid.ColumnSpan="{Binding ColumnSpan, Mode=OneTime}"
                 Grid.Row="{Binding RowIndex, Mode=OneTime}"
-                CornerRadius="2"
-                BorderThickness="4 0 0 0"
-                BorderBrush="{Binding 
-                    TypeColour, 
-                    Mode=OneTime,
-                    Converter={x:Static converters:ColorToSolidColorBrushConverter.Instance}}">
-                <!-- ReSharper restore Xaml.RedundantAttachedProperty -->
+                Command="{Binding OpenTicketCommand}"
+                CommandParameter="{Binding WorkItem}">
                 <Border
-                    BorderThickness="0 1 1 1"
-                    BorderBrush="{StaticResource Tone1-25}"
-                    Padding="4">
-                    <StackPanel Orientation="Vertical" Spacing="4">
-                        <TextBlock Foreground="{StaticResource Tone1}"
-                                   Text="{Binding WorkItem.Title, Mode=OneTime}" />
-                        <StackPanel Orientation="Horizontal" Spacing="4">
-                            <Ellipse Width="6"
-                                     Height="6"
-                                     Fill="{Binding 
+                    CornerRadius="2"
+                    BorderThickness="4 0 0 0"
+                    Margin="1 0 1 1"
+                    BorderBrush="{Binding 
+                        TypeColour, 
+                        Mode=OneTime,
+                        Converter={x:Static converters:ColorToSolidColorBrushConverter.Instance}}"
+                    Background="White">
+                    <!-- ReSharper restore Xaml.RedundantAttachedProperty -->
+                    <Border
+                        BorderThickness="0 1 1 1"
+                        BorderBrush="{StaticResource Tone1-25}"
+                        CornerRadius="0 2 2 0"
+                        Padding="4">
+                        <StackPanel Orientation="Vertical" Spacing="4">
+                            <TextBlock Foreground="{StaticResource Tone1}"
+                                       Text="{Binding WorkItem.Title, Mode=OneTime}" />
+                            <StackPanel Orientation="Horizontal" Spacing="4" ClipToBounds="True">
+                                <Ellipse Width="6"
+                                         Height="6"
+                                         Fill="{Binding 
                                     StateColour, 
                                     Mode=OneTime,
                                     Converter={x:Static converters:ColorToSolidColorBrushConverter.Instance}}" />
+                                <TextBlock Foreground="{StaticResource Tone1}"
+                                           Text="{Binding WorkItem.State, Mode=OneTime}"
+                                           FontSize="12" />
+                            </StackPanel>
                             <TextBlock Foreground="{StaticResource Tone1}"
-                                       Text="{Binding WorkItem.State, Mode=OneTime}"
-                                       FontSize="12" />
+                                       Text="{Binding WorkItem.AssignedTo, Mode=OneTime}"
+                                       FontSize="12"
+                                       IsVisible="{Binding WorkItem.AssignedTo, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
                         </StackPanel>
-                        <TextBlock Foreground="{StaticResource Tone1}"
-                                   Text="{Binding WorkItem.AssignedTo, Mode=OneTime}"
-                                   FontSize="12"
-                                   IsVisible="{Binding WorkItem.AssignedTo, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
-                    </StackPanel>
+                    </Border>
                 </Border>
-            </Border>
+            </Button>
         </DataTemplate>
     </UserControl.Resources>
 
-    <StackPanel Orientation="Vertical">
-        <TextBlock Text="{Binding ConnectionStatus}" />
-        <TextBlock Text="{Binding ProjectValidation}" />
-        <TextBlock Text="{Binding PlanValidation}" />
-        <ScrollViewer>
-            <StackPanel Orientation="Vertical">
-                <Grid Name="Grid" />
-            </StackPanel>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Vertical" Grid.Row="0" Margin="14 40 14 12">
+            <TextBlock Text="{Binding ConnectionStatus}"
+                       IsVisible="{Binding ConnectionStatus, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+            <TextBlock Text="{Binding ProjectValidation}"
+                       IsVisible="{Binding ProjectValidation, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+            <TextBlock Text="{Binding PlanValidation}"
+                       IsVisible="{Binding PlanValidation, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+        </StackPanel>
+        <!-- VerticalScrollBarVisibility and HorizontalScrollBarVisibility 
+            need to be explicitly Visible for it to work apparently -->
+        <ScrollViewer VerticalScrollBarVisibility="Visible"
+                      HorizontalScrollBarVisibility="Visible"
+                      Grid.Row="1">
+            <Grid Name="Grid" Margin="14 0 14 40" />
         </ScrollViewer>
-    </StackPanel>
+    </Grid>
 </UserControl>

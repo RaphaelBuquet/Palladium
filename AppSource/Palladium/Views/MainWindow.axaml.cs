@@ -11,6 +11,12 @@ public partial class MainWindow : Window
 		InitializeComponent();
 		// using event pattern instead of Reactive pattern for performance reasons
 		PropertyChanged += OnPropertyChanged;
+
+		// it's useful to have no min size in dev as it makes it easier to stress-test the app for overflow issues.
+#if !DEBUG
+		MinWidth = 600;
+		MinHeight = 300;
+#endif
 	}
 
 	private void OnPropertyChanged(object? sender, AvaloniaPropertyChangedEventArgs e)

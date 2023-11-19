@@ -142,6 +142,15 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 				.ToProperty(this, x => x.ProjectValidation)
 				.DisposeWith(disposables);
 
+			OpenInADOService openInADOService = new OpenInADOService(
+				projectObservable
+					.Select(x => x.Value)
+					.WhereNotNull(),
+				connectionObservable
+					.WhereNotNull()
+					.Select(x => x.Uri.AbsoluteUri)
+			).DisposeWith(disposables);
+
 			var planObservable = connectionObservable
 				.CombineLatest(projectObservable)
 				.CombineLatest(settingsDataObservable)
@@ -273,19 +282,22 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 						return RoadmapGridViewModel.Empty();
 					}
 					RoadmapGridAlgorithms.IterationsGrid iterationsGrid =
-						RoadmapGridAlgorithms.CreateIterationsGrid(tuple.roadmapEntries.Value.Iterations);
+						RoadmapGridAlgorithms.CreateIterationsGrid(10, tuple.roadmapEntries.Value.Iterations);
 					RoadmapGridAlgorithms.WorkItemGrid workItemsGrid =
 						RoadmapGridAlgorithms.CreateWorkItemsGrid(iterationsGrid.Rows.Count, iterationsGrid.IterationViewModels, tuple.roadmapEntries.Value.RoadmapWorkItems);
 
 					foreach (WorkItemViewModel workItemViewModel in workItemsGrid.WorkItemViewModels)
 					{
 						workItemViewModel.WorkItemStyles = tuple.workItemStyles.Value;
+						workItemViewModel.OpenTicketCommand = openInADOService.OpenInADOCommand;
 					}
 
 					return new RoadmapGridViewModel()
 					{
 						Columns = iterationsGrid.Columns,
-						Rows = iterationsGrid.Rows.Concat(workItemsGrid.Rows).ToList(),
+						Rows = iterationsGrid.Rows
+							.Concat(workItemsGrid.Rows)
+							.ToList(),
 						IterationViewModels = iterationsGrid.IterationViewModels,
 						WorkItemViewModels = workItemsGrid.WorkItemViewModels
 					};
@@ -358,8 +370,9 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 				},
 				WorkItemViewModels = new List<WorkItemViewModel>()
 				{
-					new WorkItemViewModel(new RoadmapWorkItem()
+					new (new RoadmapWorkItem()
 					{
+						Id = 1,
 						AssignedTo = "John Smith",
 						Iteration = m1,
 						State = "In progress",
@@ -368,7 +381,7 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 					})
 					{
 						StartColumnIndex = 0,
-						RowIndex = 1,
+						RowIndex = 2,
 						EndColumnIndexExclusive = 1,
 						WorkItemStyles = styles
 					}

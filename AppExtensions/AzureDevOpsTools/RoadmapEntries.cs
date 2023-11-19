@@ -16,6 +16,7 @@ public class Iteration
 
 public class RoadmapWorkItem
 {
+	public required int? Id { get; init; }
 	public required string Type { get; init; }
 	public required string Title { get; init; }
 	public required string State { get; init; }

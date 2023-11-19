@@ -4,13 +4,13 @@
     <Design.PreviewWith>
         <Border Padding="20">
             <StackPanel Orientation="Horizontal">
-                <Button>Hello</Button>
+                <Button Classes="GhostButton">Hello</Button>
                 <controls:IconButton IconData="{StaticResource SettingsIcon}" Content="Hello" />
             </StackPanel>
         </Border>
     </Design.PreviewWith>
 
-    <Style Selector="Button">
+    <Style Selector="Button.GhostButton">
         <Setter Property="Theme">
             <ControlTheme TargetType="Button">
                 <Setter Property="Template">

@@ -157,6 +157,7 @@ public static class AzureQueries
 
 		var roadmapWorkItems = workItems.Select(x => new RoadmapWorkItem()
 		{
+			Id = x.Id,
 			Title = x.Fields.TryGetWithDefault("System.Title", "UNKNOWN"),
 			State = x.Fields.TryGetWithDefault("System.State", "UNKNOWN"),
 			Type = x.Fields.TryGetWithDefault("System.WorkItemType", "UNKNOWN"),

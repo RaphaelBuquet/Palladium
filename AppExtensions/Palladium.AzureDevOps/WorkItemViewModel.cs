@@ -1,5 +1,7 @@
-﻿using Avalonia.Media;
+﻿using System.Reactive;
+using Avalonia.Media;
 using AzureDevOpsTools;
+using ReactiveUI;
 
 namespace Palladium.AzureDevOps;
 
@@ -16,6 +18,7 @@ public class WorkItemViewModel
 	public int RowIndex { get; init; }
 	public int EndColumnIndexExclusive { get; init; }
 	public int ColumnSpan => EndColumnIndexExclusive - StartColumnIndex;
+	public ReactiveCommand<RoadmapWorkItem, Unit>? OpenTicketCommand { get; set; }
 
 	public Color TypeColour
 	{

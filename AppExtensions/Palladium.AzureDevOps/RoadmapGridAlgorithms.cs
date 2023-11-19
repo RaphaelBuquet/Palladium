@@ -10,6 +10,189 @@ public static class RoadmapGridAlgorithms
 	public const int IterationRowOffset = 0;
 	public const int IterationColumnOffset = 0;
 
+	public static IterationsGrid CreateIterationsGrid(double scale, IReadOnlyList<Iteration> iterations)
+	{
+		// break down iterations into two objects, to represent the start and end of the iterations
+		var columnChanges = new List<ColumnChange>();
+		foreach (Iteration iteration in iterations)
+		{
+			int level = CalculateIterationLevel(iteration.IterationPath);
+			columnChanges.Add(new ColumnChange()
+			{
+				Iteration = iteration,
+				ChangeDate = iteration.StartDate,
+				IsStart = true,
+				Level = level
+			});
+			columnChanges.Add(new ColumnChange()
+			{
+				Iteration = iteration,
+				ChangeDate = iteration.EndDate,
+				IsStart = false,
+				Level = level
+			});
+		}
+
+		// order items
+		var orderedColumnChanges = columnChanges
+			.OrderBy(x => x.ChangeDate) // order by date: old->new
+			.ThenByDescending(x => x.IsStart) // order by: start->end (true first, false second)
+			.ThenBy(x => x.Level) // order by level: 0->1 (high level first)
+			.ThenBy(x => x.Iteration.DisplayName)
+			.ToImmutableList(); // finally order by name for determinism
+
+
+		// firstly compute the columns, so that we can later generate a grid to place the blocks on 
+		var items = new Dictionary<Iteration, IterationViewModel>();
+		var columns = new List<GridLength>();
+		{
+			int currentColumnIndex = IterationColumnOffset - 1;
+			var currentColumnTime = new DateTime(0);
+			foreach (ColumnChange columnChange in orderedColumnChanges)
+			{
+				if (currentColumnTime != columnChange.ChangeDate)
+				{
+					Debug.Assert(columnChange.ChangeDate > currentColumnTime);
+					if (currentColumnIndex >= 0)
+					{
+						double elapsedDays = (columnChange.ChangeDate - currentColumnTime).TotalDays;
+						columns.Add(new GridLength(elapsedDays * scale, GridUnitType.Pixel));
+					}
+					++currentColumnIndex;
+					currentColumnTime = columnChange.ChangeDate;
+				}
+
+				if (columnChange.IsStart)
+				{
+					int columnIndex = currentColumnIndex;
+					items[columnChange.Iteration] = new IterationViewModel(columnChange.Iteration)
+					{
+						StartColumnIndex = columnIndex
+					};
+				}
+				else
+				{
+					IterationViewModel vm = items[columnChange.Iteration];
+					vm.EndColumnIndexExclusive = currentColumnIndex;
+				}
+			}
+		}
+
+		var iterationViewModels = items.Values.ToList();
+
+		var columnCount = 0;
+		if (iterationViewModels.Count > 0)
+		{
+			columnCount = iterationViewModels.Max(x => x.EndColumnIndexExclusive);
+		}
+
+		// now create grids. each level is its own grid.
+		var levels = orderedColumnChanges
+			.Select(x => x.Level)
+			.Distinct()
+			.OrderBy(x => x) // shortest paths first
+			.ToList();
+		int rowCount = 0;
+		foreach (int level in levels)
+		{
+			var gridOccupancy = new GridOccupancy(columnCount);
+			var gridIterations = orderedColumnChanges
+				.Where(x => x.Level == level && x.IsStart)
+				.Select(x => x.Iteration);
+			int levelGridRowCount = 0;
+			foreach (Iteration iteration in gridIterations)
+			{
+				IterationViewModel vm = items[iteration];
+				var rowIndexInLevelGrid = gridOccupancy.FindRowForItem(vm.StartColumnIndex, vm.EndColumnIndexExclusive);
+				vm.RowIndex = rowIndexInLevelGrid + rowCount;
+				levelGridRowCount = int.Max(levelGridRowCount, rowIndexInLevelGrid + 1);
+			}
+
+			rowCount += levelGridRowCount;
+		}
+
+		return new IterationsGrid()
+		{
+			IterationViewModels = iterationViewModels,
+			Columns = columns,
+			Rows = Enumerable.Repeat(GridLength.Auto, rowCount).ToList()
+		};
+	}
+
+	public static WorkItemGrid CreateWorkItemsGrid(
+		int rowOffset,
+		IReadOnlyList<IterationViewModel> iterationViewModels,
+		IReadOnlyList<RoadmapWorkItem> roadmapWorkItems)
+	{
+		var lookup = iterationViewModels.ToDictionary(x => x.Iteration);
+
+		var columnCount = 0;
+		foreach (IterationViewModel iteration in iterationViewModels)
+		{
+			columnCount = int.Max(columnCount, iteration.EndColumnIndexExclusive);
+		}
+		var gridOccupancy = new GridOccupancy(columnCount);
+
+		var vms = new List<WorkItemViewModel>();
+		var orderedItems = roadmapWorkItems
+			.OrderByDescending(x =>  x.Iteration.EndDate.Subtract(x.Iteration.StartDate));
+		foreach (RoadmapWorkItem workItem in orderedItems)
+		{
+			IterationViewModel columnInfo = lookup[workItem.Iteration];
+			int rowForWorkItem = gridOccupancy.FindRowForItem(columnInfo.StartColumnIndex, columnInfo.EndColumnIndexExclusive);
+
+			var vm = new WorkItemViewModel(workItem)
+			{
+				StartColumnIndex = columnInfo.StartColumnIndex,
+				EndColumnIndexExclusive = columnInfo.EndColumnIndexExclusive,
+				RowIndex = rowForWorkItem + rowOffset
+			};
+			vms.Add(vm);
+		}
+
+		int rowCount = gridOccupancy.CalculateRowCount();
+		return new WorkItemGrid()
+		{
+			Rows = new List<GridLength>(Enumerable.Repeat(GridLength.Auto, rowCount)),
+			WorkItemViewModels = vms
+		};
+	}
+
+	public static int CalculateIterationLevel(string argPath)
+	{
+		return argPath.Count(x => x == '\\');
+	}
+
+	public static bool HasNoOverlaps(List<IterationViewModel> iterationViewModels)
+	{
+		var columnCount = 0;
+		var rowCount = 0;
+		foreach (IterationViewModel vm in iterationViewModels)
+		{
+			columnCount = int.Max(columnCount, vm.EndColumnIndexExclusive);
+			rowCount = int.Max(rowCount, vm.RowIndex + 1);
+		}
+
+		var grid = new bool[rowCount, columnCount];
+
+		var hasOverlap = false;
+
+		foreach (IterationViewModel vm in iterationViewModels)
+		{
+			for (int columnIndex = vm.StartColumnIndex; columnIndex < vm.EndColumnIndexExclusive; columnIndex++)
+			{
+				if (grid[vm.RowIndex, columnIndex])
+				{
+					hasOverlap = true;
+					break;
+				}
+				grid[vm.RowIndex, columnIndex] = true;
+			}
+		}
+
+		return !hasOverlap;
+	}
+
 	private struct ColumnChange
 	{
 		public Iteration Iteration;
@@ -145,188 +328,5 @@ public static class RoadmapGridAlgorithms
 		{
 			return bitfieldIndex * 64 + bitIndex;
 		}
-	}
-
-	public static IterationsGrid CreateIterationsGrid(IReadOnlyList<Iteration> iterations)
-	{
-		// break down iterations into two objects, to represent the start and end of the iterations
-		var columnChanges = new List<ColumnChange>();
-		foreach (Iteration iteration in iterations)
-		{
-			int level = CalculateIterationLevel(iteration.IterationPath);
-			columnChanges.Add(new ColumnChange()
-			{
-				Iteration = iteration,
-				ChangeDate = iteration.StartDate,
-				IsStart = true,
-				Level = level
-			});
-			columnChanges.Add(new ColumnChange()
-			{
-				Iteration = iteration,
-				ChangeDate = iteration.EndDate,
-				IsStart = false,
-				Level = level
-			});
-		}
-
-		// order items
-		var orderedColumnChanges = columnChanges
-			.OrderBy(x => x.ChangeDate) // order by date: old->new
-			.ThenByDescending(x => x.IsStart) // order by: start->end (true first, false second)
-			.ThenBy(x => x.Level) // order by level: 0->1 (high level first)
-			.ThenBy(x => x.Iteration.DisplayName)
-			.ToImmutableList(); // finally order by name for determinism
-
-
-		// firstly compute the columns, so that we can later generate a grid to place the blocks on 
-		var items = new Dictionary<Iteration, IterationViewModel>();
-		var columns = new List<GridLength>();
-		{
-			int currentColumnIndex = IterationColumnOffset - 1;
-			var currentColumnTime = new DateTime(0);
-			foreach (ColumnChange columnChange in orderedColumnChanges)
-			{
-				if (currentColumnTime != columnChange.ChangeDate)
-				{
-					Debug.Assert(columnChange.ChangeDate > currentColumnTime);
-					if (currentColumnIndex >= 0)
-					{
-						double elapsedDays = (columnChange.ChangeDate - currentColumnTime).TotalDays;
-						columns.Add(new GridLength(elapsedDays, GridUnitType.Star));
-					}
-					++currentColumnIndex;
-					currentColumnTime = columnChange.ChangeDate;
-				}
-
-				if (columnChange.IsStart)
-				{
-					int columnIndex = currentColumnIndex;
-					items[columnChange.Iteration] = new IterationViewModel(columnChange.Iteration)
-					{
-						StartColumnIndex = columnIndex
-					};
-				}
-				else
-				{
-					IterationViewModel vm = items[columnChange.Iteration];
-					vm.EndColumnIndexExclusive = currentColumnIndex;
-				}
-			}
-		}
-		
-		var iterationViewModels = items.Values.ToList();
-
-		var columnCount = 0;
-		if (iterationViewModels.Count > 0)
-		{
-			columnCount = iterationViewModels.Max(x => x.EndColumnIndexExclusive);
-		}
-
-		// now create grids. each level is its own grid.
-		var levels = orderedColumnChanges
-			.Select(x => x.Level)
-			.Distinct()
-			.OrderBy(x => x) // shortest paths first
-			.ToList();
-		int rowCount = 0;
-		foreach (int level in levels)
-		{
-			var gridOccupancy = new GridOccupancy(columnCount);
-			var gridIterations = orderedColumnChanges
-				.Where(x => x.Level == level && x.IsStart)
-				.Select(x => x.Iteration);
-			int levelGridRowCount = 0;
-			foreach (Iteration iteration in gridIterations)
-			{
-				IterationViewModel vm = items[iteration];
-				var rowIndexInLevelGrid = gridOccupancy.FindRowForItem(vm.StartColumnIndex, vm.EndColumnIndexExclusive);
-				vm.RowIndex = rowIndexInLevelGrid + rowCount;
-				levelGridRowCount = int.Max(levelGridRowCount, rowIndexInLevelGrid + 1);
-			}
-
-			rowCount += levelGridRowCount;
-		}
-
-		return new IterationsGrid()
-		{
-			IterationViewModels = iterationViewModels,
-			Columns = columns,
-			Rows = Enumerable.Repeat(GridLength.Auto, rowCount).ToList()
-		};
-	}
-
-	public static WorkItemGrid CreateWorkItemsGrid(
-		int rowOffset,
-		IReadOnlyList<IterationViewModel> iterationViewModels,
-		IReadOnlyList<RoadmapWorkItem> roadmapWorkItems)
-	{
-		var lookup = iterationViewModels.ToDictionary(x => x.Iteration);
-
-		var columnCount = 0;
-		foreach (IterationViewModel iteration in iterationViewModels)
-		{
-			columnCount = int.Max(columnCount, iteration.EndColumnIndexExclusive);
-		}
-		var gridOccupancy = new GridOccupancy(columnCount);
-
-		var vms = new List<WorkItemViewModel>();
-		var orderedItems = roadmapWorkItems
-			.OrderByDescending(x =>  x.Iteration.EndDate.Subtract(x.Iteration.StartDate));
-		foreach (RoadmapWorkItem workItem in orderedItems)
-		{
-			IterationViewModel columnInfo = lookup[workItem.Iteration];
-			int rowForWorkItem = gridOccupancy.FindRowForItem(columnInfo.StartColumnIndex, columnInfo.EndColumnIndexExclusive);
-
-			var vm = new WorkItemViewModel(workItem)
-			{
-				StartColumnIndex = columnInfo.StartColumnIndex,
-				EndColumnIndexExclusive = columnInfo.EndColumnIndexExclusive,
-				RowIndex = rowForWorkItem + rowOffset
-			};
-			vms.Add(vm);
-		}
-
-		int rowCount = gridOccupancy.CalculateRowCount();
-		return new WorkItemGrid()
-		{
-			Rows = new List<GridLength>(Enumerable.Repeat(GridLength.Auto, rowCount)),
-			WorkItemViewModels = vms
-		};
-	}
-
-	public static int CalculateIterationLevel(string argPath)
-	{
-		return argPath.Count(x => x == '\\');
-	}
-
-	public static bool HasNoOverlaps(List<IterationViewModel> iterationViewModels)
-	{
-		var columnCount = 0;
-		var rowCount = 0;
-		foreach (IterationViewModel vm in iterationViewModels)
-		{
-			columnCount = int.Max(columnCount, vm.EndColumnIndexExclusive);
-			rowCount = int.Max(rowCount, vm.RowIndex + 1);
-		}
-
-		var grid = new bool[rowCount, columnCount];
-
-		var hasOverlap = false;
-
-		foreach (IterationViewModel vm in iterationViewModels)
-		{
-			for (int columnIndex = vm.StartColumnIndex; columnIndex < vm.EndColumnIndexExclusive; columnIndex++)
-			{
-				if (grid[vm.RowIndex, columnIndex])
-				{
-					hasOverlap = true;
-					break;
-				}
-				grid[vm.RowIndex, columnIndex] = true;
-			}
-		}
-
-		return !hasOverlap;
 	}
 }
