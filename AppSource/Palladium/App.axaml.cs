@@ -14,10 +14,8 @@ using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 using Palladium.ActionsService;
 using Palladium.Builtin.ImmersiveGame;
-using Palladium.Builtin.SearchOverride;
 using Palladium.Builtin.Settings;
 using Palladium.Controls;
-using Palladium.Plugins;
 using Palladium.Logging;
 using Palladium.Settings;
 using Palladium.ViewModels;
@@ -103,7 +101,7 @@ public  class App : Application
 				PluginsLoader.LoadAll(actionsRepositoryService, log, settingsService);
 			}
 			catch (Exception e)
-			{ 
+			{
 				log?.Emit(new EventId(), LogLevel.Critical, "Fatal error occured when booting application", e);
 				desktop.Shutdown();
 			}
@@ -127,7 +125,7 @@ public  class App : Application
 
 	private void InstallActions(ActionsRepositoryService actionsRepositoryService, Log? log, SettingsService settingsService)
 	{
-		new SearchOverrideAction().Init(actionsRepositoryService, settingsService, log);
+		// new SearchOverrideAction().Init(actionsRepositoryService, settingsService, log);
 		actionsRepositoryService.Actions.AddOrUpdate(new ImmersiveGameAction(log).Description);
 	}
 
