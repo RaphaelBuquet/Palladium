@@ -92,18 +92,18 @@ public static class RoadmapGridAlgorithms
 			.Distinct()
 			.OrderBy(x => x) // shortest paths first
 			.ToList();
-		int rowCount = 0;
+		var rowCount = 0;
 		foreach (int level in levels)
 		{
 			var gridOccupancy = new GridOccupancy(columnCount);
 			var gridIterations = orderedColumnChanges
 				.Where(x => x.Level == level && x.IsStart)
 				.Select(x => x.Iteration);
-			int levelGridRowCount = 0;
+			var levelGridRowCount = 0;
 			foreach (Iteration iteration in gridIterations)
 			{
 				IterationViewModel vm = items[iteration];
-				var rowIndexInLevelGrid = gridOccupancy.FindRowForItem(vm.StartColumnIndex, vm.EndColumnIndexExclusive);
+				int rowIndexInLevelGrid = gridOccupancy.FindRowForItem(vm.StartColumnIndex, vm.EndColumnIndexExclusive);
 				vm.RowIndex = rowIndexInLevelGrid + rowCount;
 				levelGridRowCount = int.Max(levelGridRowCount, rowIndexInLevelGrid + 1);
 			}
@@ -214,6 +214,47 @@ public static class RoadmapGridAlgorithms
 		public required List<GridLength> Rows;
 	}
 
+	public struct ColumnOccupancy
+	{
+		public readonly List<ulong> Bitfields = new () { 0 };
+		public int NextAvailableBitfieldIndex = 0;
+		public int NextAvailableBitIndex = 0;
+
+		public ColumnOccupancy()
+		{ }
+
+		private void AddBitfield()
+		{
+			if (Bitfields.Count == NextAvailableBitfieldIndex + 1)
+			{
+				Bitfields.Add(0);
+			}
+			NextAvailableBitfieldIndex++;
+			NextAvailableBitIndex = 0;
+		}
+
+		public void MakeOccupied(int bitfieldIndex, int bitIndex)
+		{
+			Bitfields[bitfieldIndex] |= 1UL << bitIndex;
+
+			// update cache
+			do
+			{
+				NextAvailableBitIndex++;
+				if (NextAvailableBitIndex == 64)
+				{
+					AddBitfield();
+				}
+			} while (IsOccupied(NextAvailableBitfieldIndex, NextAvailableBitIndex));
+		}
+
+		public bool IsOccupied(int bitfieldIndex, int bitIndex)
+		{
+			ulong bitfield = Bitfields[bitfieldIndex];
+			return (bitfield & (1UL << bitIndex)) != 0;
+		}
+	}
+
 	/// <summary>
 	///     Grid of items with a height of 1 row, but with a variable width. The grid will try to fill gaps.
 	/// </summary>
@@ -222,42 +263,31 @@ public static class RoadmapGridAlgorithms
 		/// <summary>
 		///     Each list represents the occupancy of a column. Each ulong in the list represents 64 cells (bitfield).
 		/// </summary>
-		private readonly List<List<ulong>> grid;
+		private readonly ColumnOccupancy[] grid;
 
 		public GridOccupancy(int columnCount)
 		{
-			grid = new List<List<ulong>>(columnCount);
+			grid = new ColumnOccupancy[columnCount];
 			for (var i = 0; i < columnCount; i++)
 			{
-				grid.Add(new List<ulong>() { 0 });
+				grid[i] = new ColumnOccupancy();
 			}
-		}
-
-		private static bool IsOccupied(List<ulong> column, int bitfieldIndex, int bitIndex)
-		{
-			ulong bitfield = column[bitfieldIndex];
-			return (bitfield & (1UL << bitIndex)) != 0;
-		}
-
-		private static void MakeOccupied(List<ulong> column, int bitfieldIndex, int bitIndex)
-		{
-			column[bitfieldIndex] |= 1UL << bitIndex;
 		}
 
 		public int FindRowForItem(int columnStartIndex, int columnEndIndex)
 		{
-			var targetColumn = grid[columnStartIndex];
+			ref ColumnOccupancy targetColumn = ref grid[columnStartIndex];
 			var found = false;
-			var bitfieldIndex = 0;
-			var bitIndex = 0;
+			int bitfieldIndex = targetColumn.NextAvailableBitfieldIndex;
+			int bitIndex = targetColumn.NextAvailableBitIndex;
 
 			// look for the first available slot from the start
 			// using the start instead of the end because multi-column items may leave holes otherwise.
 			while (!found)
 			{
-				if (bitfieldIndex == targetColumn.Count)
+				if (bitfieldIndex == targetColumn.Bitfields.Count)
 				{
-					targetColumn.Add(0); // allocate another item if capacity is reached
+					targetColumn.Bitfields.Add(0); // allocate another item if capacity is reached
 				}
 				else if (bitIndex == 64)
 				{
@@ -266,7 +296,7 @@ public static class RoadmapGridAlgorithms
 				}
 				else
 				{
-					bool isOccupied = IsOccupied(targetColumn, bitfieldIndex, bitIndex);
+					bool isOccupied = targetColumn.IsOccupied(bitfieldIndex, bitIndex);
 					if (isOccupied)
 					{
 						bitIndex++;
@@ -278,8 +308,7 @@ public static class RoadmapGridAlgorithms
 						int columnIndex = columnStartIndex + 1;
 						while (available && columnIndex < columnEndIndex)
 						{
-							var column = grid[columnIndex];
-							bool adjacentCellOccupied = IsOccupied(column, bitfieldIndex, bitIndex);
+							bool adjacentCellOccupied = targetColumn.IsOccupied(bitfieldIndex, bitIndex);
 							if (adjacentCellOccupied)
 							{
 								available = false;
@@ -304,7 +333,8 @@ public static class RoadmapGridAlgorithms
 			// paint the grid
 			for (int columnIndex = columnStartIndex; columnIndex < columnEndIndex; columnIndex++)
 			{
-				MakeOccupied(grid[columnIndex], bitfieldIndex, bitIndex);
+				ref ColumnOccupancy column = ref grid[columnIndex];
+				column.MakeOccupied(bitfieldIndex, bitIndex);
 			}
 
 			return ConvertBitfieldIndexToRowIndex(bitfieldIndex, bitIndex);
@@ -313,12 +343,12 @@ public static class RoadmapGridAlgorithms
 		public int CalculateRowCount()
 		{
 			var max = 0;
-			for (int columnIndex = grid.Count - 1; columnIndex >= 0 ; columnIndex--)
+			for (int columnIndex = grid.Length - 1; columnIndex >= 0 ; columnIndex--)
 			{
 				var column = grid[columnIndex];
-				ulong lastBitfield = column[^1];
+				ulong lastBitfield = column.Bitfields[^1];
 				int highestBitIndex = 64 - 1 - System.Numerics.BitOperations.LeadingZeroCount(lastBitfield);
-				int rowCount = ConvertBitfieldIndexToRowIndex(column.Count - 1, highestBitIndex) + 1;
+				int rowCount = ConvertBitfieldIndexToRowIndex(column.Bitfields.Count - 1, highestBitIndex) + 1;
 				if (rowCount > max) max = rowCount;
 			}
 			return max;
