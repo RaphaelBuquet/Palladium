@@ -19,6 +19,8 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="6" />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="6" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <Grid.ColumnDefinitions>
@@ -38,6 +40,9 @@
             
             <TextBlock Grid.Row="6" Grid.Column="0" VerticalAlignment="Center" Text="Plan ID:" />
             <TextBox Grid.Row="6" Grid.Column="2" VerticalAlignment="Center" Name="Plan" />
+
+            <TextBlock Grid.Row="8" Grid.Column="0" VerticalAlignment="Center" Text="Query ID:" />
+            <TextBox Grid.Row="8" Grid.Column="2" VerticalAlignment="Center" Name="Query" />
         </Grid>
     </StackPanel>
 </UserControl>

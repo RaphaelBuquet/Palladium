@@ -78,20 +78,26 @@ public static class AzureQueries
 		return workClient.GetPlanAsync(projectId, planId);
 	}
 
-	public static async Task<RoadmapDefinition> GetRoadmapDefinition(VssConnection connection, string projectId, string planId)
+	public static async Task<QueryHierarchyItem?> GetQuery(VssConnection connection, string projectId, string queryId)
+	{
+		var witHttpClient = connection.GetClient<WorkItemTrackingHttpClient>();
+		QueryHierarchyItem? query = await witHttpClient.GetQueryAsync(projectId, queryId, QueryExpand.None);
+		return query;
+	}
+
+	public static async Task<RoadmapDefinition?> GetRoadmapDefinition(VssConnection connection, string projectId, Plan plan)
 	{
 		var workClient = connection.GetClient<WorkHttpClient>();
 		var teamHttpClient = connection.GetClient<TeamHttpClient>();
-		Plan? plan = await workClient.GetPlanAsync(projectId, planId);
 		if (plan.Properties is not JObject jObject)
 		{
-			return new RoadmapDefinition();
+			return null;
 		}
 
 		var settings = jObject.ToObject<JsonTypes.PlanSettings>();
 		if (settings == null)
 		{
-			return new RoadmapDefinition();
+			return null;
 		}
 
 		var teamsContexts = settings.TeamBacklogMappings.Select(x =>  x.TeamId)
@@ -117,7 +123,6 @@ public static class AzureQueries
 		return new RoadmapDefinition
 		{
 			ProjectId = projectId,
-			RoadmapId = planId,
 			PlanSettings = settings,
 			Iterations = iterations,
 			Teams = teams,
@@ -125,21 +130,10 @@ public static class AzureQueries
 		};
 	}
 
-	public static async Task<RoadmapEntries> GetRoadmapEntries(VssConnection connection, RoadmapDefinition roadmapDefinition, List<string> types)
+	public static async Task<RoadmapEntries> GetRoadmapEntries(VssConnection connection, RoadmapDefinition roadmapDefinition, Guid queryId)
 	{
 		var witHttpClient = connection.GetClient<WorkItemTrackingHttpClient>();
-		var areas = roadmapDefinition.AreasByTeam.Values
-			.SelectMany(list => list)
-			.Select(value => $"'{value.Value}'")
-			.Distinct();
-		types = types.Select(type => $"'{type}'")
-			.ToList();
-		string query = $"SELECT [System.Id] " +
-		               $"FROM WorkItems " +
-		               $"WHERE [System.WorkItemType] IN ({string.Join(", ", types)}) " +
-		               $"AND [System.AreaPath] IN ({string.Join(", ", areas)})";
-
-		WorkItemQueryResult? queryResults = await witHttpClient.QueryByWiqlAsync(new Wiql() { Query = query }, roadmapDefinition.ProjectId);
+		WorkItemQueryResult? queryResults = await witHttpClient.QueryByIdAsync(roadmapDefinition.ProjectId, queryId);
 
 		int[] workItemIds = queryResults.WorkItems.Select(x => x.Id).ToArray();
 		var getWorkItemsTasks = new List<Task<List<WorkItem>>>();

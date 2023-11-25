@@ -110,8 +110,8 @@
                        IsVisible="{Binding ConnectionStatus, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
             <TextBlock Text="{Binding ProjectValidation}"
                        IsVisible="{Binding ProjectValidation, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
-            <TextBlock Text="{Binding PlanValidation}"
-                       IsVisible="{Binding PlanValidation, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+            <TextBlock Text="{Binding QueryValidation}"
+                       IsVisible="{Binding QueryValidation, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
         </StackPanel>
         <!-- VerticalScrollBarVisibility and HorizontalScrollBarVisibility 
             need to be explicitly Visible for it to work apparently -->

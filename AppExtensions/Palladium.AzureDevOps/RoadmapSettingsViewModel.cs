@@ -2,7 +2,6 @@
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Runtime.CompilerServices;
 using Microsoft.AspNetCore.DataProtection;
 using Palladium.Settings;
 using ReactiveUI;
@@ -12,31 +11,9 @@ namespace Palladium.AzureDevOps;
 
 public class RoadmapSettingsViewModel :  ReactiveObject, IActivatableViewModel, ISettings<RoadmapSettings>
 {
-	[Reactive]
-	public string? OrganisationUrl { get; set; }
-
-	[Reactive]
-	public string? ConnectionToken { get ; set ; }
-	
-	[Reactive]
-	public string? ProjectId { get; set; }
-
-	[Reactive]
-	public string? PlanId { get; set; }
-
-	/// <inheritdoc />
-	public Guid SettingsGuid => new ("863E717F-C1ED-43CD-A54D-823F0A10BD5B");
-
-	/// <inheritdoc />
-	public SettingsText SettingsText => new()
-	{
-		Title = "Azure DevOps Roadmap Settings",
-		SectionTitle = "🗓️ Azure DevOps Roadmap Settings"
-	};
-	
 	public RoadmapSettingsViewModel() : this(null)
 	{ }
-	
+
 	/// <param name="settingsService"></param>
 	/// <inheritdoc />
 	public RoadmapSettingsViewModel(ISettingsService? settingsService)
@@ -49,13 +26,15 @@ public class RoadmapSettingsViewModel :  ReactiveObject, IActivatableViewModel, 
 				ConnectionToken = Decrypt(x.ConnectionTokenEncrypted);
 				ProjectId = x.ProjectId;
 				PlanId = x.PlanId;
+				QueryId = x.QueryId;
 			});
 
 			this.WhenAnyValue(
-					x => x.OrganisationUrl, 
+					x => x.OrganisationUrl,
 					x => x.ConnectionToken,
 					x => x.ProjectId,
-					x => x.PlanId)
+					x => x.PlanId,
+					x => x.QueryId)
 				.Skip(1)
 				.Subscribe(_ =>
 				{
@@ -64,11 +43,12 @@ public class RoadmapSettingsViewModel :  ReactiveObject, IActivatableViewModel, 
 						OrganisationUrl = OrganisationUrl,
 						ConnectionTokenEncrypted = Encrypt(ConnectionToken),
 						ProjectId = ProjectId,
-						PlanId = PlanId
+						PlanId = PlanId,
+						QueryId = QueryId
 					});
 				})
 				.DisposeWith(disposables);
-			
+
 			Data.Skip(1)
 				.DistinctUntilChanged()
 				.ObserveOn(RxApp.TaskpoolScheduler)
@@ -77,6 +57,41 @@ public class RoadmapSettingsViewModel :  ReactiveObject, IActivatableViewModel, 
 		});
 	}
 
+	[Reactive]
+	public string? OrganisationUrl { get; set; }
+
+	[Reactive]
+	public string? ConnectionToken { get ; set ; }
+
+	[Reactive]
+	public string? ProjectId { get; set; }
+
+	[Reactive]
+	public string? PlanId { get; set; }
+
+	[Reactive]
+	public string? QueryId { get; set; }
+
+	/// <inheritdoc />
+	public Guid SettingsGuid => new ("863E717F-C1ED-43CD-A54D-823F0A10BD5B");
+
+	/// <inheritdoc />
+	public SettingsText SettingsText => new()
+	{
+		Title = "Azure DevOps Roadmap Settings",
+		SectionTitle = "🗓️ Azure DevOps Roadmap Settings"
+	};
+
+	/// <inheritdoc />
+	public BehaviorSubject<RoadmapSettings> Data { get; } = new (new RoadmapSettings());
+
+	/// <inheritdoc />
+	public Subject<RoadmapSettings> DeserializedData { get; } = new ();
+
+
+	/// <inheritdoc />
+	ViewModelActivator IActivatableViewModel.Activator { get; } = new ();
+
 	[return: NotNullIfNotNull(nameof(connectionTokenEncrypted))]
 	internal static string? Decrypt(string? connectionTokenEncrypted)
 	{
@@ -84,7 +99,7 @@ public class RoadmapSettingsViewModel :  ReactiveObject, IActivatableViewModel, 
 		{
 			return null;
 		}
-		
+
 		IDataProtectionProvider dataProtectionProvider = DataProtectionProvider.Create("Palladium");
 		IDataProtector dataProtector = dataProtectionProvider.CreateProtector("Token");
 		return dataProtector.Unprotect(connectionTokenEncrypted);
@@ -97,19 +112,9 @@ public class RoadmapSettingsViewModel :  ReactiveObject, IActivatableViewModel, 
 		{
 			return null;
 		}
-		
+
 		IDataProtectionProvider dataProtectionProvider = DataProtectionProvider.Create("Palladium");
 		IDataProtector dataProtector = dataProtectionProvider.CreateProtector("Token");
 		return dataProtector.Protect(connectionToken);
 	}
-
-	/// <inheritdoc />
-	public BehaviorSubject<RoadmapSettings> Data { get; } = new (new RoadmapSettings());
-
-	/// <inheritdoc />
-	public Subject<RoadmapSettings> DeserializedData { get; } = new ();
-
-
-	/// <inheritdoc />
-	ViewModelActivator IActivatableViewModel.Activator { get; } = new ();
 }

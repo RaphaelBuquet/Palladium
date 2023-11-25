@@ -27,7 +27,7 @@ public class RoadmapSettingsTests
 		// assert
 		Assert.AreEqual(url, vm.OrganisationUrl);
 		Assert.AreEqual(url, vm.Data.Value.OrganisationUrl);
-		
+
 		// act
 		const string token = "hello world";
 		view.ConnectionToken.Text = token;
@@ -35,7 +35,7 @@ public class RoadmapSettingsTests
 		// assert
 		Assert.AreEqual(token, vm.ConnectionToken);
 		Assert.IsNotNull(vm.Data.Value.ConnectionTokenEncrypted);
-		
+
 		// act
 		const string projectId = "123";
 		view.Project.Text = projectId;
@@ -43,7 +43,7 @@ public class RoadmapSettingsTests
 		// assert
 		Assert.AreEqual(projectId, vm.ProjectId);
 		Assert.AreEqual(projectId, vm.Data.Value.ProjectId);
-		
+
 		// act
 		const string planId = "567";
 		view.Plan.Text = planId;
@@ -51,6 +51,14 @@ public class RoadmapSettingsTests
 		// assert
 		Assert.AreEqual(planId, vm.PlanId);
 		Assert.AreEqual(planId, vm.Data.Value.PlanId);
+
+		// act
+		const string queryId = "89";
+		view.Query.Text = queryId;
+
+		// assert
+		Assert.AreEqual(queryId, vm.QueryId);
+		Assert.AreEqual(queryId, vm.Data.Value.QueryId);
 	}
 
 	[AvaloniaTest]
@@ -73,26 +81,33 @@ public class RoadmapSettingsTests
 
 		// assert
 		Assert.AreEqual(url, view.OrganisationUrl.Text);
-		
+
 		// act
 		const string token = "hello world";
 		vm.Data.OnNext(vm.Data.Value with { ConnectionTokenEncrypted = RoadmapSettingsViewModel.Encrypt(token) });
 
 		// assert
 		Assert.IsNotNull(token, view.ConnectionToken.Text);
-		
+
 		// act
 		const string projectId = "123";
 		vm.Data.OnNext(vm.Data.Value with { ProjectId = projectId });
 
 		// assert
 		Assert.AreEqual(projectId, view.Project.Text);
-		
+
 		// act
 		const string planId = "567";
 		vm.Data.OnNext(vm.Data.Value with { PlanId = planId });
 
 		// assert
 		Assert.AreEqual(planId, view.Plan.Text);
+
+		// act
+		const string queryId = "89";
+		vm.Data.OnNext(vm.Data.Value with { QueryId = queryId });
+
+		// assert
+		Assert.AreEqual(queryId, view.Query.Text);
 	}
 }

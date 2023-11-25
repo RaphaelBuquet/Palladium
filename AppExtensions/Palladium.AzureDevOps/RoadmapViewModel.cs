@@ -1,11 +1,13 @@
 ﻿using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using Avalonia.Controls;
 using Avalonia.Media;
 using AzureDevOpsTools;
 using Microsoft.Extensions.Logging;
 using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.Work.WebApi;
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using Microsoft.VisualStudio.Services.Common;
 using Microsoft.VisualStudio.Services.WebApi;
 using Palladium.ExtensionFunctions;
@@ -17,12 +19,13 @@ namespace Palladium.AzureDevOps;
 
 public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycleAwareViewModel
 {
-	private readonly RoadmapSettingsViewModel? settings;
+	private readonly RoadmapSettingsViewModel? settingsViewModel;
 	private ObservableAsPropertyHelper<string>? connectionStatus;
 
 	private ObservableAsPropertyHelper<RoadmapGridViewModel>? roadmapGridViewModel;
 
 	private ObservableAsPropertyHelper<string?>? planValidation;
+	private ObservableAsPropertyHelper<string?>? queryValidation;
 
 	private ObservableAsPropertyHelper<string?>? projectValidation;
 
@@ -32,7 +35,7 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 	{ }
 
 	/// <inheritdoc />
-	public RoadmapViewModel(RoadmapSettingsViewModel? settings, Log? log)
+	public RoadmapViewModel(RoadmapSettingsViewModel? settingsViewModel, Log? log)
 	{
 		if (Design.IsDesignMode)
 		{
@@ -40,9 +43,9 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 			return;
 		}
 
-		this.settings = settings;
+		this.settingsViewModel = settingsViewModel;
 
-		var settingsDataObservable = this.settings?.Data ?? Observable.Return(new RoadmapSettings());
+		var settingsDataObservable = this.settingsViewModel?.Data ?? Observable.Return(new RoadmapSettings());
 
 		var connectionTasks = settingsDataObservable
 			.Select<RoadmapSettings, Task<VssConnection>?>(settingsData =>
@@ -58,32 +61,7 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 
 		this.WhenActivated(disposables =>
 		{
-			connectionStatus = connectionTasks
-				.AddTaskCompletion()
-				.Select(task =>
-				{
-					if (task == null)
-					{
-						return "Add credentials in application settings to connect to Azure DevOps.";
-					}
-					if (task.IsCompleted)
-					{
-						if (task.IsCompletedSuccessfully)
-						{
-							return "Connected.";
-						}
-						if (task.Exception != null)
-						{
-							log?.Emit(new EventId(), LogLevel.Information, "Connection to Azure DevOps failed.", task.Exception);
-							if (task.Exception.InnerExceptions.First() is VssUnauthorizedException)
-							{
-								return "Connection failed: the token is invalid.";
-							}
-						}
-						return "Connection failed.";
-					}
-					return "Connecting...";
-				}).ToProperty(this, x => x.ConnectionStatus)
+			connectionStatus = ConnectionStatusObservable(log, connectionTasks).ToProperty(this, x => x.ConnectionStatus)
 				.DisposeWith(disposables);
 
 			var connectionObservable = connectionTasks
@@ -91,50 +69,7 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 				.Where(task => task == null || task.IsCompletedSuccessfully)
 				.Select(task => task?.IsCompletedSuccessfully == true ? task.Result : null);
 
-			var projectObservable = connectionObservable
-				.CombineLatest(settingsDataObservable)
-				.Select(x => (connection: x.First, projectId: x.Second.ProjectId))
-				.SelectMany(async tuple =>
-				{
-					if (tuple.connection == null)
-					{
-						return new ValidatedField<string> { Value = null, Validation = null };
-					}
-					if (string.IsNullOrWhiteSpace(tuple.projectId))
-					{
-						return new ValidatedField<string>
-						{
-							Value = null,
-							Validation = "Add project ID in application settings to display a roadmap."
-						};
-					}
-					try
-					{
-						TeamProject? project = await AzureQueries.GetProject(tuple.connection, tuple.projectId);
-						if (project == null)
-						{
-							return new ValidatedField<string>()
-							{
-								Value = null,
-								Validation = "Project could not be found."
-							};
-						}
-						return new ValidatedField<string>
-						{
-							Value = tuple.projectId,
-							Validation = null
-						};
-					}
-					catch (Exception e)
-					{
-						log?.Emit(new EventId(), LogLevel.Information, "Failed to get project.", e);
-						return new ValidatedField<string>
-						{
-							Value = null,
-							Validation = "Failed to get project."
-						};
-					}
-				}).Replay(1);
+			var projectObservable = ProjectObservable(log, connectionObservable, settingsDataObservable);
 			projectObservable.Connect().DisposeWith(disposables);
 
 			projectValidation = projectObservable
@@ -151,51 +86,7 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 					.Select(x => x.Uri.AbsoluteUri)
 			).DisposeWith(disposables);
 
-			var planObservable = connectionObservable
-				.CombineLatest(projectObservable)
-				.CombineLatest(settingsDataObservable)
-				.Select(x => (connection: x.First.First, project: x.First.Second, planId: x.Second.PlanId))
-				.SelectMany(async tuple =>
-				{
-					if (tuple.connection == null || !tuple.project.IsValid)
-					{
-						return new ValidatedField<string> { Value = null, Validation = null };
-					}
-					if (string.IsNullOrWhiteSpace(tuple.planId))
-					{
-						return new ValidatedField<string>
-						{
-							Value = null,
-							Validation = "Add plan ID in application settings to display a roadmap."
-						};
-					}
-					try
-					{
-						Plan? plan = await AzureQueries.GetPlan(tuple.connection, tuple.project.Value!, tuple.planId);
-						if (plan == null)
-						{
-							return new ValidatedField<string>()
-							{
-								Value = null,
-								Validation = "Plan could not be found."
-							};
-						}
-						return new ValidatedField<string>
-						{
-							Value = tuple.planId,
-							Validation = null
-						};
-					}
-					catch (Exception e)
-					{
-						log?.Emit(new EventId(), LogLevel.Information, "Failed to get plan.", e);
-						return new ValidatedField<string>
-						{
-							Value = null,
-							Validation = "Failed to get plan."
-						};
-					}
-				}).Replay(1);
+			var planObservable = PlanObservable(log, connectionObservable, projectObservable, settingsDataObservable);
 			planObservable.Connect().DisposeWith(disposables);
 
 			planValidation = planObservable
@@ -203,42 +94,15 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 				.ToProperty(this, x => x.PlanValidation)
 				.DisposeWith(disposables);
 
-			var workItemStylesObservable = connectionObservable
-				.CombineLatest(projectObservable)
-				.Select(x => (connection: x.First, project: x.Second))
-				.SelectMany(async tuple =>
-				{
-					if (tuple.connection == null || !tuple.project.IsValid)
-					{
-						return new ValidatedField<WorkItemStyles> { Value = null, Validation = null };
-					}
-					try
-					{
-						var workItemTypes = await AzureQueries.GetWorkItemTypes(tuple.connection, tuple.project.Value!);
-						var stateColorsTask = await AzureQueries.GetStateColors(tuple.connection, workItemTypes, tuple.project.Value!);
+			var queryObservable = QueryObservable(log, connectionObservable, projectObservable, settingsDataObservable);
+			queryObservable.Connect().DisposeWith(disposables);
 
-						var styles = new WorkItemStyles()
-						{
-							StateToColour = WorkItemStyles.BuildStateColourLookup(stateColorsTask),
-							TypeToColour = WorkItemStyles.BuildTypeColourLookup(workItemTypes)
-						};
+			queryValidation = queryObservable
+				.Select(x => x.Validation)
+				.ToProperty(this, x => x.QueryValidation)
+				.DisposeWith(disposables);
 
-						return new ValidatedField<WorkItemStyles>
-						{
-							Value = styles,
-							Validation = null
-						};
-					}
-					catch (Exception e)
-					{
-						log?.Emit(new EventId(), LogLevel.Information, "Failed to get plan.", e);
-						return new ValidatedField<WorkItemStyles>
-						{
-							Value = null,
-							Validation = "Failed to get plan."
-						};
-					}
-				}).Replay(1);
+			var workItemStylesObservable = WorkItemStylesObservable(log, connectionObservable, projectObservable);
 			workItemStylesObservable.Connect().DisposeWith(disposables);
 
 			workItemStylesValidation = workItemStylesObservable
@@ -246,62 +110,10 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 				.ToProperty(this, x => x.WorkItemStylesValidation)
 				.DisposeWith(disposables);
 
-			var roadmapEntriesObservable = connectionObservable
-				.CombineLatest(
-					projectObservable,
-					planObservable,
-					(connection, project, plan)
-						=> (connection, project, plan))
-				.SelectMany(async tuple =>
-				{
-					if (tuple.connection == null || !tuple.project.IsValid || !tuple.plan.IsValid)
-					{
-						return null;
-					}
-					try
-					{
-						var roadmapTypes = await AzureQueries.GetAutomaticRoadmapTypes(tuple.connection, tuple.project.Value!);
-						RoadmapDefinition roadmapDefinition = await AzureQueries.GetRoadmapDefinition(tuple.connection, tuple.project.Value!, tuple.plan.Value!);
-						RoadmapEntries roadmapEntries = await AzureQueries.GetRoadmapEntries(tuple.connection, roadmapDefinition, roadmapTypes);
-						return (RoadmapEntries?)roadmapEntries;
-					}
-					catch (Exception)
-					{
-						return null;
-					}
-				});
+			var roadmapEntriesObservable = RoadmapEntriesObservable(log, connectionObservable, projectObservable, planObservable, settingsDataObservable);
 
-			roadmapGridViewModel = roadmapEntriesObservable
-				.CombineLatest(workItemStylesObservable,
-					(roadmapEntries, workItemStyles)
-						=> (roadmapEntries, workItemStyles))
-				.Select(tuple =>
-				{
-					if (tuple.roadmapEntries == null || !tuple.workItemStyles.IsValid)
-					{
-						return RoadmapGridViewModel.Empty();
-					}
-					RoadmapGridAlgorithms.IterationsGrid iterationsGrid =
-						RoadmapGridAlgorithms.CreateIterationsGrid(10, tuple.roadmapEntries.Value.Iterations);
-					RoadmapGridAlgorithms.WorkItemGrid workItemsGrid =
-						RoadmapGridAlgorithms.CreateWorkItemsGrid(iterationsGrid.Rows.Count, iterationsGrid.IterationViewModels, tuple.roadmapEntries.Value.RoadmapWorkItems);
-
-					foreach (WorkItemViewModel workItemViewModel in workItemsGrid.WorkItemViewModels)
-					{
-						workItemViewModel.WorkItemStyles = tuple.workItemStyles.Value;
-						workItemViewModel.OpenTicketCommand = openInADOService.OpenInADOCommand;
-					}
-
-					return new RoadmapGridViewModel()
-					{
-						Columns = iterationsGrid.Columns,
-						Rows = iterationsGrid.Rows
-							.Concat(workItemsGrid.Rows)
-							.ToList(),
-						IterationViewModels = iterationsGrid.IterationViewModels,
-						WorkItemViewModels = workItemsGrid.WorkItemViewModels
-					};
-				}).ToProperty(this, x => x.RoadmapGridViewModel)
+			roadmapGridViewModel = RoadmapGridViewModelObservable(roadmapEntriesObservable, workItemStylesObservable, openInADOService)
+				.ToProperty(this, x => x.RoadmapGridViewModel)
 				.DisposeWith(disposables);
 		});
 	}
@@ -313,6 +125,8 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 
 	public string? PlanValidation => planValidation?.Value;
 
+	public string? QueryValidation => queryValidation?.Value;
+
 	public RoadmapGridViewModel RoadmapGridViewModel => roadmapGridViewModel?.Value ?? RoadmapGridViewModel.Empty();
 
 	public string? WorkItemStylesValidation => workItemStylesValidation?.Value;
@@ -321,6 +135,290 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 
 	/// <inheritdoc />
 	LifecycleActivator ILifecycleAwareViewModel.Activator { get; } = new ();
+
+	private static IObservable<string> ConnectionStatusObservable(Log? log, IConnectableObservable<Task<VssConnection>?> connectionTasks)
+	{
+		return connectionTasks
+			.AddTaskCompletion()
+			.Select(task =>
+			{
+				if (task == null)
+				{
+					return "Add credentials in application settings to connect to Azure DevOps.";
+				}
+				if (task.IsCompleted)
+				{
+					if (task.IsCompletedSuccessfully)
+					{
+						return "Connected.";
+					}
+					if (task.Exception != null)
+					{
+						log?.Emit(new EventId(), LogLevel.Information, "Connection to Azure DevOps failed.", task.Exception);
+						if (task.Exception.InnerExceptions.First() is VssUnauthorizedException)
+						{
+							return "Connection failed: the token is invalid.";
+						}
+					}
+					return "Connection failed.";
+				}
+				return "Connecting...";
+			});
+	}
+
+	private static IConnectableObservable<ValidatedField<string>> ProjectObservable(Log? log, IObservable<VssConnection?> connectionObservable, IObservable<RoadmapSettings> settingsDataObservable)
+	{
+		return connectionObservable
+			.CombineLatest(settingsDataObservable)
+			.Select(x => (connection: x.First, projectId: x.Second.ProjectId))
+			.SelectMany(async tuple =>
+			{
+				if (tuple.connection == null)
+				{
+					return new ValidatedField<string> { Value = null, Validation = null };
+				}
+				if (string.IsNullOrWhiteSpace(tuple.projectId))
+				{
+					return new ValidatedField<string>
+					{
+						Value = null,
+						Validation = "Add project ID in application settings to display a roadmap."
+					};
+				}
+				try
+				{
+					TeamProject? project = await AzureQueries.GetProject(tuple.connection, tuple.projectId);
+					if (project == null)
+					{
+						return new ValidatedField<string>()
+						{
+							Value = null,
+							Validation = "Project could not be found."
+						};
+					}
+					return new ValidatedField<string>
+					{
+						Value = tuple.projectId,
+						Validation = null
+					};
+				}
+				catch (Exception e)
+				{
+					log?.Emit(new EventId(), LogLevel.Information, "Failed to get project.", e);
+					return new ValidatedField<string>
+					{
+						Value = null,
+						Validation = "Failed to get project."
+					};
+				}
+			}).Replay(1);
+	}
+
+	private static IConnectableObservable<ValidatedField<Plan>> PlanObservable(Log? log, IObservable<VssConnection?> connectionObservable, IConnectableObservable<ValidatedField<string>> projectObservable, IObservable<RoadmapSettings> settingsDataObservable)
+	{
+		return connectionObservable
+			.CombineLatest(projectObservable)
+			.CombineLatest(settingsDataObservable)
+			.Select(x => (connection: x.First.First, project: x.First.Second, planId: x.Second.PlanId))
+			.SelectMany(async tuple =>
+			{
+				if (tuple.connection == null || !tuple.project.IsValid)
+				{
+					return new ValidatedField<Plan> { Value = null, Validation = null };
+				}
+				if (string.IsNullOrWhiteSpace(tuple.planId))
+				{
+					return new ValidatedField<Plan>
+					{
+						Value = null,
+						Validation = "Add plan ID in application settings to display a roadmap."
+					};
+				}
+				try
+				{
+					Plan? plan = await AzureQueries.GetPlan(tuple.connection, tuple.project.Value!, tuple.planId);
+					if (plan == null)
+					{
+						return new ValidatedField<Plan>()
+						{
+							Value = null,
+							Validation = "Plan could not be found."
+						};
+					}
+					return new ValidatedField<Plan>
+					{
+						Value = plan,
+						Validation = null
+					};
+				}
+				catch (Exception e)
+				{
+					log?.Emit(new EventId(), LogLevel.Information, "Failed to get plan.", e);
+					return new ValidatedField<Plan>
+					{
+						Value = null,
+						Validation = "Failed to get plan."
+					};
+				}
+			}).Replay(1);
+	}
+
+	private static IConnectableObservable<ValidatedField<QueryHierarchyItem>> QueryObservable(Log? log, IObservable<VssConnection?> connectionObservable, IConnectableObservable<ValidatedField<string>> projectObservable, IObservable<RoadmapSettings> settingsDataObservable)
+	{
+		return connectionObservable
+			.CombineLatest(projectObservable)
+			.CombineLatest(settingsDataObservable)
+			.Select(x => (connection: x.First.First, project: x.First.Second, queryId: x.Second.QueryId))
+			.SelectMany(async tuple =>
+			{
+				if (tuple.connection == null || !tuple.project.IsValid)
+				{
+					return new ValidatedField<QueryHierarchyItem> { Value = null, Validation = null };
+				}
+				if (string.IsNullOrWhiteSpace(tuple.queryId))
+				{
+					return new ValidatedField<QueryHierarchyItem>
+					{
+						Value = null,
+						Validation = "Add query ID in application settings to display a roadmap."
+					};
+				}
+				try
+				{
+					QueryHierarchyItem? query = await AzureQueries.GetQuery(tuple.connection, tuple.project.Value!, tuple.queryId);
+					if (query == null)
+					{
+						return new ValidatedField<QueryHierarchyItem>()
+						{
+							Value = null,
+							Validation = "Query could not be found."
+						};
+					}
+					return new ValidatedField<QueryHierarchyItem>
+					{
+						Value = query,
+						Validation = null
+					};
+				}
+				catch (Exception e)
+				{
+					log?.Emit(new EventId(), LogLevel.Information, "Failed to get query.", e);
+					return new ValidatedField<QueryHierarchyItem>
+					{
+						Value = null,
+						Validation = "Failed to get query."
+					};
+				}
+			}).Replay(1);
+	}
+
+	private static IConnectableObservable<ValidatedField<WorkItemStyles>> WorkItemStylesObservable(Log? log, IObservable<VssConnection?> connectionObservable, IConnectableObservable<ValidatedField<string>> projectObservable)
+	{
+		return connectionObservable
+			.CombineLatest(projectObservable)
+			.Select(x => (connection: x.First, project: x.Second))
+			.SelectMany(async tuple =>
+			{
+				if (tuple.connection == null || !tuple.project.IsValid)
+				{
+					return new ValidatedField<WorkItemStyles> { Value = null, Validation = null };
+				}
+				try
+				{
+					var workItemTypes = await AzureQueries.GetWorkItemTypes(tuple.connection, tuple.project.Value!);
+					var stateColorsTask = await AzureQueries.GetStateColors(tuple.connection, workItemTypes, tuple.project.Value!);
+
+					var styles = new WorkItemStyles()
+					{
+						StateToColour = WorkItemStyles.BuildStateColourLookup(stateColorsTask),
+						TypeToColour = WorkItemStyles.BuildTypeColourLookup(workItemTypes)
+					};
+
+					return new ValidatedField<WorkItemStyles>
+					{
+						Value = styles,
+						Validation = null
+					};
+				}
+				catch (Exception e)
+				{
+					log?.Emit(new EventId(), LogLevel.Information, "Failed to get styles.", e);
+					return new ValidatedField<WorkItemStyles>
+					{
+						Value = null,
+						Validation = "Failed to get styles."
+					};
+				}
+			}).Replay(1);
+	}
+
+	private static IObservable<RoadmapEntries?> RoadmapEntriesObservable(Log? log, IObservable<VssConnection?> connectionObservable, IConnectableObservable<ValidatedField<string>> projectObservable, IConnectableObservable<ValidatedField<Plan>> planObservable, IObservable<RoadmapSettings> settingsDataObservable)
+	{
+		return connectionObservable
+			.CombineLatest(
+				projectObservable,
+				planObservable,
+				settingsDataObservable,
+				(connection, project, plan, roadmapSettings)
+					=> (connection, project, plan, roadmapSettings))
+			.SelectMany(async tuple =>
+			{
+				if (tuple.connection == null || !tuple.project.IsValid || !tuple.plan.IsValid || string.IsNullOrEmpty(tuple.roadmapSettings.QueryId))
+				{
+					return null;
+				}
+				try
+				{
+					var roadmapDefinition = await AzureQueries.GetRoadmapDefinition(tuple.connection, tuple.project.Value!, tuple.plan.Value!);
+					if (roadmapDefinition == null)
+					{
+						return null;
+					}
+					RoadmapEntries roadmapEntries = await AzureQueries.GetRoadmapEntries(tuple.connection, roadmapDefinition.Value, new Guid(tuple.roadmapSettings.QueryId));
+					return (RoadmapEntries?)roadmapEntries;
+				}
+				catch (Exception e)
+				{
+					log?.Emit(new EventId(), LogLevel.Information, "Failed to get roadmap entries.", e);
+					return null;
+				}
+			});
+	}
+
+	private static IObservable<RoadmapGridViewModel> RoadmapGridViewModelObservable(IObservable<RoadmapEntries?> roadmapEntriesObservable, IConnectableObservable<ValidatedField<WorkItemStyles>> workItemStylesObservable, OpenInADOService openInADOService)
+	{
+		return roadmapEntriesObservable
+			.CombineLatest(workItemStylesObservable,
+				(roadmapEntries, workItemStyles)
+					=> (roadmapEntries, workItemStyles))
+			.Select(tuple =>
+			{
+				if (tuple.roadmapEntries == null || !tuple.workItemStyles.IsValid)
+				{
+					return RoadmapGridViewModel.Empty();
+				}
+				RoadmapGridAlgorithms.IterationsGrid iterationsGrid =
+					RoadmapGridAlgorithms.CreateIterationsGrid(10, tuple.roadmapEntries.Value.Iterations);
+				RoadmapGridAlgorithms.WorkItemGrid workItemsGrid =
+					RoadmapGridAlgorithms.CreateWorkItemsGrid(iterationsGrid.Rows.Count, iterationsGrid.IterationViewModels, tuple.roadmapEntries.Value.RoadmapWorkItems);
+
+				foreach (WorkItemViewModel workItemViewModel in workItemsGrid.WorkItemViewModels)
+				{
+					workItemViewModel.WorkItemStyles = tuple.workItemStyles.Value;
+					workItemViewModel.OpenTicketCommand = openInADOService.OpenInADOCommand;
+				}
+
+				return new RoadmapGridViewModel()
+				{
+					Columns = iterationsGrid.Columns,
+					Rows = iterationsGrid.Rows
+						.Concat(workItemsGrid.Rows)
+						.ToList(),
+					IterationViewModels = iterationsGrid.IterationViewModels,
+					WorkItemViewModels = workItemsGrid.WorkItemViewModels
+				};
+			});
+	}
 
 	private void HandleDesignMode()
 	{
