@@ -5,7 +5,7 @@ using ReactiveUI;
 
 namespace Palladium.AzureDevOps;
 
-public class WorkItemViewModel
+public class WorkItemViewModel : IGridItemViewModel
 {
 	public WorkItemViewModel(RoadmapWorkItem workItem)
 	{

@@ -1,0 +1,39 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:Palladium.Controls;assembly=Palladium.Controls"
+             xmlns:tests="clr-namespace:Palladium.Controls.Tests"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Palladium.Controls.Tests.VirtualizingGridUseCase"
+             x:DataType="tests:ItemsViewModel">
+    <ItemsControl x:Name="ItemsControl"
+                  ItemsSource="{CompiledBinding DataType=tests:ItemsViewModel, Path=Items}">
+        <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+                <controls:VirtualizingGrid />
+            </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.Styles>
+            <Style x:DataType="tests:ItemViewModel"
+                   Selector="ItemsControl controls|VirtualizingGrid > Grid > ContentPresenter">
+                <Setter Property="Grid.Column" Value="{CompiledBinding ColumnIndex}" />
+                <Setter Property="Grid.Row" Value="{CompiledBinding RowIndex}" />
+                <Setter Property="Grid.ColumnSpan" Value="{CompiledBinding ColumnSpan}" />
+                <Setter Property="Grid.RowSpan" Value="{CompiledBinding RowSpan}" />
+            </Style>
+        </ItemsControl.Styles>
+        <ItemsControl.ItemTemplate>
+            <DataTemplate DataType="tests:ItemViewModel">
+                <Border Width="{CompiledBinding Width}"
+                        Height="{CompiledBinding Height}"
+                        Grid.Column="{CompiledBinding ColumnIndex}"
+                        Grid.Row="{CompiledBinding RowIndex}"
+                        Grid.ColumnSpan="{CompiledBinding ColumnSpan}"
+                        Grid.RowSpan="{CompiledBinding RowSpan}"
+                        Background="Fuchsia"
+                        BorderThickness="0" />
+            </DataTemplate>
+        </ItemsControl.ItemTemplate>
+    </ItemsControl>
+</UserControl>

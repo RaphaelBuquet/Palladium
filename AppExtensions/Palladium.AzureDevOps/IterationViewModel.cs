@@ -2,13 +2,13 @@
 
 namespace Palladium.AzureDevOps;
 
-public class IterationViewModel
+public class IterationViewModel : IGridItemViewModel
 {
 	public IterationViewModel(Iteration iteration)
 	{
 		Iteration = iteration;
 	}
-	
+
 	public Iteration Iteration { get; }
 
 	public string IterationName => Iteration.DisplayName;

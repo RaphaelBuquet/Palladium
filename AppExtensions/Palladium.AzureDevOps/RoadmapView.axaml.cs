@@ -1,8 +1,8 @@
 ﻿using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Avalonia.Controls;
-using Avalonia.Markup.Xaml.Templates;
 using Avalonia.ReactiveUI;
+using Palladium.Controls;
 using Palladium.ExtensionFunctions.Lifecycle;
 using ReactiveUI;
 
@@ -25,59 +25,30 @@ public partial class RoadmapView : ReactiveUserControl<RoadmapViewModel>, IDispo
 					var columnDefinitions = new ColumnDefinitions();
 					rowDefinitions.AddRange(roadmapGridViewModel.Rows.Select(gridLength => new RowDefinition(gridLength)));
 					columnDefinitions.AddRange(roadmapGridViewModel.Columns.Select(gridLength => new ColumnDefinition(gridLength)));
-					if (Grid is not null)
+					if (VirtualizingGrid is not null)
 					{
-						Grid.RowDefinitions = rowDefinitions;
-						Grid.ColumnDefinitions = columnDefinitions;
+						VirtualizingGrid.RowDefinitions = rowDefinitions;
+						VirtualizingGrid.ColumnDefinitions = columnDefinitions;
 
-						Grid.Children.Clear();
-
-						PopulateIterations(roadmapGridViewModel);
-						PopulateWorkItems(roadmapGridViewModel);
+						var viewModels = new List<object>();
+						viewModels.AddRange(roadmapGridViewModel.IterationViewModels);
+						viewModels.AddRange(roadmapGridViewModel.WorkItemViewModels);
+						ItemsControl.ItemsSource = viewModels;
 					}
 				})
 				.DisposeWith(disposables);
 
 			Disposable.Create(() =>
 			{
-				if (Grid is not null) Grid.Children.Clear();
+				if (ItemsControl is not null)
+				{
+					ItemsControl.ItemsSource = null;
+				}
 			}).DisposeWith(disposables);
 		});
 	}
 
-	private void PopulateIterations(RoadmapGridViewModel roadmapGridViewModel)
-	{
-		Resources.TryGetValue(typeof(IterationViewModel), out object? iterationDataTemplateResource);
-		if (iterationDataTemplateResource is DataTemplate dataTemplate)
-		{
-			var iterationControls = roadmapGridViewModel.IterationViewModels
-				.Select(vm =>
-				{
-					Control? control = dataTemplate.Build(null);
-					if (control is not null) control.DataContext = vm;
-					return control;
-				})
-				.Where(x => x != null);
-			Grid.Children.AddRange(iterationControls!);
-		}
-	}
-
-	private void PopulateWorkItems(RoadmapGridViewModel roadmapGridViewModel)
-	{
-		Resources.TryGetValue(typeof(WorkItemViewModel), out object? workItemDataTemplateResource);
-		if (workItemDataTemplateResource is DataTemplate dataTemplate)
-		{
-			var workItemControls = roadmapGridViewModel.WorkItemViewModels
-				.Select(vm =>
-				{
-					Control? control = dataTemplate.Build(null);
-					if (control is not null) control.DataContext = vm;
-					return control;
-				})
-				.Where(x => x != null);
-			Grid.Children.AddRange(workItemControls!);
-		}
-	}
+	private VirtualizingGrid? VirtualizingGrid => ItemsControl?.ItemsPanelRoot as VirtualizingGrid;
 
 	/// <inheritdoc />
 	public void Dispose()
