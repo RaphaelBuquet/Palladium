@@ -1,40 +1,32 @@
-﻿using System.Diagnostics;
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Generators;
-using Avalonia.Input;
+using Avalonia.Controls.Templates;
+using ReactiveUI;
 
 namespace Palladium.Controls;
 
-// Currently this inherits VirtualizingPanel. But perhaps in the future it could inherit Grid, 
-// and add functionality similar to ItemsControl, like ItemsSource and support for the DataTemplates.
-public class VirtualizingGrid : VirtualizingPanel
+public class VirtualizingGrid : Grid
 {
 	private static readonly AttachedProperty<object?> RecycleKeyProperty =
 		AvaloniaProperty.RegisterAttached<VirtualizingGrid, Control, object?>("RecycleKey");
 
-	private static readonly object s_itemIsItsOwnContainer = new ();
-
-	private readonly Dictionary<object, Stack<Control>>? _recyclePool = new ();
-
-	private readonly Grid internalGrid = new ();
+	public static readonly StyledProperty<IReadOnlyList<object>> ItemsSourceProperty =
+		AvaloniaProperty.Register<ItemsControl, IReadOnlyList<object>>(nameof(ItemsSource), new List<object>());
 
 	/// <inheritdoc />
 	public VirtualizingGrid()
 	{
-		Children.Add(internalGrid);
+		this.WhenAnyValue(x => x.ItemsSource)
+			.Subscribe(_ =>
+			{
+				Children.Clear(); // they will be recreated on the next measure
+			});
 	}
 
-	public ColumnDefinitions ColumnDefinitions
+	public IReadOnlyList<object> ItemsSource
 	{
-		get => internalGrid.ColumnDefinitions;
-		set => internalGrid.ColumnDefinitions = value;
-	}
-
-	public RowDefinitions RowDefinitions
-	{
-		get => internalGrid.RowDefinitions;
-		set => internalGrid.RowDefinitions = value;
+		get => GetValue(ItemsSourceProperty);
+		set => SetValue(ItemsSourceProperty, value);
 	}
 
 	/// <inheritdoc />
@@ -46,122 +38,35 @@ public class VirtualizingGrid : VirtualizingPanel
 
 	private Size CalculateDesiredSize(Size availableSize)
 	{
-		internalGrid.Measure(availableSize);
-		return internalGrid.DesiredSize;
+		return base.MeasureOverride(availableSize);
 	}
 
 	private void RealizeElements(Size availableSize)
 	{
-		for (var index = 0; index < Items.Count; index++)
+		if (Children.Count != 0)
 		{
-			object? item = Items[index];
-			Control control = RealizeElement(item, index);
+			return;
+		}
+
+		for (var index = 0; index < ItemsSource.Count; index++)
+		{
+			object item = ItemsSource[index];
+			Control control = CreateElement(item);
+			AddItemAsChild(control);
 			control.Measure(availableSize);
 		}
 	}
 
-	private Control RealizeElement(object? item, int index)
+	private Control CreateElement(object item)
 	{
-		Debug.Assert(ItemContainerGenerator != null, nameof(ItemContainerGenerator) + " != null");
-
-		if (ItemContainerGenerator.NeedsContainer(item, index, out object? recycleKey))
-		{
-			return GetRecycledElement(item, index, recycleKey) ??
-			       CreateElement(item, index, recycleKey);
-		}
-		else
-		{
-			return GetItemAsOwnContainer(item, index);
-		}
-	}
-
-	private Control? GetRecycledElement(object? item, int index, object? recycleKey)
-	{
-		Debug.Assert(ItemContainerGenerator is not null);
-
-		if (recycleKey is null)
-			return null;
-
-		ItemContainerGenerator generator = ItemContainerGenerator!;
-
-		if (_recyclePool?.TryGetValue(recycleKey, out var recyclePool) == true && recyclePool.Count > 0)
-		{
-			Control recycled = recyclePool.Pop();
-			recycled.IsVisible = true;
-			generator.PrepareItemContainer(recycled, item, index);
-			generator.ItemContainerPrepared(recycled, item, index);
-			return recycled;
-		}
-
-		return null;
-	}
-
-	private Control CreateElement(object? item, int index, object? recycleKey)
-	{
-		Debug.Assert(ItemContainerGenerator is not null);
-
-		ItemContainerGenerator generator = ItemContainerGenerator!;
-		Control container = generator.CreateContainer(item, index, recycleKey);
-
-		container.SetValue(RecycleKeyProperty, recycleKey);
-		generator.PrepareItemContainer(container, item, index);
-		AddItemAsChild(container);
-		generator.ItemContainerPrepared(container, item, index);
-
-		return container;
-	}
-
-	private Control GetItemAsOwnContainer(object? item, int index)
-	{
-		Debug.Assert(ItemContainerGenerator is not null);
-
-		var controlItem = (Control)item!;
-		ItemContainerGenerator generator = ItemContainerGenerator!;
-
-		if (!controlItem.IsSet(RecycleKeyProperty))
-		{
-			generator.PrepareItemContainer(controlItem, controlItem, index);
-			AddItemAsChild(controlItem);
-			controlItem.SetValue(RecycleKeyProperty, s_itemIsItsOwnContainer);
-			generator.ItemContainerPrepared(controlItem, item, index);
-		}
-
-		controlItem.IsVisible = true;
-		return controlItem;
+		IDataTemplate dataTemplate = this.FindDataTemplate(item) ?? FuncDataTemplate.Default;
+		Control control = dataTemplate.Build(item) ?? throw new Exception($"Failed to create control for item \"{item}\"");
+		control.DataContext = item;
+		return control;
 	}
 
 	private void AddItemAsChild(Control control)
 	{
-		internalGrid.Children.Add(control);
-	}
-
-	/// <inheritdoc />
-	protected override Control? ScrollIntoView(int index)
-	{
-		throw new NotImplementedException();
-	}
-
-	/// <inheritdoc />
-	protected override Control? ContainerFromIndex(int index)
-	{
-		throw new NotImplementedException();
-	}
-
-	/// <inheritdoc />
-	protected override int IndexFromContainer(Control container)
-	{
-		throw new NotImplementedException();
-	}
-
-	/// <inheritdoc />
-	protected override IEnumerable<Control>? GetRealizedContainers()
-	{
-		throw new NotImplementedException();
-	}
-
-	/// <inheritdoc />
-	protected override IInputElement? GetControl(NavigationDirection direction, IInputElement? from, bool wrap)
-	{
-		throw new NotImplementedException();
+		Children.Add(control);
 	}
 }

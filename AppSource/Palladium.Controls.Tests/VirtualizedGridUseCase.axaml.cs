@@ -15,25 +15,15 @@ public partial class VirtualizingGridUseCase : ReactiveUserControl<ItemsViewMode
 		{
 			this.WhenAnyValue(x => x.ViewModel!.RowDefinitions)
 				.ObserveOn(RxApp.MainThreadScheduler)
-				.Subscribe(rowDefinitions =>
-				{
-					if (VirtualizingGrid is null) return;
-					VirtualizingGrid.RowDefinitions = rowDefinitions;
-				})
+				.Subscribe(rowDefinitions => { VirtualizingGrid.RowDefinitions = rowDefinitions; })
 				.DisposeWith(disposables);
 
 			this.WhenAnyValue(x => x.ViewModel!.ColumnDefinitions)
 				.ObserveOn(RxApp.MainThreadScheduler)
-				.Subscribe(columnDefinitions =>
-				{
-					if (VirtualizingGrid is null) return;
-					VirtualizingGrid.ColumnDefinitions = columnDefinitions;
-				})
+				.Subscribe(columnDefinitions => { VirtualizingGrid.ColumnDefinitions = columnDefinitions; })
 				.DisposeWith(disposables);
 		});
 	}
-
-	private VirtualizingGrid? VirtualizingGrid => ItemsControl?.ItemsPanelRoot as VirtualizingGrid;
 }
 
 public class ItemsViewModel

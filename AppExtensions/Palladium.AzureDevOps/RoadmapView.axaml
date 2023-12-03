@@ -53,22 +53,9 @@
                       HorizontalScrollBarVisibility="Visible"
                       Grid.Row="1">
 
-            <ItemsControl Name="ItemsControl"
-                          Margin="14 0 14 40">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <controls:VirtualizingGrid />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.Styles>
-                    <Style x:DataType="azureDevOps:IGridItemViewModel"
-                           Selector="ItemsControl controls|VirtualizingGrid > Grid > ContentPresenter">
-                        <Setter Property="Grid.Column" Value="{CompiledBinding StartColumnIndex}" />
-                        <Setter Property="Grid.Row" Value="{CompiledBinding RowIndex}" />
-                        <Setter Property="Grid.ColumnSpan" Value="{CompiledBinding ColumnSpan}" />
-                    </Style>
-                </ItemsControl.Styles>
-                <ItemsControl.DataTemplates>
+            <controls:VirtualizingGrid Name="VirtualizingGrid"
+                                       Margin="14 0 14 40">
+                <controls:VirtualizingGrid.DataTemplates>
                     <DataTemplate DataType="{x:Type azureDevOps:IterationViewModel}">
                         <!-- ReSharper disable Xaml.RedundantAttachedProperty -->
                         <Border
@@ -135,8 +122,8 @@
                             </Border>
                         </Button>
                     </DataTemplate>
-                </ItemsControl.DataTemplates>
-            </ItemsControl>
+                </controls:VirtualizingGrid.DataTemplates>
+            </controls:VirtualizingGrid>
         </ScrollViewer>
     </Grid>
 </UserControl>

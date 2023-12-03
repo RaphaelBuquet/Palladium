@@ -7,23 +7,9 @@
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Palladium.Controls.Tests.VirtualizingGridUseCase"
              x:DataType="tests:ItemsViewModel">
-    <ItemsControl x:Name="ItemsControl"
-                  ItemsSource="{CompiledBinding DataType=tests:ItemsViewModel, Path=Items}">
-        <ItemsControl.ItemsPanel>
-            <ItemsPanelTemplate>
-                <controls:VirtualizingGrid />
-            </ItemsPanelTemplate>
-        </ItemsControl.ItemsPanel>
-        <ItemsControl.Styles>
-            <Style x:DataType="tests:ItemViewModel"
-                   Selector="ItemsControl controls|VirtualizingGrid > Grid > ContentPresenter">
-                <Setter Property="Grid.Column" Value="{CompiledBinding ColumnIndex}" />
-                <Setter Property="Grid.Row" Value="{CompiledBinding RowIndex}" />
-                <Setter Property="Grid.ColumnSpan" Value="{CompiledBinding ColumnSpan}" />
-                <Setter Property="Grid.RowSpan" Value="{CompiledBinding RowSpan}" />
-            </Style>
-        </ItemsControl.Styles>
-        <ItemsControl.ItemTemplate>
+
+    <controls:VirtualizingGrid Name="VirtualizingGrid" ItemsSource="{CompiledBinding Path=Items}">
+        <controls:VirtualizingGrid.DataTemplates>
             <DataTemplate DataType="tests:ItemViewModel">
                 <Border Width="{CompiledBinding Width}"
                         Height="{CompiledBinding Height}"
@@ -34,6 +20,6 @@
                         Background="Fuchsia"
                         BorderThickness="0" />
             </DataTemplate>
-        </ItemsControl.ItemTemplate>
-    </ItemsControl>
+        </controls:VirtualizingGrid.DataTemplates>
+    </controls:VirtualizingGrid>
 </UserControl>
