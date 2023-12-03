@@ -1,5 +1,6 @@
 ﻿using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.ReactiveUI;
 using Palladium.ExtensionFunctions.Lifecycle;
@@ -31,6 +32,16 @@ public partial class RoadmapView : ReactiveUserControl<RoadmapViewModel>, IDispo
 					viewModels.AddRange(roadmapGridViewModel.IterationViewModels);
 					viewModels.AddRange(roadmapGridViewModel.WorkItemViewModels);
 					VirtualizingGrid.ItemsSource = viewModels;
+				})
+				.DisposeWith(disposables);
+
+			this.WhenAnyValue(x => x.ViewModel!.DefaultScrollbarNormalisedPosition)
+				.ObserveOn(RxApp.MainThreadScheduler)
+				.CombineLatest(this.WhenAnyValue(x => x.ScrollViewer.Extent), (vm, extent) => (vm, extent))
+				.Subscribe(tuple =>
+				{
+					(Vector defaultScrollbarNormalisedPosition, Size extent) = tuple;
+					ScrollViewer.Offset = new Vector(defaultScrollbarNormalisedPosition.X * extent.Width, defaultScrollbarNormalisedPosition.Y * extent.Height);
 				})
 				.DisposeWith(disposables);
 

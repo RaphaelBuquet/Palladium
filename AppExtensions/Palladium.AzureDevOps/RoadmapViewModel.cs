@@ -1,6 +1,7 @@
 ﻿using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media;
 using AzureDevOpsTools;
@@ -30,6 +31,8 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 	private ObservableAsPropertyHelper<string?>? projectValidation;
 
 	private ObservableAsPropertyHelper<string?>? workItemStylesValidation;
+
+	private ObservableAsPropertyHelper<Vector>? defaultScrollbarNormalisedPosition;
 
 	public RoadmapViewModel() : this(null, null)
 	{ }
@@ -115,8 +118,14 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 			roadmapGridViewModel = RoadmapGridViewModelObservable(roadmapEntriesObservable, workItemStylesObservable, openInADOService)
 				.ToProperty(this, x => x.RoadmapGridViewModel)
 				.DisposeWith(disposables);
+
+			defaultScrollbarNormalisedPosition = DefaultScrollbarNormalisedPositionObservable(roadmapEntriesObservable)
+				.ToProperty(this, x => x.DefaultScrollbarNormalisedPosition)
+				.DisposeWith(disposables);
 		});
 	}
+
+	public Vector DefaultScrollbarNormalisedPosition => defaultScrollbarNormalisedPosition?.Value ?? Vector.Zero;
 
 	public string ConnectionStatus => connectionStatus?.Value ?? string.Empty;
 
@@ -135,6 +144,23 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 
 	/// <inheritdoc />
 	LifecycleActivator ILifecycleAwareViewModel.Activator { get; } = new ();
+
+	private IObservable<Vector> DefaultScrollbarNormalisedPositionObservable(IObservable<RoadmapEntries?> roadmapEntriesObservable)
+	{
+		return roadmapEntriesObservable
+			.WhereNotNull()
+			.Where(entries => entries.Iterations.Count >= 2)
+			.Select(entries =>
+			{
+				DateTime now = DateTime.Now;
+				DateTime startDate = entries.Iterations.Min(x => x.StartDate);
+				DateTime endDate = entries.Iterations.Max(x => x.EndDate);
+
+				double relativePosition = Maths.InverseLerp(startDate.Ticks, endDate.Ticks, now.Ticks);
+
+				return new Vector(relativePosition, 0);
+			});
+	}
 
 	private static IObservable<string> ConnectionStatusObservable(Log? log, IConnectableObservable<Task<VssConnection>?> connectionTasks)
 	{

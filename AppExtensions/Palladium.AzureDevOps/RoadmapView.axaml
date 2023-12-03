@@ -51,6 +51,7 @@
             need to be explicitly Visible for it to work apparently -->
         <ScrollViewer VerticalScrollBarVisibility="Visible"
                       HorizontalScrollBarVisibility="Visible"
+                      Name="ScrollViewer"
                       Grid.Row="1">
 
             <controls:VirtualizingGrid Name="VirtualizingGrid"
@@ -100,7 +101,8 @@
                                     CornerRadius="0 2 2 0"
                                     Padding="4">
                                     <StackPanel Orientation="Vertical" Spacing="4">
-                                        <TextBlock Foreground="{StaticResource Tone1}"
+                                        <TextBlock ToolTip.Tip="{CompiledBinding WorkItem.Title, Mode=OneTime}"
+                                                   Foreground="{StaticResource Tone1}"
                                                    Text="{CompiledBinding WorkItem.Title, Mode=OneTime}" />
                                         <StackPanel Orientation="Horizontal" Spacing="4" ClipToBounds="True">
                                             <Ellipse Width="6"

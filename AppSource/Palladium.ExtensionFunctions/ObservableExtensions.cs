@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using System.Diagnostics.CodeAnalysis;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Microsoft.Extensions.Logging;
@@ -225,5 +224,19 @@ public static class ObservableExtensions
 	public static IObservable<T> IgnoreErrors<T>(this IObservable<T> observable)
 	{
 		return Observable.Create<T>(observer => { return observable.Subscribe(observer.OnNext, _ => { }, observer.OnCompleted); });
+	}
+
+	/// <summary>
+	///     Returns only values that are not null.
+	///     Converts the nullability.
+	/// </summary>
+	/// <typeparam name="T">The type of value emitted by the observable.</typeparam>
+	/// <param name="observable">The observable that can contain nulls.</param>
+	/// <returns>A non nullable version of the observable that only emits valid values.</returns>
+	public static IObservable<T> WhereNotNull<T>(this IObservable<T?> observable) where T : struct
+	{
+		return observable
+			.Where(x => x.HasValue)
+			.Select(x => x!.Value);
 	}
 }

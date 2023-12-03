@@ -2,7 +2,14 @@
 
 public struct RoadmapEntries
 {
+	/// <summary>
+	///     List of iterations used by the roadmap. No particular order is guaranteed.
+	/// </summary>
 	public List<Iteration> Iterations;
+
+	/// <summary>
+	///     The items to be shown on the roadmap as returned by the query. No particular order is guaranteed.
+	/// </summary>
 	public List<RoadmapWorkItem> RoadmapWorkItems;
 }
 
