@@ -168,7 +168,6 @@ public class AppSettingsViewModelTests
 	}
 
 	[TestCase]
-	[Timeout(1000)]
 	public async Task LaunchAtStartupIsChanging_ReflectsHandlerTaskStatus()
 	{
 		// arrange

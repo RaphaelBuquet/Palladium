@@ -1,0 +1,5 @@
+﻿root = true
+
+[*.{cs,vb}]
+dotnet_diagnostic.NUnit2005.severity = suggestion
+dotnet_diagnostic.NUnit2049.severity = suggestion

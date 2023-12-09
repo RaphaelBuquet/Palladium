@@ -87,7 +87,7 @@ public class RoadmapSettingsTests
 		vm.Data.OnNext(vm.Data.Value with { ConnectionTokenEncrypted = RoadmapSettingsViewModel.Encrypt(token) });
 
 		// assert
-		Assert.IsNotNull(token, view.ConnectionToken.Text);
+		Assert.AreEqual(token, view.ConnectionToken.Text);
 
 		// act
 		const string projectId = "123";

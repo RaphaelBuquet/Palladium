@@ -1,11 +1,9 @@
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Documents;
 using Avalonia.Controls.Templates;
 using Avalonia.Headless.NUnit;
-using Avalonia.Media;
 using Avalonia.Threading;
 using Microsoft.Reactive.Testing;
 using ReactiveUI;
@@ -54,7 +52,7 @@ public class MiniLogTests
 		// assert
 		TextBlock? textBlock = control.GetTemplateChildren().OfType<TextBlock>().FirstOrDefault();
 		Assert.IsNotNull(textBlock);
-		CollectionAssert.AreEqual(new InlineCollection { inline1, inline2 },  textBlock!.Inlines);
+		CollectionAssert.AreEqual(new InlineCollection { inline1, inline2 },  textBlock!.Inlines!);
 	}
 
 	[AvaloniaTest]
@@ -80,6 +78,6 @@ public class MiniLogTests
 		// assert
 		TextBlock? textBlock = control.GetTemplateChildren().OfType<TextBlock>().FirstOrDefault();
 		Assert.IsNotNull(textBlock);
-		CollectionAssert.AreEqual(new InlineCollection { inline },  textBlock!.Inlines);
+		CollectionAssert.AreEqual(new InlineCollection { inline },  textBlock!.Inlines!);
 	}
 }
