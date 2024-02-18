@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:azureDevOps="clr-namespace:Palladium.AzureDevOps"
              xmlns:converters="clr-namespace:Palladium.Converters;assembly=Palladium.Converters"
-             xmlns:controls="clr-namespace:Palladium.Controls;assembly=Palladium.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Palladium.AzureDevOps.RoadmapView"
              x:DataType="azureDevOps:RoadmapViewModel">
@@ -54,9 +53,22 @@
                       Name="ScrollViewer"
                       Grid.Row="1">
 
-            <controls:VirtualizingGrid Name="VirtualizingGrid"
-                                       Margin="14 0 14 40">
-                <controls:VirtualizingGrid.DataTemplates>
+            <ItemsControl Name="ItemsControl"
+                          Margin="14 0 14 40">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <Grid />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.Styles>
+                    <Style x:DataType="azureDevOps:IGridItemViewModel"
+                           Selector="ItemsControl > ContentPresenter">
+                        <Setter Property="Grid.Column" Value="{CompiledBinding StartColumnIndex}" />
+                        <Setter Property="Grid.Row" Value="{CompiledBinding RowIndex}" />
+                        <Setter Property="Grid.ColumnSpan" Value="{CompiledBinding ColumnSpan}" />
+                    </Style>
+                </ItemsControl.Styles>
+                <ItemsControl.DataTemplates>
                     <DataTemplate DataType="{x:Type azureDevOps:IterationViewModel}">
                         <!-- ReSharper disable Xaml.RedundantAttachedProperty -->
                         <Border
@@ -124,8 +136,8 @@
                             </Border>
                         </Button>
                     </DataTemplate>
-                </controls:VirtualizingGrid.DataTemplates>
-            </controls:VirtualizingGrid>
+                </ItemsControl.DataTemplates>
+            </ItemsControl>
         </ScrollViewer>
     </Grid>
 </UserControl>

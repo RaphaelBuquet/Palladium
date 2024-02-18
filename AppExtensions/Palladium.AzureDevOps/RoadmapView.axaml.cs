@@ -25,13 +25,14 @@ public partial class RoadmapView : ReactiveUserControl<RoadmapViewModel>, IDispo
 					var columnDefinitions = new ColumnDefinitions();
 					rowDefinitions.AddRange(roadmapGridViewModel.Rows.Select(gridLength => new RowDefinition(gridLength)));
 					columnDefinitions.AddRange(roadmapGridViewModel.Columns.Select(gridLength => new ColumnDefinition(gridLength)));
-					VirtualizingGrid.RowDefinitions = rowDefinitions;
-					VirtualizingGrid.ColumnDefinitions = columnDefinitions;
+					var grid = (Grid)ItemsControl.ItemsPanelRoot;
+					grid.RowDefinitions = rowDefinitions;
+					grid.ColumnDefinitions = columnDefinitions;
 
 					var viewModels = new List<object>();
 					viewModels.AddRange(roadmapGridViewModel.IterationViewModels);
 					viewModels.AddRange(roadmapGridViewModel.WorkItemViewModels);
-					VirtualizingGrid.ItemsSource = viewModels;
+					ItemsControl.ItemsSource = viewModels;
 				})
 				.DisposeWith(disposables);
 
@@ -50,7 +51,7 @@ public partial class RoadmapView : ReactiveUserControl<RoadmapViewModel>, IDispo
 				// empty the grid when it goes out of view.
 				// that's because it is automatically refreshed when it goes into view, it would look weird if 
 				// it didn't get emptied.
-				VirtualizingGrid.ItemsSource = new List<object>();
+				ItemsControl.ItemsSource = new List<object>();
 			}).DisposeWith(disposables);
 		});
 	}
