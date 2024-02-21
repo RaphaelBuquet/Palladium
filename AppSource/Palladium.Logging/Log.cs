@@ -56,4 +56,32 @@ public class Log
 			Color = Config.Colors[logLevel]
 		});
 	}
+
+	public void Info(string? message)
+	{
+		var logLevel = LogLevel.Information;
+		DataStore.AddEntry(new LogModel()
+		{
+			Timestamp = DateTime.UtcNow,
+			LogLevel = logLevel,
+			EventId = new EventId(),
+			State = message,
+			Exception = null,
+			Color = Config.Colors[logLevel]
+		});
+	}
+
+	public void Error(string? message, Exception? exception = null)
+	{
+		var logLevel = LogLevel.Error;
+		DataStore.AddEntry(new LogModel()
+		{
+			Timestamp = DateTime.UtcNow,
+			LogLevel = logLevel,
+			EventId = new EventId(),
+			State = message,
+			Exception = exception?.ToString() ?? message,
+			Color = Config.Colors[logLevel]
+		});
+	}
 }
