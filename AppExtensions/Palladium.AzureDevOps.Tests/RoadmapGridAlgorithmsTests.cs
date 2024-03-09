@@ -10,7 +10,7 @@ public class RoadmapGridAlgorithmsTests
 	{
 		// ReSharper disable once CollectionNeverUpdated.Local
 		var iterations = new List<Iteration>();
-		RoadmapGridAlgorithms.IterationsGrid result = RoadmapGridAlgorithms.CreateIterationsGrid(1, iterations);
+		RoadmapGridAlgorithms.IterationsGrid result = RoadmapGridAlgorithms.CreateIterationsGrid(iterations);
 		Assert.AreEqual(0, result.IterationViewModels.Count);
 		Assert.AreEqual(0, result.Columns.Count);
 		Assert.AreEqual(0, result.Rows.Count);
@@ -29,7 +29,7 @@ public class RoadmapGridAlgorithmsTests
 				IterationPath = "Palladium\\M1"
 			}
 		};
-		RoadmapGridAlgorithms.IterationsGrid result = RoadmapGridAlgorithms.CreateIterationsGrid(1, iterations);
+		RoadmapGridAlgorithms.IterationsGrid result = RoadmapGridAlgorithms.CreateIterationsGrid(iterations);
 		Assert.AreEqual(1, result.IterationViewModels.Count);
 
 		Assert.AreEqual("M1", result.IterationViewModels[0].IterationName);
@@ -37,7 +37,7 @@ public class RoadmapGridAlgorithmsTests
 		Assert.AreEqual(RoadmapGridAlgorithms.IterationColumnOffset, result.IterationViewModels[0].StartColumnIndex);
 		Assert.AreEqual(RoadmapGridAlgorithms.IterationColumnOffset + 1, result.IterationViewModels[0].EndColumnIndexExclusive);
 		Assert.AreEqual(1, result.Columns.Count);
-		Assert.AreEqual(new GridLength(29, GridUnitType.Pixel), result.Columns[0]);
+		Assert.AreEqual(new GridLength(29, GridUnitType.Star), result.Columns[0]);
 		Assert.AreEqual(1, result.Rows.Count);
 		Assert.AreEqual(GridLength.Auto, result.Rows[0]);
 	}
@@ -62,7 +62,7 @@ public class RoadmapGridAlgorithmsTests
 				IterationPath = "Palladium\\M2"
 			}
 		};
-		RoadmapGridAlgorithms.IterationsGrid result = RoadmapGridAlgorithms.CreateIterationsGrid(1, iterations);
+		RoadmapGridAlgorithms.IterationsGrid result = RoadmapGridAlgorithms.CreateIterationsGrid(iterations);
 		Assert.AreEqual(2, result.IterationViewModels.Count);
 		Assert.AreEqual(3, result.Columns.Count);
 		Assert.AreEqual(1, result.Rows.Count);
@@ -100,7 +100,7 @@ public class RoadmapGridAlgorithmsTests
 				IterationPath = "Palladium\\Milestone"
 			},
 		};
-		RoadmapGridAlgorithms.IterationsGrid result = RoadmapGridAlgorithms.CreateIterationsGrid(1, iterations);
+		RoadmapGridAlgorithms.IterationsGrid result = RoadmapGridAlgorithms.CreateIterationsGrid(iterations);
 		Assert.AreEqual(2, result.IterationViewModels.Count);
 		Assert.AreEqual(3, result.Columns.Count);
 		Assert.AreEqual(2, result.Rows.Count);
@@ -138,7 +138,7 @@ public class RoadmapGridAlgorithmsTests
 				IterationPath = "Palladium\\Example2"
 			},
 		};
-		RoadmapGridAlgorithms.IterationsGrid result = RoadmapGridAlgorithms.CreateIterationsGrid(1, iterations);
+		RoadmapGridAlgorithms.IterationsGrid result = RoadmapGridAlgorithms.CreateIterationsGrid(iterations);
 		Assert.AreEqual(2, result.IterationViewModels.Count);
 		Assert.AreEqual(3, result.Columns.Count);
 		Assert.AreEqual(2, result.Rows.Count);

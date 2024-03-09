@@ -29,48 +29,48 @@
                     <DrawingImage>
                         <DrawingImage.Drawing>
                             <DrawingGroup ClipGeometry="M0,0 V14 H14 V0 H0 Z">
-                                <GeometryDrawing Brush="#FF4D5272"
+                                <GeometryDrawing Brush="{DynamicResource Tone1}"
                                                  Geometry="F0 M14,14z M0,0z M6,2L6,4C6,4.552 6.448,5 7,5 7.552,5 8,4.552 8,4L8,2C8,1.448 7.552,1 7,1 6.448,1 6,1.448 6,2z" />
                                 <GeometryDrawing
                                     Geometry="F0 M14,14z M0,0z M2.757,4.172L4.172,5.586C4.562,5.976 5.196,5.976 5.586,5.586 5.976,5.196 5.976,4.562 5.586,4.172L4.172,2.757C3.781,2.367 3.148,2.367 2.757,2.757 2.367,3.148 2.367,3.781 2.757,4.172z">
                                     <GeometryDrawing.Brush>
-                                        <SolidColorBrush Color="#FF4D5272" Opacity="0.8" />
+                                        <SolidColorBrush Color="{DynamicResource Tone1}" Opacity="0.8" />
                                     </GeometryDrawing.Brush>
                                 </GeometryDrawing>
                                 <GeometryDrawing
                                     Geometry="F0 M14,14z M0,0z M2,8L4,8C4.552,8 5,7.552 5,7 5,6.448 4.552,6 4,6L2,6C1.448,6 1,6.448 1,7 1,7.552 1.448,8 2,8z">
                                     <GeometryDrawing.Brush>
-                                        <SolidColorBrush Color="#FF4D5272" Opacity="0.7" />
+                                        <SolidColorBrush Color="{DynamicResource Tone1}" Opacity="0.7" />
                                     </GeometryDrawing.Brush>
                                 </GeometryDrawing>
                                 <GeometryDrawing
                                     Geometry="F0 M14,14z M0,0z M4.172,11.243L5.586,9.828C5.976,9.438 5.976,8.804 5.586,8.414 5.196,8.024 4.562,8.024 4.172,8.414L2.757,9.828C2.367,10.219 2.367,10.852 2.757,11.243 3.148,11.633 3.781,11.633 4.172,11.243z">
                                     <GeometryDrawing.Brush>
-                                        <SolidColorBrush Color="#FF4D5272" Opacity="0.6" />
+                                        <SolidColorBrush Color="{DynamicResource Tone1}" Opacity="0.6" />
                                     </GeometryDrawing.Brush>
                                 </GeometryDrawing>
                                 <GeometryDrawing
                                     Geometry="F0 M14,14z M0,0z M8,12L8,10C8,9.448 7.552,9 7,9 6.448,9 6,9.448 6,10L6,12C6,12.552 6.448,13 7,13 7.552,13 8,12.552 8,12z">
                                     <GeometryDrawing.Brush>
-                                        <SolidColorBrush Color="#FF4D5272" Opacity="0.5" />
+                                        <SolidColorBrush Color="{DynamicResource Tone1}" Opacity="0.5" />
                                     </GeometryDrawing.Brush>
                                 </GeometryDrawing>
                                 <GeometryDrawing
                                     Geometry="F0 M14,14z M0,0z M11.243,9.828L9.828,8.414C9.438,8.024 8.804,8.024 8.414,8.414 8.024,8.804 8.024,9.438 8.414,9.828L9.828,11.243C10.219,11.633 10.852,11.633 11.243,11.243 11.633,10.852 11.633,10.219 11.243,9.828z">
                                     <GeometryDrawing.Brush>
-                                        <SolidColorBrush Color="#FF4D5272" Opacity="0.4" />
+                                        <SolidColorBrush Color="{DynamicResource Tone1}" Opacity="0.4" />
                                     </GeometryDrawing.Brush>
                                 </GeometryDrawing>
                                 <GeometryDrawing
                                     Geometry="F0 M14,14z M0,0z M12,6L10,6C9.448,6 9,6.448 9,7 9,7.552 9.448,8 10,8L12,8C12.552,8 13,7.552 13,7 13,6.448 12.552,6 12,6z">
                                     <GeometryDrawing.Brush>
-                                        <SolidColorBrush Color="#FF4D5272" Opacity="0.3" />
+                                        <SolidColorBrush Color="{DynamicResource Tone1}" Opacity="0.3" />
                                     </GeometryDrawing.Brush>
                                 </GeometryDrawing>
                                 <GeometryDrawing
                                     Geometry="F0 M14,14z M0,0z M9.828,2.757L8.414,4.172C8.024,4.562 8.024,5.196 8.414,5.586 8.804,5.976 9.438,5.976 9.828,5.586L11.243,4.172C11.633,3.781 11.633,3.148 11.243,2.757 10.852,2.367 10.219,2.367 9.828,2.757z">
                                     <GeometryDrawing.Brush>
-                                        <SolidColorBrush Color="#FF4D5272" Opacity="0.2" />
+                                        <SolidColorBrush Color="{DynamicResource Tone1}" Opacity="0.2" />
                                     </GeometryDrawing.Brush>
                                 </GeometryDrawing>
                             </DrawingGroup>

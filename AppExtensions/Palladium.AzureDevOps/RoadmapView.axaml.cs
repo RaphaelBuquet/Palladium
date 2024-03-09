@@ -1,4 +1,5 @@
-﻿using System.Reactive.Disposables;
+﻿using System.Diagnostics;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Avalonia;
 using Avalonia.Controls;
@@ -25,7 +26,7 @@ public partial class RoadmapView : ReactiveUserControl<RoadmapViewModel>, IDispo
 					var columnDefinitions = new ColumnDefinitions();
 					rowDefinitions.AddRange(roadmapGridViewModel.Rows.Select(gridLength => new RowDefinition(gridLength)));
 					columnDefinitions.AddRange(roadmapGridViewModel.Columns.Select(gridLength => new ColumnDefinition(gridLength)));
-					var grid = (Grid)ItemsControl.ItemsPanelRoot;
+					Grid grid = GetGrid();
 					grid.RowDefinitions = rowDefinitions;
 					grid.ColumnDefinitions = columnDefinitions;
 
@@ -36,13 +37,36 @@ public partial class RoadmapView : ReactiveUserControl<RoadmapViewModel>, IDispo
 				})
 				.DisposeWith(disposables);
 
+			// TODO: make zoom/unzoom preserve the content at the center of the screen
+			this.WhenAnyValue(x => x.ViewModel!.RoadmapGridViewModel)
+				.Skip(1) // without this, this will override the DefaultScrollbarNormalisedPosition offset code
+				.Select(CalculateGridWidth)
+				.CombineLatest(
+					this.WhenAnyValue(x => x.ViewModel!.ZoomLevel),
+					(sizeSum, zoom) => (sizeSum, zoom))
+				.Select(pair => pair.sizeSum * 10 * pair.zoom)
+				.ObserveOn(RxApp.MainThreadScheduler)
+				.Subscribe(width =>
+				{
+					Grid grid = GetGrid();
+					grid.Width = width;
+				})
+				.DisposeWith(disposables);
+
+			// TODO: there is a visual artefact with this, where for a frame the grid is shown with the scrollbar at the beginning.
 			this.WhenAnyValue(x => x.ViewModel!.DefaultScrollbarNormalisedPosition)
 				.ObserveOn(RxApp.MainThreadScheduler)
-				.CombineLatest(this.WhenAnyValue(x => x.ScrollViewer.Extent), (vm, extent) => (vm, extent))
-				.Subscribe(tuple =>
+				.Subscribe(defaultScrollbarNormalisedPosition =>
 				{
-					(Vector defaultScrollbarNormalisedPosition, Size extent) = tuple;
-					ScrollViewer.Offset = new Vector(defaultScrollbarNormalisedPosition.X * extent.Width, defaultScrollbarNormalisedPosition.Y * extent.Height);
+					Size extent = ScrollViewer.Extent;
+					double offsetX = defaultScrollbarNormalisedPosition.X * extent.Width;
+					double offsetY = defaultScrollbarNormalisedPosition.Y * extent.Height;
+
+					// TODO center content
+					// For the X offset we want the normalised position to represent the middle of the screen,
+					// such that for a value of 0.5 the viewport will be centered,
+					// rather than being offset a bit to the right.
+					ScrollViewer.Offset = new Vector(offsetX, offsetY);
 				})
 				.DisposeWith(disposables);
 
@@ -56,9 +80,26 @@ public partial class RoadmapView : ReactiveUserControl<RoadmapViewModel>, IDispo
 		});
 	}
 
+	private double CalculateGridWidth(RoadmapGridViewModel roadmapGridViewModel)
+	{
+		double total = 0;
+		foreach (GridLength column in roadmapGridViewModel.Columns)
+		{
+			Debug.Assert(column.IsStar);
+			total += column.Value;
+		}
+		return total;
+	}
+
 	/// <inheritdoc />
 	public void Dispose()
 	{
 		DataContext = null;
+	}
+
+	private Grid GetGrid()
+	{
+		Debug.Assert(ItemsControl.ItemsPanelRoot != null, "ItemsControl.ItemsPanelRoot != null");
+		return (Grid)ItemsControl.ItemsPanelRoot;
 	}
 }

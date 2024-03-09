@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:azureDevOps="clr-namespace:Palladium.AzureDevOps"
              xmlns:converters="clr-namespace:Palladium.Converters;assembly=Palladium.Converters"
+             xmlns:controls="clr-namespace:Palladium.Controls;assembly=Palladium.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="Palladium.AzureDevOps.RoadmapView"
              x:DataType="azureDevOps:RoadmapViewModel">
@@ -37,27 +38,48 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <StackPanel Orientation="Vertical" Grid.Row="0" Margin="14 40 14 12">
-            <TextBlock Text="{CompiledBinding ConnectionStatus}"
-                       IsVisible="{CompiledBinding ConnectionStatus, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
-            <TextBlock Text="{CompiledBinding ProjectValidation}"
-                       IsVisible="{CompiledBinding ProjectValidation, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
-            <TextBlock Text="{CompiledBinding QueryValidation}"
-                       IsVisible="{CompiledBinding QueryValidation, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
-        </StackPanel>
+        <Grid Grid.Row="0"
+              Margin="14 40 14 12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Orientation="Vertical">
+                <TextBlock Text="{CompiledBinding ConnectionStatus}"
+                           IsVisible="{CompiledBinding ConnectionStatus, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                <TextBlock Text="{CompiledBinding ProjectValidation}"
+                           IsVisible="{CompiledBinding ProjectValidation, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+                <TextBlock Text="{CompiledBinding QueryValidation}"
+                           IsVisible="{CompiledBinding QueryValidation, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
+                <controls:ActivityIndicator IsVisible="{CompiledBinding IsLoading}" />
+                <Button Classes="GhostButton" Command="{CompiledBinding RefreshCommand}"
+                        IsEnabled="{CompiledBinding !IsLoading}">
+                    Refresh
+                </Button>
+            </StackPanel>
+        </Grid>
         <!-- VerticalScrollBarVisibility and HorizontalScrollBarVisibility 
             need to be explicitly Visible for it to work apparently -->
         <ScrollViewer VerticalScrollBarVisibility="Visible"
                       HorizontalScrollBarVisibility="Visible"
                       Name="ScrollViewer"
                       Grid.Row="1">
-
             <ItemsControl Name="ItemsControl"
                           Margin="14 0 14 40">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <Grid />
+                        <!-- Align to left as it could be smaller than the window. -->
+                        <Grid HorizontalAlignment="Left">
+                            <Grid.Transitions>
+                                <Transitions>
+                                    <DoubleTransition Property="Width" Duration="0:0:0.08" Easing="SineEaseOut" />
+                                </Transitions>
+                            </Grid.Transitions>
+                        </Grid>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.Styles>
@@ -139,5 +161,13 @@
                 </ItemsControl.DataTemplates>
             </ItemsControl>
         </ScrollViewer>
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right">
+            <controls:IconButton Classes="Borderless"
+                                 IconData="{DynamicResource UnzoomIcon}"
+                                 Command="{CompiledBinding Unzoom}" />
+            <controls:IconButton Classes="Borderless"
+                                 IconData="{DynamicResource ZoomIcon}"
+                                 Command="{CompiledBinding Zoom}" />
+        </StackPanel>
     </Grid>
 </UserControl>

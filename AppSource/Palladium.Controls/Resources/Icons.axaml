@@ -32,6 +32,15 @@
         <PathGeometry>F1 M32,32z M0,0z M5.4902,4.4902A1.0001,1.0001,0,0,0,4.79293,6.207L14.58593,16 4.79293,25.793A1.0001,1.0001,0,1,0,6.20703,27.2071L16.00003,17.4141 25.79303,27.2071A1.0001,1.0001,0,1,0,27.20713,25.793L17.41413,16 27.20713,6.207A1.0001,1.0001,0,0,0,26.48057,4.4902A1.0001,1.0001,0,0,0,25.79307,4.79293L16.00007,14.58593 6.20707,4.79293A1.0001,1.0001,0,0,0,5.49027,4.4902z</PathGeometry>
     </GeometryGroup>
 
+    <GeometryGroup x:Key="ZoomIcon">
+        <PathGeometry>F1 M32,32z M0,0z M13,3C7.489,3 3,7.489 3,13 3,18.511 7.489,23 13,23 15.3965,23 17.5974,22.14899 19.3223,20.7363L26.793,28.207A1.0001,1.0001,0,1,0,28.2071,26.7929L20.7364,19.3222C22.1491,17.5973 23.0001,15.3964 23.0001,12.9999 23.0001,7.4889 18.5111,2.9999 13.0001,2.9999z M13,5C17.4301,5 21,8.5699 21,13 21,17.4301 17.4301,21 13,21 8.5699,21 5,17.4301 5,13 5,8.5699 8.5699,5 13,5z</PathGeometry>
+        <PathGeometry>F1 M32,32z M0,0z M12.984,8.9863A1.0001,1.0001,0,0,0,11.99962,10L11.99962,12 9.99962,12A1.0001,1.0001,0,1,0,9.99962,14L11.99962,14 11.99962,16A1.0001,1.0001,0,1,0,13.99962,16L13.99962,14 15.99962,14A1.0001,1.0001,0,1,0,15.99962,12L13.99962,12 13.99962,10A1.0001,1.0001,0,0,0,12.98402,8.9863z</PathGeometry>
+    </GeometryGroup>
+    <GeometryGroup x:Key="UnzoomIcon">
+        <PathGeometry>F1 M32,32z M0,0z M13,3C7.489,3 3,7.489 3,13 3,18.511 7.489,23 13,23 15.3965,23 17.5974,22.14899 19.3223,20.7363L26.793,28.207A1.0001,1.0001,0,1,0,28.2071,26.7929L20.7364,19.3222C22.1491,17.5973 23.0001,15.3964 23.0001,12.9999 23.0001,7.4889 18.5111,2.9999 13.0001,2.9999z M13,5C17.4301,5 21,8.5699 21,13 21,17.4301 17.4301,21 13,21 8.5699,21 5,17.4301 5,13 5,8.5699 8.5699,5 13,5z</PathGeometry>
+        <PathGeometry>F1 M32,32z M0,0z M10,12A1.0001,1.0001,0,1,0,10,14L16,14A1.0001,1.0001,0,1,0,16,12z</PathGeometry>
+    </GeometryGroup>
+    
     <Design.PreviewWith>
         <Border Padding="2">
             <StackPanel Orientation="Vertical">
@@ -43,6 +52,8 @@
                 <PathIcon Width="24" Height="24" Foreground="SandyBrown" Data="{StaticResource PlayIcon}" />
                 <PathIcon Width="24" Height="24" Foreground="SandyBrown" Data="{StaticResource CheckmarkIcon}" />
                 <PathIcon Width="24" Height="24" Foreground="SandyBrown" Data="{StaticResource CloseIcon}" />
+                <PathIcon Width="24" Height="24" Foreground="SandyBrown" Data="{StaticResource ZoomIcon}" />
+                <PathIcon Width="24" Height="24" Foreground="SandyBrown" Data="{StaticResource UnzoomIcon}" />
                 <TextBlock>End</TextBlock>
             </StackPanel>
         </Border>

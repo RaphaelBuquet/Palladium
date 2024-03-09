@@ -1,4 +1,6 @@
-﻿using System.Reactive.Disposables;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Avalonia;
@@ -18,6 +20,8 @@ using ReactiveUI;
 
 namespace Palladium.AzureDevOps;
 
+[SuppressMessage("ReSharper", "ConvertToLambdaExpression", Justification = "Ignore this as it can make code less readable.")]
+[SuppressMessage("ReSharper", "UseCollectionExpression", Justification = "Ignore this as it can make code less readable.")]
 public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycleAwareViewModel
 {
 	private readonly RoadmapSettingsViewModel? settingsViewModel;
@@ -27,12 +31,11 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 
 	private ObservableAsPropertyHelper<string?>? planValidation;
 	private ObservableAsPropertyHelper<string?>? queryValidation;
-
 	private ObservableAsPropertyHelper<string?>? projectValidation;
-
 	private ObservableAsPropertyHelper<string?>? workItemStylesValidation;
-
 	private ObservableAsPropertyHelper<Vector>? defaultScrollbarNormalisedPosition;
+	private ObservableAsPropertyHelper<bool>? isLoading;
+	private double zoomLevel = 1;
 
 	public RoadmapViewModel() : this(null, null)
 	{ }
@@ -46,11 +49,16 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 			return;
 		}
 
+		Zoom = ReactiveCommand.Create(() => { ZoomLevel += 0.2; });
+		Unzoom = ReactiveCommand.Create(() => { ZoomLevel = Math.Max(0.2, ZoomLevel - 0.2); });
+
 		this.settingsViewModel = settingsViewModel;
 
 		var settingsDataObservable = this.settingsViewModel?.Data ?? Observable.Return(new RoadmapSettings());
 
 		var connectionTasks = settingsDataObservable
+			// when the user clicks on refresh, push a new value again to kick off the observable chain.
+			.CombineLatest(RefreshCommand.StartWith(new Unit()), (settings, _) => settings)
 			.Select<RoadmapSettings, Task<VssConnection>?>(settingsData =>
 			{
 				if (string.IsNullOrWhiteSpace(settingsData.OrganisationUrl) || string.IsNullOrWhiteSpace(settingsData.ConnectionTokenEncrypted))
@@ -59,18 +67,22 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 				}
 
 				return AzureQueries.ConnectWithToken(settingsData.OrganisationUrl, RoadmapSettingsViewModel.Decrypt(settingsData.ConnectionTokenEncrypted));
-			}).Replay(1);
+			})
+			.Replay(1);
 		this.WhenAttached(disposables => { connectionTasks.Connect().DisposeWith(disposables); });
 
 		this.WhenActivated(disposables =>
 		{
-			connectionStatus = ConnectionStatusObservable(log, connectionTasks).ToProperty(this, x => x.ConnectionStatus)
+			connectionStatus = ConnectionStatusObservable(log, connectionTasks)
+				.ToProperty(this, x => x.ConnectionStatus)
 				.DisposeWith(disposables);
 
 			var connectionObservable = connectionTasks
 				.AddTaskCompletion()
 				.Where(task => task == null || task.IsCompletedSuccessfully)
-				.Select(task => task?.IsCompletedSuccessfully == true ? task.Result : null);
+				.Select(task => task?.IsCompletedSuccessfully == true ? task.Result : null)
+				.Replay(1);
+			connectionObservable.Connect().DisposeWith(disposables);
 
 			var projectObservable = ProjectObservable(log, connectionObservable, settingsDataObservable);
 			projectObservable.Connect().DisposeWith(disposables);
@@ -113,7 +125,9 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 				.ToProperty(this, x => x.WorkItemStylesValidation)
 				.DisposeWith(disposables);
 
-			var roadmapEntriesObservable = RoadmapEntriesObservable(log, connectionObservable, projectObservable, planObservable, settingsDataObservable);
+			var roadmapEntriesObservable = RoadmapEntriesObservable(log, connectionObservable, projectObservable, planObservable, settingsDataObservable)
+				.Replay(1);
+			roadmapEntriesObservable.Connect().DisposeWith(disposables);
 
 			roadmapGridViewModel = RoadmapGridViewModelObservable(roadmapEntriesObservable, workItemStylesObservable, openInADOService)
 				.ToProperty(this, x => x.RoadmapGridViewModel)
@@ -121,6 +135,10 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 
 			defaultScrollbarNormalisedPosition = DefaultScrollbarNormalisedPositionObservable(roadmapEntriesObservable)
 				.ToProperty(this, x => x.DefaultScrollbarNormalisedPosition)
+				.DisposeWith(disposables);
+
+			isLoading = IsLoadingObservable(connectionTasks, roadmapEntriesObservable)
+				.ToProperty(this, x => x.IsLoading)
 				.DisposeWith(disposables);
 		});
 	}
@@ -142,13 +160,47 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 
 	public string? ProjectValidation => projectValidation?.Value;
 
+	public ReactiveCommand<Unit, Unit> RefreshCommand { get; } = ReactiveCommand.Create(() => new Unit());
+
+	public bool IsLoading => isLoading?.Value ?? false;
+
+	public double ZoomLevel
+	{
+		get => zoomLevel;
+		set => this.RaiseAndSetIfChanged(ref zoomLevel, value);
+	}
+
+	public ReactiveCommand<Unit, Unit>? Zoom { get; set; }
+	public ReactiveCommand<Unit, Unit>? Unzoom { get; set; }
+
 	/// <inheritdoc />
 	LifecycleActivator ILifecycleAwareViewModel.Activator { get; } = new ();
 
-	private IObservable<Vector> DefaultScrollbarNormalisedPositionObservable(IObservable<RoadmapEntries?> roadmapEntriesObservable)
+	private static IObservable<bool> IsLoadingObservable(IObservable<Task<VssConnection>?> connectionTasks, IObservable<RoadmapEntries?> roadmapEntriesObservable)
+	{
+		// for this observable, we need a "source" of objects that will turn on the loading indicator
+		// and a source of items that will turn it off.
+		return connectionTasks
+			.Select(task =>
+			{
+				// no task? nothing is loading.
+				// if there is a task, then turn on the loading indicator. 
+				// it will be turned off when items have been emitted.
+				return task == null ? LoadingIndicator.Hide : LoadingIndicator.Show;
+			})
+			// whenever a value is emitted, remove the loading indicator
+			.Merge(roadmapEntriesObservable.Select(_ => LoadingIndicator.Hide))
+			.Select(loadingIndicator => { return loadingIndicator == LoadingIndicator.Show; });
+	}
+
+	private static IObservable<Vector> DefaultScrollbarNormalisedPositionObservable(IObservable<RoadmapEntries?> roadmapEntriesObservable)
 	{
 		return roadmapEntriesObservable
 			.WhereNotNull()
+			// Only take the initial entry. Any additional value is from the user clicking "refresh",
+			// and we don't want to move the scrollbar when the user clicks refresh as the user 
+			// could have manually moved the scrollbar.
+			.Take(1)
 			.Where(entries => entries.Iterations.Count >= 2)
 			.Select(entries =>
 			{
@@ -243,7 +295,7 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 	private static IConnectableObservable<ValidatedField<Plan>> PlanObservable(Log? log, IObservable<VssConnection?> connectionObservable, IConnectableObservable<ValidatedField<string>> projectObservable, IObservable<RoadmapSettings> settingsDataObservable)
 	{
 		return connectionObservable
-			.CombineLatest(projectObservable)
+			.Zip(projectObservable) // zip instead of CombineLatest, as project will emit after connection emits.
 			.CombineLatest(settingsDataObservable)
 			.Select(x => (connection: x.First.First, project: x.First.Second, planId: x.Second.PlanId))
 			.SelectMany(async tuple =>
@@ -292,7 +344,7 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 	private static IConnectableObservable<ValidatedField<QueryHierarchyItem>> QueryObservable(Log? log, IObservable<VssConnection?> connectionObservable, IConnectableObservable<ValidatedField<string>> projectObservable, IObservable<RoadmapSettings> settingsDataObservable)
 	{
 		return connectionObservable
-			.CombineLatest(projectObservable)
+			.Zip(projectObservable) // zip instead of CombineLatest, as project will emit after connection emits.
 			.CombineLatest(settingsDataObservable)
 			.Select(x => (connection: x.First.First, project: x.First.Second, queryId: x.Second.QueryId))
 			.SelectMany(async tuple =>
@@ -341,7 +393,7 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 	private static IConnectableObservable<ValidatedField<WorkItemStyles>> WorkItemStylesObservable(Log? log, IObservable<VssConnection?> connectionObservable, IConnectableObservable<ValidatedField<string>> projectObservable)
 	{
 		return connectionObservable
-			.CombineLatest(projectObservable)
+			.Zip(projectObservable) // zip instead of CombineLatest, as project will emit after connection emits.
 			.Select(x => (connection: x.First, project: x.Second))
 			.SelectMany(async tuple =>
 			{
@@ -381,12 +433,10 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 	private static IObservable<RoadmapEntries?> RoadmapEntriesObservable(Log? log, IObservable<VssConnection?> connectionObservable, IConnectableObservable<ValidatedField<string>> projectObservable, IConnectableObservable<ValidatedField<Plan>> planObservable, IObservable<RoadmapSettings> settingsDataObservable)
 	{
 		return connectionObservable
-			.CombineLatest(
-				projectObservable,
-				planObservable,
-				settingsDataObservable,
-				(connection, project, plan, roadmapSettings)
-					=> (connection, project, plan, roadmapSettings))
+			// zip instead of CombineLatest, as they will emit when connection emits.
+			.Zip(projectObservable, planObservable,
+				(connection, project, plan) => (connection, project, plan))
+			.CombineLatest(settingsDataObservable, (tuple, roadmapSettings) => (tuple.connection, tuple.project, tuple.plan, roadmapSettings))
 			.SelectMany(async tuple =>
 			{
 				if (tuple.connection == null || !tuple.project.IsValid || !tuple.plan.IsValid || string.IsNullOrEmpty(tuple.roadmapSettings.QueryId))
@@ -414,7 +464,8 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 	private static IObservable<RoadmapGridViewModel> RoadmapGridViewModelObservable(IObservable<RoadmapEntries?> roadmapEntriesObservable, IConnectableObservable<ValidatedField<WorkItemStyles>> workItemStylesObservable, OpenInADOService openInADOService)
 	{
 		return roadmapEntriesObservable
-			.CombineLatest(workItemStylesObservable,
+			// zip instead of CombineLatest, as they will both emit in unison
+			.Zip(workItemStylesObservable,
 				(roadmapEntries, workItemStyles)
 					=> (roadmapEntries, workItemStyles))
 			.Select(tuple =>
@@ -424,7 +475,7 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 					return RoadmapGridViewModel.Empty();
 				}
 				RoadmapGridAlgorithms.IterationsGrid iterationsGrid =
-					RoadmapGridAlgorithms.CreateIterationsGrid(10, tuple.roadmapEntries.Value.Iterations);
+					RoadmapGridAlgorithms.CreateIterationsGrid(tuple.roadmapEntries.Value.Iterations);
 				RoadmapGridAlgorithms.WorkItemGrid workItemsGrid =
 					RoadmapGridAlgorithms.CreateWorkItemsGrid(iterationsGrid.Rows.Count, iterationsGrid.IterationViewModels, tuple.roadmapEntries.Value.RoadmapWorkItems);
 
@@ -526,5 +577,11 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 		public required T? Value;
 		public required string? Validation;
 		public bool IsValid => Value != null && Validation == null;
+	}
+
+	private enum LoadingIndicator
+	{
+		Hide = 0,
+		Show = 1
 	}
 }

@@ -10,7 +10,7 @@ public static class RoadmapGridAlgorithms
 	public const int IterationRowOffset = 0;
 	public const int IterationColumnOffset = 0;
 
-	public static IterationsGrid CreateIterationsGrid(double scale, IReadOnlyList<Iteration> iterations)
+	public static IterationsGrid CreateIterationsGrid(IReadOnlyList<Iteration> iterations)
 	{
 		// break down iterations into two objects, to represent the start and end of the iterations
 		var columnChanges = new List<ColumnChange>();
@@ -56,7 +56,7 @@ public static class RoadmapGridAlgorithms
 					if (currentColumnIndex >= 0)
 					{
 						double elapsedDays = (columnChange.ChangeDate - currentColumnTime).TotalDays;
-						columns.Add(new GridLength(elapsedDays * scale, GridUnitType.Pixel));
+						columns.Add(new GridLength(elapsedDays, GridUnitType.Star));
 					}
 					++currentColumnIndex;
 					currentColumnTime = columnChange.ChangeDate;
