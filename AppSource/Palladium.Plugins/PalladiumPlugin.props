@@ -22,8 +22,8 @@
    Nuget packages used by Palladium that are likely to be needed by plugins. 
    -->
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="11.0.6"/>
-    <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.6"/>
+    <PackageReference Include="Avalonia" Version="11.0.10"/>
+    <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.10"/>
     <PackageReference Include="DynamicData" Version="8.3.25"/>
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0"/>
     <PackageReference Include="ReactiveUI" Version="19.5.1"/>

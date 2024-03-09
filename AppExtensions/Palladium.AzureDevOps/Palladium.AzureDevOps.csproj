@@ -7,8 +7,8 @@
     <PackageReference Include="Microsoft.AspNetCore.DataProtection.Extensions" Version="8.0.0"/>
     <PackageReference Include="Microsoft.TeamFoundationServer.Client" Version="16.205.1"/>
     <PackageReference Include="ReactiveUI.Fody" Version="19.5.1"/>
-    <PackageReference Update="Avalonia" Version="11.0.6"/>
-    <PackageReference Update="Avalonia.ReactiveUI" Version="11.0.6"/>
+    <PackageReference Update="Avalonia" Version="11.0.10"/>
+    <PackageReference Update="Avalonia.ReactiveUI" Version="11.0.10"/>
     <PackageReference Update="DynamicData" Version="8.3.25"/>
     <PackageReference Update="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0"/>
   </ItemGroup>
