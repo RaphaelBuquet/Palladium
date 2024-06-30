@@ -36,6 +36,10 @@
                             </ControlTemplate>
                         </Setter>
 
+                        <!-- Note: it seems a background must be set, otherwise the mouse over raycasts won't work.
+                        It makes the button impossible to click until the mouse has hover over any part of the button
+                        that does have a background or border. -->
+                        <Setter Property="Background" Value="White" />
                         <Setter Property="CornerRadius" Value="4" />
                         <Setter Property="BorderThickness" Value="1" />
                         <Setter Property="BorderBrush" Value="{StaticResource Tone1}" />
