@@ -37,7 +37,6 @@ public partial class RoadmapView : ReactiveUserControl<RoadmapViewModel>, IDispo
 				})
 				.DisposeWith(disposables);
 
-			// TODO: make zoom/unzoom preserve the content at the center of the screen
 			this.WhenAnyValue(x => x.ViewModel!.RoadmapGridViewModel)
 				.Skip(1) // without this, this will override the DefaultScrollbarNormalisedPosition offset code
 				.Select(CalculateGridWidth)
@@ -46,10 +45,19 @@ public partial class RoadmapView : ReactiveUserControl<RoadmapViewModel>, IDispo
 					(sizeSum, zoom) => (sizeSum, zoom))
 				.Select(pair => pair.sizeSum * 10 * pair.zoom)
 				.ObserveOn(RxApp.MainThreadScheduler)
-				.Subscribe(width =>
+				.Subscribe(newWidth =>
 				{
 					Grid grid = GetGrid();
-					grid.Width = width;
+					double widthBefore = grid.Width;
+					grid.Width = newWidth;
+					if (widthBefore > 0)
+					{
+						double extentBefore = ScrollViewer.Extent.Width;
+						double diff = extentBefore - widthBefore;
+						double extentAfter = newWidth + diff;
+						double newOffset = CalculateScrollViewerOffsetOnZoomChange(extentBefore, extentAfter, ScrollViewer.Viewport.Width, ScrollViewer.Offset.X);
+						ScrollViewer.Offset = new Vector(newOffset, ScrollViewer.Offset.Y);
+					}
 				})
 				.DisposeWith(disposables);
 
@@ -80,7 +88,7 @@ public partial class RoadmapView : ReactiveUserControl<RoadmapViewModel>, IDispo
 		});
 	}
 
-	private double CalculateGridWidth(RoadmapGridViewModel roadmapGridViewModel)
+	private static double CalculateGridWidth(RoadmapGridViewModel roadmapGridViewModel)
 	{
 		double total = 0;
 		foreach (GridLength column in roadmapGridViewModel.Columns)
@@ -89,6 +97,28 @@ public partial class RoadmapView : ReactiveUserControl<RoadmapViewModel>, IDispo
 			total += column.Value;
 		}
 		return total;
+	}
+
+	private static double CalculateScrollViewerOffsetOnZoomChange(double extentBefore, double extentAfter, double viewportSize, double existingOffset)
+	{
+		// clamp viewport size, in case it is bigger than the extent.
+		// viewportSize = Math.Min(viewportSize, extentBefore);
+
+		double centeredOffsetBefore = existingOffset + viewportSize / 2.0;
+		double normalisedOffsetBefore = InvertLerp(0, extentBefore, centeredOffsetBefore);
+		double centeredOffsetAfter = Lerp(0, extentAfter, normalisedOffsetBefore);
+		double offsetAfter = centeredOffsetAfter - viewportSize / 2.0;
+		return offsetAfter;
+	}
+
+	private static double Lerp(double a, double b, double x)
+	{
+		return a + x * (b - a);
+	}
+
+	private static double InvertLerp(double a, double b, double x)
+	{
+		return (x - a) / (b - a);
 	}
 
 	/// <inheritdoc />

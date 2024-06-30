@@ -68,12 +68,25 @@
                       HorizontalScrollBarVisibility="Visible"
                       Name="ScrollViewer"
                       Grid.Row="1">
+            <!-- 
+            Keep in sync with the grid's transition. 
+            The scroll viewer offset and the grid width are set in code, and are both using a transition.
+            -->
+            <ScrollViewer.Transitions>
+                <Transitions>
+                    <VectorTransition Property="Offset" Duration="0:0:0.08" Easing="SineEaseOut" />
+                </Transitions>
+            </ScrollViewer.Transitions>
             <ItemsControl Name="ItemsControl"
                           Margin="14 0 14 40">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <!-- Align to left as it could be smaller than the window. -->
                         <Grid HorizontalAlignment="Left">
+                            <!-- 
+                            Keep in sync with the scroll viewer's transition. 
+                            The scroll viewer offset and the grid width are set in code, and are both using a transition.
+                            -->
                             <Grid.Transitions>
                                 <Transitions>
                                     <DoubleTransition Property="Width" Duration="0:0:0.08" Easing="SineEaseOut" />
