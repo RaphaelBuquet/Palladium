@@ -4,6 +4,8 @@ using System.Reactive.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.ReactiveUI;
+using Avalonia.Threading;
+using Palladium.ExtensionFunctions;
 using Palladium.ExtensionFunctions.Lifecycle;
 using ReactiveUI;
 
@@ -37,46 +39,76 @@ public partial class RoadmapView : ReactiveUserControl<RoadmapViewModel>, IDispo
 				})
 				.DisposeWith(disposables);
 
+			// handle change of VM: set the scroll offset and set the grid width
 			this.WhenAnyValue(x => x.ViewModel!.RoadmapGridViewModel)
-				.Skip(1) // without this, this will override the DefaultScrollbarNormalisedPosition offset code
-				.Select(CalculateGridWidth)
-				.CombineLatest(
+				.CombineLatestNoEmit(
 					this.WhenAnyValue(x => x.ViewModel!.ZoomLevel),
-					(sizeSum, zoom) => (sizeSum, zoom))
-				.Select(pair => pair.sizeSum * 10 * pair.zoom)
+					(vm, zoom) => (vm, zoom))
 				.ObserveOn(RxApp.MainThreadScheduler)
-				.Subscribe(newWidth =>
+				.Subscribe(pair =>
 				{
 					Grid grid = GetGrid();
-					double widthBefore = grid.Width;
-					grid.Width = newWidth;
-					if (widthBefore > 0)
+
+					// calculate this here manually, as Avalonia may not have done the layout pass yet
+					double newGridWidth = CalculateGridWidth(pair.vm, pair.zoom);
+					grid.Width = newGridWidth;
+					var newScrollViewerExtent = new Size(
+						newGridWidth + ScrollViewerMargin.Left + ScrollViewerMargin.Right,
+						ScrollViewer.Extent.Height);
+
+					Size viewport = ScrollViewer.Viewport;
+					if (pair.vm.InitialScrollbarNormalisedPosition.HasValue)
 					{
-						double extentBefore = ScrollViewer.Extent.Width;
-						double diff = extentBefore - widthBefore;
-						double extentAfter = newWidth + diff;
-						double newOffset = CalculateScrollViewerOffsetOnZoomChange(extentBefore, extentAfter, ScrollViewer.Viewport.Width, ScrollViewer.Offset.X);
-						ScrollViewer.Offset = new Vector(newOffset, ScrollViewer.Offset.Y);
+						Vector scrollbarPos = pair.vm.InitialScrollbarNormalisedPosition.Value;
+						// do some processing on the X offset to make sure the content can be centered on the screen 
+						// for a value of 0.5
+						double offsetX = scrollbarPos.X * newScrollViewerExtent.Width - viewport.Width / 2.0;
+						double offsetY = scrollbarPos.Y * newScrollViewerExtent.Height;
+
+						// Delay to next frame
+						// TODO with a custom transition this would probably not be needed (avalonia currently clamps the offset before the extent has been changed by the grid's width being set)
+						// TODO the transition should be turned off when setting this specific value, because we don't want a transition when setting the initial value. this currently creates a flicker.
+						Vector newOffsetToApplyNextFrame = ClampOffset(new Vector(offsetX, offsetY), newScrollViewerExtent, viewport);
+						Dispatcher.UIThread.InvokeAsync(() => { ScrollViewer.Offset = newOffsetToApplyNextFrame; });
 					}
 				})
 				.DisposeWith(disposables);
 
-			// TODO: there is a visual artefact with this, where for a frame the grid is shown with the scrollbar at the beginning.
-			this.WhenAnyValue(x => x.ViewModel!.DefaultScrollbarNormalisedPosition)
+			// Handle zoom: set the grid's width,
+			// and update the scroll offset as well so that the zoom is centered in the middle of the screen.
+			// This is separate from the one above as it needs to read InitialScrollbarNormalisedPosition when it 
+			// has been set for the first time. Using CombineLatest would repeat it and it would reset the initial
+			// scrollbar position when the user tries to zoom/unzoom...
+			this.WhenAnyValue(x => x.ViewModel!.ZoomLevel)
+				.CombineLatestNoEmit(
+					this.WhenAnyValue(x => x.ViewModel!.RoadmapGridViewModel),
+					(zoom, vm) => (zoom, vm))
 				.ObserveOn(RxApp.MainThreadScheduler)
-				.Subscribe(defaultScrollbarNormalisedPosition =>
+				.Subscribe(pair =>
 				{
-					Size extent = ScrollViewer.Extent;
-					double offsetX = defaultScrollbarNormalisedPosition.X * extent.Width;
-					double offsetY = defaultScrollbarNormalisedPosition.Y * extent.Height;
+					Grid grid = GetGrid();
 
-					// TODO center content
-					// For the X offset we want the normalised position to represent the middle of the screen,
-					// such that for a value of 0.5 the viewport will be centered,
-					// rather than being offset a bit to the right.
-					ScrollViewer.Offset = new Vector(offsetX, offsetY);
+					double newGridWidth = CalculateGridWidth(pair.vm, pair.zoom);
+					grid.Width = newGridWidth;
+
+					// calculate this here manually, as Avalonia has not done the layout pass yet
+					var newScrollViewerExtent = new Size(
+						newGridWidth + ScrollViewerMargin.Left + ScrollViewerMargin.Right,
+						ScrollViewer.Extent.Height);
+
+					Size viewport = ScrollViewer.Viewport;
+
+					double extentBefore = ScrollViewer.Extent.Width;
+					double extentAfter = newGridWidth + ScrollViewerMargin.Left + ScrollViewerMargin.Right;
+					double existingOffset = ScrollViewer.Offset.X;
+					double newOffsetX = CalculateScrollViewerOffsetOnZoomChange(extentBefore, extentAfter, viewport.Width, existingOffset);
+
+					// TODO: this when the offset is 0 or all the way to the max. When clicking unzoom or zoom respectively, it will cause a flicker.
+					// the solution is probably a custom transition
+					ScrollViewer.Offset = ClampOffset(new Vector(newOffsetX, ScrollViewer.Offset.Y), newScrollViewerExtent, viewport);
 				})
 				.DisposeWith(disposables);
+
 
 			Disposable.Create(() =>
 			{
@@ -88,7 +120,21 @@ public partial class RoadmapView : ReactiveUserControl<RoadmapViewModel>, IDispo
 		});
 	}
 
-	private static double CalculateGridWidth(RoadmapGridViewModel roadmapGridViewModel)
+	/// <summary>
+	///     This is needed in C# to calculate the roadmap grid width and scroll viewer width correctly, before avalonia has run
+	///     the layout pass for them.
+	/// </summary>
+	public static Thickness ScrollViewerMargin => new (14, 0, 14, 40);
+
+	private static Vector ClampOffset(Vector offset, Size extent, Size viewport)
+	{
+		return new Vector(
+			Math.Clamp(offset.X, 0, Math.Max(0, extent.Width - viewport.Width)),
+			Math.Clamp(offset.Y, 0, Math.Max(0, extent.Height - viewport.Height))
+		);
+	}
+
+	private static double CalculateGridWidth(RoadmapGridViewModel roadmapGridViewModel, double zoom)
 	{
 		double total = 0;
 		foreach (GridLength column in roadmapGridViewModel.Columns)
@@ -96,7 +142,7 @@ public partial class RoadmapView : ReactiveUserControl<RoadmapViewModel>, IDispo
 			Debug.Assert(column.IsStar);
 			total += column.Value;
 		}
-		return total;
+		return total * zoom * 10;
 	}
 
 	private static double CalculateScrollViewerOffsetOnZoomChange(double extentBefore, double extentAfter, double viewportSize, double existingOffset)

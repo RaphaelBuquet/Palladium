@@ -33,7 +33,6 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 	private ObservableAsPropertyHelper<string?>? queryValidation;
 	private ObservableAsPropertyHelper<string?>? projectValidation;
 	private ObservableAsPropertyHelper<string?>? workItemStylesValidation;
-	private ObservableAsPropertyHelper<Vector>? defaultScrollbarNormalisedPosition;
 	private ObservableAsPropertyHelper<bool>? isLoading;
 	private double zoomLevel = 1;
 
@@ -133,17 +132,11 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 				.ToProperty(this, x => x.RoadmapGridViewModel)
 				.DisposeWith(disposables);
 
-			defaultScrollbarNormalisedPosition = DefaultScrollbarNormalisedPositionObservable(roadmapEntriesObservable)
-				.ToProperty(this, x => x.DefaultScrollbarNormalisedPosition)
-				.DisposeWith(disposables);
-
 			isLoading = IsLoadingObservable(connectionTasks, roadmapEntriesObservable)
 				.ToProperty(this, x => x.IsLoading)
 				.DisposeWith(disposables);
 		});
 	}
-
-	public Vector DefaultScrollbarNormalisedPosition => defaultScrollbarNormalisedPosition?.Value ?? Vector.Zero;
 
 	public string ConnectionStatus => connectionStatus?.Value ?? string.Empty;
 
@@ -191,27 +184,6 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 			// whenever a value is emitted, remove the loading indicator
 			.Merge(roadmapEntriesObservable.Select(_ => LoadingIndicator.Hide))
 			.Select(loadingIndicator => { return loadingIndicator == LoadingIndicator.Show; });
-	}
-
-	private static IObservable<Vector> DefaultScrollbarNormalisedPositionObservable(IObservable<RoadmapEntries?> roadmapEntriesObservable)
-	{
-		return roadmapEntriesObservable
-			.WhereNotNull()
-			// Only take the initial entry. Any additional value is from the user clicking "refresh",
-			// and we don't want to move the scrollbar when the user clicks refresh as the user 
-			// could have manually moved the scrollbar.
-			.Take(1)
-			.Where(entries => entries.Iterations.Count >= 2)
-			.Select(entries =>
-			{
-				DateTime now = DateTime.Now;
-				DateTime startDate = entries.Iterations.Min(x => x.StartDate);
-				DateTime endDate = entries.Iterations.Max(x => x.EndDate);
-
-				double relativePosition = Maths.InverseLerp(startDate.Ticks, endDate.Ticks, now.Ticks);
-
-				return new Vector(relativePosition, 0);
-			});
 	}
 
 	private static IObservable<string> ConnectionStatusObservable(Log? log, IConnectableObservable<Task<VssConnection>?> connectionTasks)
@@ -463,6 +435,7 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 
 	private static IObservable<RoadmapGridViewModel> RoadmapGridViewModelObservable(IObservable<RoadmapEntries?> roadmapEntriesObservable, IConnectableObservable<ValidatedField<WorkItemStyles>> workItemStylesObservable, OpenInADOService openInADOService)
 	{
+		var emittedScrollbarPosition = false;
 		return roadmapEntriesObservable
 			// zip instead of CombineLatest, as they will both emit in unison
 			.Zip(workItemStylesObservable,
@@ -474,6 +447,13 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 				{
 					return RoadmapGridViewModel.Empty();
 				}
+				Vector? initialScrollbarNormalisedPosition = null;
+				if (!emittedScrollbarPosition)
+				{
+					emittedScrollbarPosition = true;
+					initialScrollbarNormalisedPosition = CalculateInitialScrollbarNormalisedPosition(tuple.roadmapEntries.Value);
+				}
+
 				RoadmapGridAlgorithms.IterationsGrid iterationsGrid =
 					RoadmapGridAlgorithms.CreateIterationsGrid(tuple.roadmapEntries.Value.Iterations);
 				RoadmapGridAlgorithms.WorkItemGrid workItemsGrid =
@@ -492,9 +472,27 @@ public class RoadmapViewModel : ReactiveObject, IActivatableViewModel, ILifecycl
 						.Concat(workItemsGrid.Rows)
 						.ToList(),
 					IterationViewModels = iterationsGrid.IterationViewModels,
-					WorkItemViewModels = workItemsGrid.WorkItemViewModels
+					WorkItemViewModels = workItemsGrid.WorkItemViewModels,
+					InitialScrollbarNormalisedPosition = initialScrollbarNormalisedPosition
 				};
 			});
+	}
+
+	private static Vector? CalculateInitialScrollbarNormalisedPosition(RoadmapEntries entries)
+	{
+		// needs a min of 2 entries to do the maths
+		if (entries.Iterations.Count < 2)
+		{
+			return null;
+		}
+
+		DateTime now = DateTime.Now;
+		DateTime startDate = entries.Iterations.Min(x => x.StartDate);
+		DateTime endDate = entries.Iterations.Max(x => x.EndDate);
+
+		double relativePosition = Maths.InverseLerp(startDate.Ticks, endDate.Ticks, now.Ticks);
+
+		return new Vector(relativePosition, 0);
 	}
 
 	private void HandleDesignMode()

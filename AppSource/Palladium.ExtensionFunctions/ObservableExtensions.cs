@@ -1,6 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Subjects;
 using Microsoft.Extensions.Logging;
 using Palladium.Logging;
 
@@ -238,5 +239,58 @@ public static class ObservableExtensions
 		return observable
 			.Where(x => x.HasValue)
 			.Select(x => x!.Value);
+	}
+
+	/// <summary>
+	///     <para>
+	///         Similar to CombineLatest, but if a new value is emitted by <paramref name="right" />, it won't emit a new pair.
+	///         New pairs are only emitted when <paramref name="left" /> emits, along with the last recorded value of
+	///         <paramref name="right" />.
+	///     </para>
+	///     <para>
+	///         The first pair is emitted once both <paramref name="left" /> and <paramref name="right" /> have emitted at
+	///         least a
+	///         value.
+	///     </para>
+	/// </summary>
+	public static IObservable<TResult> CombineLatestNoEmit<TLeft, TRight, TResult>
+	(
+		this IObservable<TLeft> left,
+		IObservable<TRight> right,
+		Func<TLeft, TRight, TResult> resultSelector
+	)
+	{
+		var refcountedLeft = left.Publish().RefCount();
+		var refcountedRight = right.Publish().RefCount();
+
+		var onCompletedNotifier = new Subject<TLeft?>();
+
+		var hasAccessedRight = 0;
+
+		return Observable.Join(
+			refcountedLeft,
+			refcountedRight,
+			value =>
+			{
+				// immediately close the time window, if an item has ever been emitted by the right
+				if (hasAccessedRight > 0)
+				{
+					return Observable.Empty<TLeft>();
+				}
+				// otherwise, close the time window when a new item is emitted, or when an item from the right is emitted.
+				return refcountedLeft.TakeUntil(onCompletedNotifier);
+			},
+			value =>
+			{
+				hasAccessedRight++;
+				// don't complete the first one, as it would get completed before this function returns
+				// so instead complete the second one just before it's about to be used :)
+				if (hasAccessedRight == 2)
+				{
+					onCompletedNotifier.OnNext(default);
+				}
+				return refcountedRight;
+			},
+			resultSelector);
 	}
 }

@@ -1,4 +1,3 @@
-using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Microsoft.Reactive.Testing;
@@ -165,20 +164,20 @@ public class ObservableExtensionsTests
 		var tcs = new TaskCompletionSource<int>();
 		var subject = new BehaviorSubject<Task<int>>(tcs.Task);
 		var taskObservable = subject.AddTaskCompletion();
-		
+
 		// assert
 		using var enumerator = taskObservable.ToEnumerable().GetEnumerator();
 		Assert.IsTrue(enumerator.MoveNext());
 		Assert.AreEqual(tcs.Task, enumerator.Current);
-		
+
 		// act
 		tcs.SetResult(1);
-		
+
 		// assert
 		Assert.IsTrue(enumerator.MoveNext());
 		Assert.AreEqual(tcs.Task, enumerator.Current);
-	}	
-	
+	}
+
 	[Test]
 	public void AddTaskCompletion_CompletedTaskIsOnlyEmittedOnce()
 	{
@@ -187,34 +186,34 @@ public class ObservableExtensionsTests
 		tcs.SetResult(1);
 		var testScheduler = new TestScheduler();
 		var subject = new BehaviorSubject<Task<int>>(tcs.Task);
-		
+
 		// act
 		var observer = testScheduler.CreateObserver<Task<int>?>();
 		var taskObservable = subject.AddTaskCompletion();
 		taskObservable.Subscribe(observer);
 		testScheduler.AdvanceBy(1);
-		
+
 		// assert
 		observer.Messages.AssertEqual(ReactiveTest.OnNext<Task<int>?>(0, tcs.Task));
 	}
-	
+
 	[Test]
 	public void AddTaskCompletion_WhenTaskObservableCompletes_ObservableCompletes()
 	{
 		// arrange
 		var testScheduler = new TestScheduler();
 		var completedObservable = Observable.Empty<Task<int>>(testScheduler);
-		
+
 		// act
 		var observer = testScheduler.CreateObserver<Task<int>?>();
 		var taskObservable = completedObservable.AddTaskCompletion();
 		taskObservable.Subscribe(observer);
 		testScheduler.AdvanceBy(1);
-		
+
 		// assert
 		observer.Messages.AssertEqual(ReactiveTest.OnCompleted<Task<int>?>(1));
 	}
-	
+
 	[Test]
 	public void AddTaskCompletion_DoesNotEmitsTaskAgain_WhenAnotherTaskIsEmitted()
 	{
@@ -234,20 +233,20 @@ public class ObservableExtensionsTests
 		// act
 		testScheduler.AdvanceBy(1);
 		tcs1.SetResult(1);
-		
+
 		// act
 		testScheduler.AdvanceBy(1);
 		tcs2.SetResult(2);
-		
+
 
 		// assert
 		observer.Messages.AssertEqual(
 			ReactiveTest.OnNext(0, (Task<int>?)tcs1.Task),
 			ReactiveTest.OnNext(1, (Task<int>?)tcs2.Task),
 			ReactiveTest.OnNext(3, (Task<int>?)tcs2.Task)
-			);
+		);
 	}
-	
+
 	[Test]
 	public void AddTaskCompletion_DoesNotEmitsTaskAgain_WhenNullTaskIsEmitted()
 	{
@@ -266,14 +265,14 @@ public class ObservableExtensionsTests
 		// act
 		testScheduler.AdvanceBy(1);
 		tcs1.SetResult(1);
-		
+
 		// assert
 		observer.Messages.AssertEqual(
 			ReactiveTest.OnNext(0, (Task<int>?)tcs1.Task),
 			ReactiveTest.OnNext(1, (Task<int>?)null)
-			);
+		);
 	}
-	
+
 	[Test]
 	public void AddTaskCompletion_EmitsNullTask()
 	{
@@ -287,6 +286,34 @@ public class ObservableExtensionsTests
 		// assert
 		observer.Messages.AssertEqual(
 			ReactiveTest.OnNext(0, (Task<int>?)null)
-			);
+		);
+	}
+
+	[Test]
+	public void CombineLatestNoEmit_SequenceTest()
+	{
+		// arrange
+		var left = new Subject<int>();
+		var right = new ReplaySubject<string>();
+		var toTest = left.CombineLatestNoEmit(right, (number, text) => $"{number}{text}");
+		var observer = new TestScheduler().CreateObserver<string>();
+		toTest.Subscribe(observer);
+
+		// act
+		left.OnNext(0);
+		left.OnNext(1);
+		right.OnNext("A");
+		right.OnNext("B");
+		right.OnNext("C");
+		left.OnNext(2);
+		left.OnNext(3);
+		right.OnNext("D");
+
+		// assert 
+		observer.Messages.AssertEqual(
+			ReactiveTest.OnNext(0, "1A"),
+			ReactiveTest.OnNext(0, "2C"),
+			ReactiveTest.OnNext(0, "3C")
+		);
 	}
 }

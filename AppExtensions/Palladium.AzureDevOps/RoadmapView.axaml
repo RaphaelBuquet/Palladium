@@ -78,7 +78,7 @@
                 </Transitions>
             </ScrollViewer.Transitions>
             <ItemsControl Name="ItemsControl"
-                          Margin="14 0 14 40">
+                          Margin="{x:Static azureDevOps:RoadmapView.ScrollViewerMargin}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <!-- Align to left as it could be smaller than the window. -->
